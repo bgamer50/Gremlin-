@@ -1,13 +1,10 @@
-main.exe: gremlin.dll main.o
-	g++ --std=c++11 -Wall main.o -lgremlin -o main.exe
+libgremlin.dylib: Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o
+	g++ --std=c++11 -shared Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o -o libgremlin.dylib
+	mv libgremlin.dylib /usr/local/lib/libgremlin.dylib
+	chmod 755 /usr/local/lib/libgremlin.dylib
 
-main.o: main.cpp
-	g++ --std=c++11 -c main.cpp -o main.o
-
-gremlin.dll: Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o
-	g++ --std=c++11 -shared Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o -o gremlin.dll
-	mv gremlin.dll /usr/lib/gremlin.dll
-	chmod 755 /usr/lib/gremlin.dll
+TraversalStep.o: TraversalStep.cpp
+	g++ --std=c++11 -c TraversalStep.cpp -o TraversalStep.o
 
 Vertex.o: Vertex.cpp
 	g++ --std=c++11 -c Vertex.cpp -o Vertex.o
@@ -25,4 +22,4 @@ GraphTraversalSource.o: GraphTraversalSource.cpp
 	g++ --std=c++11 -c GraphTraversalSource.cpp -o GraphTraversalSource.o
 
 clean:
-	rm -rf *.o *.exe *.so *.dll
+	rm -rf *.o *.exe *.so *.dylib

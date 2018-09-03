@@ -10,9 +10,9 @@ class GraphTraversalSource;
 
 class Graph {
 public:
-	GraphTraversalSource traversal();
-	vector<Vertex> vertices();
-	vector<Edge> edges();
+	virtual GraphTraversalSource traversal() = 0;
+	virtual vector<Vertex> vertices() = 0;
+	virtual vector<Edge> edges() = 0;
 };
 
 #endif

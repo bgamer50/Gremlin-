@@ -8,7 +8,3 @@ GraphTraversalSource::GraphTraversalSource(Graph* gr) {
 Graph* GraphTraversalSource::getGraph() {
 	return graph;
 }
-
-/*GraphTraversal traversal() {
-	return GraphTraversal(this);
-}*/

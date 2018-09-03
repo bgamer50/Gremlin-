@@ -2,14 +2,22 @@
 #include "GraphTraversalSource.h"
 #include "Graph.h"
 
-GraphTraversal::GraphTraversal(GraphTraversalSource* src) {
+template<typename T>
+GraphTraversal<T>::GraphTraversal(GraphTraversalSource* src) {
 	source = src;
 }
 
-Graph* GraphTraversal::getGraph() {
+template<typename T>
+Graph* GraphTraversal<T>::getGraph() {
 	return (*source).getGraph();
 }
 
-GraphTraversalSource* GraphTraversal::getTraversalSource() {
+template<typename T>
+GraphTraversalSource* GraphTraversal<T>::getTraversalSource() {
 	return source;
+}
+
+template<typename T>
+std::string GraphTraversal<T>::explain() {
+	
 }

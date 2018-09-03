@@ -1,11 +1,13 @@
 #ifndef TRAVERSAL_STEP_H
 #define TRAVERSAL_STEP_H
 
-enum TraversalStepType {GRAPH_STEP, VERTEX_STEP, DEDUP_STEP};
+enum TraversalStepType {map, filter, barrier};
 
 class TraversalStep {
+private:
+	TraversalStepType type;
 public:
-	TraversalStep(TraversalStepType type, ...);
+	TraversalStep(TraversalStepType tsType, ...);
 };
 
 #endif
