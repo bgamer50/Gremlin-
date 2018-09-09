@@ -4,13 +4,14 @@
 #include <vector>
 #include "Edge.h"
 #include "Vertex.h"
+#include "GraphTraversalSource.h"
 
 using namespace std;
-class GraphTraversalSource;
 
 class Graph {
 public:
-	virtual GraphTraversalSource traversal() = 0;
+	Graph();
+	virtual GraphTraversalSource* traversal() = 0;
 	virtual vector<Vertex> vertices() = 0;
 	virtual vector<Edge> edges() = 0;
 };
