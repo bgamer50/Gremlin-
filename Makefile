@@ -1,5 +1,5 @@
 CC := g++
-CFLAGS := --std=c++14
+CFLAGS := --std=c++14 -fPIC
 
 ifeq ($(shell uname -s), Darwin)
 	LIBGREMLIN_PATH := /usr/local/lib/libgremlin.dylib
