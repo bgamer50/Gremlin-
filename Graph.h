@@ -12,8 +12,8 @@ class Graph {
 public:
 	Graph();
 	virtual GraphTraversalSource* traversal() = 0;
-	virtual vector<Vertex> vertices() = 0;
-	virtual vector<Edge> edges() = 0;
+	virtual vector<Vertex*> vertices() = 0;
+	virtual vector<Edge*> edges() = 0;
 };
 
 #endif

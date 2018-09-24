@@ -28,6 +28,7 @@ public:
 	// Steps
 	GraphTraversal* addE(std::string label);
 	GraphTraversal* addV(std::string label);
+	GraphTraversal* addV();
 	GraphTraversal* property(std::string label, void* value, size_t size);
 	//GraphTraversal<auto n> aggregate(std::string sideEffectLabel);
 	//GraphTraversal<auto n> _and();
@@ -180,6 +181,7 @@ public:
 	//boolean hasNext();
 	virtual void* next() = 0;
 	virtual void forEachRemaining(std::function<void (void*)> func) = 0;
+	virtual void iterate() = 0;
 	//GraphTraversal toList();
 	//GraphTraversal toSet();
 

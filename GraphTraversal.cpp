@@ -3,6 +3,7 @@
 #include "VertexStep.h"
 #include "GraphStep.h"
 #include "HasStep.h"
+#include "AddVertexStep.h"
 #include "Direction.h"
 
 /*
@@ -33,6 +34,14 @@ std::string GraphTraversal::explain() {
 GraphTraversal* GraphTraversal::appendStep(TraversalStep* step) {
 	steps.push_back(step);
 	return this;
+}
+
+GraphTraversal* GraphTraversal::addV() {
+	return this->appendStep(new AddVertexStep());
+}
+
+GraphTraversal* GraphTraversal::addV(std::string label) {
+	return this->appendStep(new AddVertexStep(label));
 }
 
 GraphTraversal* GraphTraversal::V() {

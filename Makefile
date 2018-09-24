@@ -1,5 +1,5 @@
-libgremlin.dylib: Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o P.o
-	g++ --std=c++11 -shared Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o P.o -o libgremlin.dylib
+libgremlin.dylib: Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o P.o Traverser.o
+	g++ --std=c++11 -shared Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o P.o Traverser.o -o libgremlin.dylib
 	mv libgremlin.dylib /usr/local/lib/libgremlin.dylib
 	chmod 755 /usr/local/lib/libgremlin.dylib
 
@@ -33,8 +33,17 @@ GraphStep.o: GraphStep.cpp
 HasStep.o: HasStep.cpp
 	g++ --std=c++11 -c HasStep.cpp -o HasStep.o
 
+AddVertexStartStep.o: AddVertexStartStep.cpp
+	g++ --std=c++11 -c AddVertexStartStep.cpp -o AddVertexStartStep.o
+
+AddVertexStep.o: AddVertexStep.cpp
+	g++ --std=c++11 -c AddVertexStep.cpp -o AddVertexStep.o
+
 P.o: P.cpp
 	g++ --std=c++11 -c P.cpp -o P.o
+
+Traverser.o: Traverser.cpp
+	g++ --std=c++11 -c Traverser.cpp -o Traverser.o
 
 clean:
 	rm -rf *.o *.exe *.so *.dylib
