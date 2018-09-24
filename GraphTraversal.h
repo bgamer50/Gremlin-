@@ -54,7 +54,7 @@ public:
 	GraphTraversal* fold();
 	GraphTraversal* from(std::string sideEffectLabel);
 	GraphTraversal* from(GraphTraversal* fromTraversal);
-	GraphTraversal* from(Vertex fromVertex);
+	GraphTraversal* from(Vertex* fromVertex);
 	GraphTraversal* V();
 	GraphTraversal* V(void* objects, size_t sizeOfEach, int length);
 	//GraphTraversal group();
@@ -133,7 +133,7 @@ public:
 	GraphTraversal* to(Direction direction, std::vector<std::string> labels);
 	GraphTraversal* to(Direction direction);
 	GraphTraversal* to(GraphTraversal* toTraversal);
-	GraphTraversal* to(Vertex toVertex);
+	GraphTraversal* to(Vertex* toVertex);
 	GraphTraversal* to(Direction direction, std::string label);
 	GraphTraversal* toV(Direction direction);
 	//GraphTraversal tree(std::string sideEffectLabel);

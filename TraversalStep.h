@@ -2,6 +2,7 @@
 #define TRAVERSAL_STEP_H
 
 #include <vector>
+#include <string>
 
 enum TraversalStepType {map, filter, barrier};
 

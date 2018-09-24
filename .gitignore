@@ -1,0 +1,5 @@
+*.so
+*.dll
+*.o
+*.exe
+.vscode/*

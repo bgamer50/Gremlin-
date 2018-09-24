@@ -1,49 +1,65 @@
-libgremlin.dylib: Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o P.o Traverser.o
-	g++ --std=c++11 -shared Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o P.o Traverser.o -o libgremlin.dylib
-	mv libgremlin.dylib /usr/local/lib/libgremlin.dylib
-	chmod 755 /usr/local/lib/libgremlin.dylib
+CC := g++
+CFLAGS := --std=c++14
+
+ifeq ($(shell uname -s), Darwin)
+	LIBGREMLIN_PATH := /usr/local/lib/libgremlin.dylib
+	LIBGREMLIN_NAME := libgremlin.dylib
+endif
+ifeq ($(shell uname -s), CYGWIN_NT-10.0)
+	LIBGREMLIN_PATH := /usr/lib/libgremlin.dll.a
+	LIBGREMLIN_NAME := libgremlin.dll.a
+endif
+ifeq ($(shell uname -s), Linux)
+	LIBGREMLIN_PATH := /usr/lib/libgremlin.so
+	LIBGREMLIN_NAME := libgremlin.so
+endif
+
+lib: Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o P.o Traverser.o
+	$(CC) $(CFLAGS) -shared Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o P.o Traverser.o -o $(LIBGREMLIN_NAME)
+	mv $(LIBGREMLIN_NAME) $(LIBGREMLIN_PATH)
+	chmod 755 $(LIBGREMLIN_PATH)
 
 TraversalStep.o: TraversalStep.cpp
-	g++ --std=c++11 -c TraversalStep.cpp -o TraversalStep.o
+	$(CC) $(CFLAGS) -c TraversalStep.cpp -o TraversalStep.o
 
 Vertex.o: Vertex.cpp
-	g++ --std=c++11 -c Vertex.cpp -o Vertex.o
+	$(CC) $(CFLAGS) -c Vertex.cpp -o Vertex.o
 
 Edge.o: Edge.cpp
-	g++ --std=c++11 -c Edge.cpp -o Edge.o
+	$(CC) $(CFLAGS) -c Edge.cpp -o Edge.o
 
 Graph.o: Graph.cpp
-	g++ --std=c++11 -c Graph.cpp -o Graph.o
+	$(CC) $(CFLAGS) -c Graph.cpp -o Graph.o
 
 GraphTraversal.o: GraphTraversal.cpp
-	g++ --std=c++11 -c GraphTraversal.cpp -o GraphTraversal.o
+	$(CC) $(CFLAGS) -c GraphTraversal.cpp -o GraphTraversal.o
 
 GraphTraversalSource.o: GraphTraversalSource.cpp
-	g++ --std=c++11 -c GraphTraversalSource.cpp -o GraphTraversalSource.o
+	$(CC) $(CFLAGS) -c GraphTraversalSource.cpp -o GraphTraversalSource.o
 
 VertexStep.o: VertexStep.cpp
-	g++ --std=c++11 -c VertexStep.cpp -o VertexStep.o
+	$(CC) $(CFLAGS) -c VertexStep.cpp -o VertexStep.o
 
 EdgeStep.o: EdgeStep.cpp
-	g++ --std=c++11 -c EdgeStep.cpp -o EdgeStep.o
+	$(CC) $(CFLAGS) -c EdgeStep.cpp -o EdgeStep.o
 
 GraphStep.o: GraphStep.cpp
-	g++ --std=c++11 -c GraphStep.cpp -o GraphStep.o
+	$(CC) $(CFLAGS) -c GraphStep.cpp -o GraphStep.o
 
 HasStep.o: HasStep.cpp
-	g++ --std=c++11 -c HasStep.cpp -o HasStep.o
+	$(CC) $(CFLAGS) -c HasStep.cpp -o HasStep.o
 
 AddVertexStartStep.o: AddVertexStartStep.cpp
-	g++ --std=c++11 -c AddVertexStartStep.cpp -o AddVertexStartStep.o
+	$(CC) $(CFLAGS) -c AddVertexStartStep.cpp -o AddVertexStartStep.o
 
 AddVertexStep.o: AddVertexStep.cpp
-	g++ --std=c++11 -c AddVertexStep.cpp -o AddVertexStep.o
+	$(CC) $(CFLAGS) -c AddVertexStep.cpp -o AddVertexStep.o
 
 P.o: P.cpp
-	g++ --std=c++11 -c P.cpp -o P.o
+	$(CC) $(CFLAGS) -c P.cpp -o P.o
 
 Traverser.o: Traverser.cpp
-	g++ --std=c++11 -c Traverser.cpp -o Traverser.o
+	$(CC) $(CFLAGS) -c Traverser.cpp -o Traverser.o
 
 clean:
 	rm -rf *.o *.exe *.so *.dylib
