@@ -15,6 +15,7 @@ public:
 	virtual GraphTraversal* E() = 0;
 	virtual GraphTraversal* addV() = 0;
 	virtual GraphTraversal* addV(std::string label) = 0;
+	virtual GraphTraversal* addE(std::string label) = 0;
 };
 
 #endif

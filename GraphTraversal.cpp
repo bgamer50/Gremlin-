@@ -5,6 +5,7 @@
 #include "HasStep.h"
 #include "AddVertexStep.h"
 #include "Direction.h"
+#include <stdlib.h>
 
 /*
 	JIT compilation is supposed to check to see if these steps are valid;
@@ -34,6 +35,10 @@ std::string GraphTraversal::explain() {
 GraphTraversal* GraphTraversal::appendStep(TraversalStep* step) {
 	steps.push_back(step);
 	return this;
+}
+
+GraphTraversal* GraphTraversal::addE(std::string label){ 
+	return this->appendStep(new AddEdgeStep(label));
 }
 
 GraphTraversal* GraphTraversal::addV() {
@@ -102,6 +107,28 @@ GraphTraversal* GraphTraversal::has(std::string key, int value) {
 
 GraphTraversal* GraphTraversal::has(std::string key, std::string value) {
 	return this->appendStep(new HasStep<std::string>(key, new P<std::string>(EQ, value, value)));
+}
+
+GraphTraversal* GraphTraversal::from(std::string sideEffectLabel) {
+	// Because from() uses void* (sigh) this awkward memory copy is necessary.s
+	char* base_string = sideEffectLabel.c_str();
+	size_t size = (1 + strlen(base_string));
+
+	char* sideEffectLabel_cpy = malloc(sizeof(char) * size);
+	strncpy(sideEffectLabel_cpy, base_string, size);
+
+	return this->appendStep(new FromStep(sideEffectLabel_cpy));
+}
+
+GraphTraversal* GraphTraversal::to(std::string sideEffectLabel) {
+	// Because to() uses void* (sigh) this awkward memory copy is necessary.
+	char* base_string = sideEffectLabel.c_str();
+	size_t size = (1 + strlen(base_string));
+
+	char* sideEffectLabel_cpy = malloc(sizeof(char) * size);
+	strncpy(sideEffectLabel_cpy, base_string, size);
+
+	return this->appendStep(new ToStep(sideEffectLabel_cpy));
 }
 
 template <typename T>
