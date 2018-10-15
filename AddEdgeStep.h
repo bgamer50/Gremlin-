@@ -9,9 +9,12 @@
 class AddEdgeStep: public TraversalStep {
 	private:
 		std::string label;
+		GraphTraversal* out_vertex_traversal;
+		GraphTraversal* in_vertex_traversal;
 	public:
 		AddEdgeStep(std::string label_arg);
 		virtual std::string getInfo();
+		void addModulator(TraversalStep* modulatorStep);
 };
 
 #endif

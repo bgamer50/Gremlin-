@@ -14,3 +14,7 @@ std::string AddEdgeStep::getInfo() {
 	info += label + ")";
 	return info;
 }
+
+void AddEdgeStep::addModulator(TraversalStep* modulatorStep) {
+	
+}
