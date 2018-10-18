@@ -7,7 +7,15 @@
 VertexStep::VertexStep(Direction dir, std::vector<std::string> edge_labels_arg, GraphStepType gsType_arg)
 : TraversalStep(map, VERTEX_STEP) {
 	direction = dir;
-	edge_labels = edge_labels_arg;
+	edge_labels = new std::vector<std::string>;
+	for_each(edge_labels_arg.begin(), edge_labels_arg.end(), [](std::string str){ edge_labels->push_back(str); });
+	gsType = gsType_arg;
+}
+
+VertexStep::VertexStep(Direction dir, GraphStepType gsType_arg)
+: TraversalStep(map, VERTEX_STEP) {
+	direction = dir;
+	edge_labels = new std::vector<std::string>;
 	gsType = gsType_arg;
 }
 
@@ -16,10 +24,10 @@ std::string VertexStep::getInfo() {
 	std::string info = "VertexStep(";
 	info += (direction == IN ? "IN" : direction == OUT ? "OUT" : "BOTH");
 	info += ", ";
-	if(edge_labels.size() > 0) {
+	if(edge_labels->size() > 0) {
 		info += "{";
-		for(int k = 0; k < edge_labels.size() - 1; k++) info = info + edge_labels[k] + ", ";
-		info = info + edge_labels[edge_labels.size() - 1] +  "}";
+		for(int k = 0; k < edge_labels->size() - 1; k++) info = info + edge_labels->at(k) + ", ";
+		info = info + edge_labels->at(edge_labels->size() - 1) +  "}";
 	}
 	else info += "{}";
 	info = info + ", " + (gsType == VERTEX ? "VERTEX" : "EDGE");

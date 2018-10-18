@@ -132,9 +132,10 @@ public:
 	GraphTraversal* timeLimit(long time);
 	GraphTraversal* to(Direction direction, std::vector<std::string> labels);
 	GraphTraversal* to(Direction direction);
-	GraphTraversal* to(GraphTraversal* toTraversal);
-	GraphTraversal* to(Vertex* toVertex);
 	GraphTraversal* to(Direction direction, std::string label);
+	GraphTraversal* to(std::string sideEffectLabel); // modulator for addE
+	GraphTraversal* to(GraphTraversal* toTraversal); //modulator for addE
+	GraphTraversal* to(Vertex* toVertex); //modulator for addE
 	GraphTraversal* toV(Direction direction);
 	//GraphTraversal tree(std::string sideEffectLabel);
 	//GraphTraversal tree();
@@ -177,16 +178,17 @@ public:
 	//GraphTraversal eq(std::string equal);
 	//GraphTraversal 
 
-	// Finalizing steps
+	// Finalizing steps; these don't do anything in anonymous GraphTraversals
 	//boolean hasNext();
-	virtual void* next() = 0;
-	virtual void forEachRemaining(std::function<void (void*)> func) = 0;
-	virtual void iterate() = 0;
+	virtual void* next() { return NULL; }
+	virtual void forEachRemaining(std::function<void (void*)> func) {};
+	virtual void iterate() {};
 	//GraphTraversal toList();
 	//GraphTraversal toSet();
 
 	// Special additions
 	GraphTraversal* appendStep(TraversalStep* step);
+	void getInitialTraversal();
 };
 
 #endif

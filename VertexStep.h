@@ -11,10 +11,11 @@
 class VertexStep : public TraversalStep {
 	private:
 		Direction direction;
-		std::vector<std::string> edge_labels;
+		std::vector<std::string>* edge_labels;
 		GraphStepType gsType;
 	public:
 		VertexStep(Direction dir, std::vector<std::string> edge_labels_arg, GraphStepType gsType_arg);
+		VertexStep(Direction dir, GraphStepType gsType_arg);
 		virtual std::string getInfo();
 };
 

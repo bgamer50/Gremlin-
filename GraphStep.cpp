@@ -16,3 +16,5 @@ std::string GraphStep::getInfo() {
 	info = info + ", " + (element_ids.size() > 0 ? "{...}" : "{}");
 	return info + ")";
 }
+
+GraphStepType GraphStep::getType() { return gs_type; }

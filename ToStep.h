@@ -1,19 +1,31 @@
 #ifndef TO_STEP_H
 #define TO_STEP_H
 
+#include "__.h"
+
 #define TO_STEP 0x91
 
 class ToStep : public TraversalStep {
 	private:
-		void* data;
+		GraphTraversal* to_traversal;
 	public:
-		ToStep(void* arg)
-		: TraversalStep(modulator, FROM_STEP) {
-			data = arg;
+		ToStep(std::string side_effect_label)
+		: TraversalStep(modulator, TO_STEP) {
+			to_traversal = __.select(side_effect_label);
 		}
 
-		void* getData() {
-			return data;
+		ToStep(Vertex* to_vertex)
+		: TraversalStep(modulator, TO_STEP) {
+			to_traversal = __.V(to_vertex);
+		}
+
+		ToStep(GraphTraversal* to_vertex_traversal)
+		: TraversalStep(modulator, TO_STEP) {
+			to_traversal = to_vertex_traversal;
+		}
+
+		void* getTraversal() {
+			return to_traversal;
 		}
 };
 

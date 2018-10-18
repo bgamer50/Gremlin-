@@ -4,8 +4,12 @@
 #include "GraphStep.h"
 #include "HasStep.h"
 #include "AddVertexStep.h"
+#include "AddEdgeStep.h"
+#include "FromStep.h"
+#include "ToStep.h"
 #include "Direction.h"
 #include <stdlib.h>
+#include <string.h>
 
 /*
 	JIT compilation is supposed to check to see if these steps are valid;
@@ -13,6 +17,10 @@
 	pre-compilation.
 */
 
+/*
+	The given traversal source is allowed to be null, in the case of an
+	anomymous traversal.
+*/
 GraphTraversal::GraphTraversal(GraphTraversalSource* src) {
 	source = src;
 }
@@ -110,11 +118,11 @@ GraphTraversal* GraphTraversal::has(std::string key, std::string value) {
 }
 
 GraphTraversal* GraphTraversal::from(std::string sideEffectLabel) {
-	// Because from() uses void* (sigh) this awkward memory copy is necessary.s
-	char* base_string = sideEffectLabel.c_str();
+	// Because from() uses void* (sigh) this awkward memory copy is necessary.
+	const char* base_string = sideEffectLabel.c_str();
 	size_t size = (1 + strlen(base_string));
 
-	char* sideEffectLabel_cpy = malloc(sizeof(char) * size);
+	char* sideEffectLabel_cpy = (char*)malloc(sizeof(char) * size);
 	strncpy(sideEffectLabel_cpy, base_string, size);
 
 	return this->appendStep(new FromStep(sideEffectLabel_cpy));
@@ -122,10 +130,10 @@ GraphTraversal* GraphTraversal::from(std::string sideEffectLabel) {
 
 GraphTraversal* GraphTraversal::to(std::string sideEffectLabel) {
 	// Because to() uses void* (sigh) this awkward memory copy is necessary.
-	char* base_string = sideEffectLabel.c_str();
+	const char* base_string = sideEffectLabel.c_str();
 	size_t size = (1 + strlen(base_string));
 
-	char* sideEffectLabel_cpy = malloc(sizeof(char) * size);
+	char* sideEffectLabel_cpy = (char*)malloc(sizeof(char) * size);
 	strncpy(sideEffectLabel_cpy, base_string, size);
 
 	return this->appendStep(new ToStep(sideEffectLabel_cpy));
@@ -134,4 +142,40 @@ GraphTraversal* GraphTraversal::to(std::string sideEffectLabel) {
 template <typename T>
 GraphTraversal* GraphTraversal::has(std::string key, P<T> pred) {
 	return this->appendStep(new HasStep<T>(key, pred));
+}
+
+/*
+	In general this should be called by the finalization steps in
+	classes that extend GraphTraversal.
+*/
+void GraphTraversal::getInitialTraversal() {
+	for(int k = 0; k < steps.size(); k++) {
+		TraversalStep* currentStep = steps[k];
+		switch(currentStep->uid) {
+			case AddEdgeStep: {
+				AddEdgeStep* aes = (AddEdgeStep*)currentStep;
+				if(k + 1 < steps.size()) {
+					if(steps[k + 1]->type == FROM_STEP) aes->set_out_traversal(((FromStep*)steps[++k])->getTraversal());
+					else if(steps[k + 1]->type == TO_STEP) aes->set_in_traversal(((ToStep*)steps[++k])->getTraversal());
+					if(k + 1 < steps.size()) {
+						if(steps[k + 1]->type == FROM_STEP) aes->set_out_traversal(((FromStep*)steps[++k])->getTraversal());
+						else if(steps[k + 1]->type == TO_STEP) aes->set_in_traversal(((ToStep*)steps[++k])->getTraversal());
+					}
+				}
+				break;
+			}
+			case AddEdgeStartStep: {
+				AddEdgeStartStep* aes = (AddEdgeStartStep*)currentStep;
+				if(k + 1 < steps.size()) {
+					if(steps[k + 1]->uid == FROM_STEP) aes->set_out_traversal(((FromStep*)steps[++k])->getTraversal());
+					else if(steps[k + 1]->uid == TO_STEP) aes->set_in_traversal(((ToStep*)steps[++k])->getTraversal());
+					if(k + 1 < steps.size()) {
+						if(steps[k + 1]->uid == FROM_STEP) aes->set_out_traversal(((FromStep*)steps[++k])->getTraversal());
+						else if(steps[k + 1]->uid == TO_STEP) aes->set_in_traversal(((ToStep*)steps[++k])->getTraversal());
+					}
+				}
+				break;
+			}
+		}	
+	}
 }

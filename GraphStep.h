@@ -10,11 +10,12 @@ enum GraphStepType {VERTEX, EDGE};
 
 class GraphStep : public TraversalStep {
 	private:
-		GraphStepType gsType;
+		GraphStepType gs_type;
 		std::vector<void*> element_ids;
 	public:
 		GraphStep(GraphStepType gsType_arg, std::vector<void*> eids);
 		virtual std::string	getInfo();
+		GraphStepType getType();
 };
 
 #endif
