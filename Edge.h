@@ -2,6 +2,8 @@
 #define EDGE_H
 
 #include <stdlib.h>
+#include <string>
+#include "Vertex.h"
 
 class Edge {
 public:
@@ -19,8 +21,7 @@ public:
 
 	/*
 		Return a pointer to the Graph's label
-		for this Edge.  If this Edge does
-		not have a label, return NULL.
+		for this Edge.
 	*/
 	virtual std::string const* label() = 0;
 

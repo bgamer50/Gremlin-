@@ -24,6 +24,7 @@ public:
 	GraphTraversal(GraphTraversalSource* src);
 	Graph* getGraph();
 	GraphTraversalSource* getTraversalSource();
+	std::vector<TraversalStep*> getSteps();
 	
 	// Steps
 	GraphTraversal* addE(std::string label);
@@ -56,7 +57,9 @@ public:
 	GraphTraversal* from(GraphTraversal* fromTraversal);
 	GraphTraversal* from(Vertex* fromVertex);
 	GraphTraversal* V();
-	GraphTraversal* V(void* objects, size_t sizeOfEach, int length);
+	GraphTraversal* V(Vertex* vertex);
+	GraphTraversal* V(std::vector<Vertex*> vertices);
+	//GraphTraversal* V(void* objects, size_t sizeOfEach, int length);
 	//GraphTraversal group();
 	//GraphTraversal group(std::string sideEffectLabel);
 	//GraphTraversal groupCount();

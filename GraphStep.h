@@ -16,6 +16,7 @@ class GraphStep : public TraversalStep {
 		GraphStep(GraphStepType gsType_arg, std::vector<void*> eids);
 		virtual std::string	getInfo();
 		GraphStepType getType();
+		std::vector<void*> get_element_ids();
 };
 
 #endif

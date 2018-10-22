@@ -9,7 +9,6 @@
 
 class AddEdgeStep: public TraversalStep {
 	private:
-		bool has_traversals;
 		std::string label;
 		GraphTraversal* out_vertex_traversal; // filled in at runtime
 		GraphTraversal* in_vertex_traversal; // filled in at runtime
@@ -21,6 +20,7 @@ class AddEdgeStep: public TraversalStep {
 		GraphTraversal* get_in_traversal();
 		void set_out_traversal(GraphTraversal* new_traversal);
 		void set_in_traversal(GraphTraversal* new_traversal);
+		std::string get_label();
 };
 
 #endif

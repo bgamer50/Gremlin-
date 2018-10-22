@@ -11,19 +11,20 @@ class FromStep : public TraversalStep {
 	public:
 		FromStep(std::string side_effect_label)
 		: TraversalStep(modulator, FROM_STEP) {
-			from_traversal = __.select(side_effect_label);
+			from_traversal = __->select(side_effect_label);
 		}
 
 		FromStep(Vertex* to_vertex)
 		: TraversalStep(modulator, FROM_STEP) {
-			from_traversal = __.V(to_vertex);
+			from_traversal = __->V(to_vertex);
 		}
 
-		FromStep(GraphTraversal* from_vertex_traversal) {
+		FromStep(GraphTraversal* from_vertex_traversal)
+		: TraversalStep(modulator, FROM_STEP) {
 			from_traversal = from_vertex_traversal;
 		}
 
-		void* getTraversal() {
+		GraphTraversal* getTraversal() {
 			return from_traversal;
 		}
 };

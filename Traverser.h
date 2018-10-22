@@ -3,32 +3,27 @@
 
 #include <list>
 #include <map>
-#include <stdlib.h>
+#include <string.h>
 
 template<typename T>
 class Traverser {
 	private:
-		bool copy;
 		T* my_data;
 		std::list<void*> path;
 		std::map<std::string, void*> side_effects;
 
 	public:
-		Traverser(T* addr) {
-			my_data = addr;
-			copy = false;
-		}
-
 		Traverser(T t) {
-			my_data = malloc(sizeof(T));
+			my_data = (T*)malloc(sizeof(T));
 			memcpy(my_data, &t, sizeof(T));
-			copy = true;
 		}
-
-		//TODO write destructor
 
 		virtual T* get() {
 			return my_data;
+		}
+
+		virtual void replace_data(T t) {
+			memcpy(my_data, &t, sizeof(T));
 		}
 };
 
