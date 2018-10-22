@@ -2,4 +2,5 @@
 *.dll
 *.o
 *.exe
+*.stackdump
 .vscode/*
