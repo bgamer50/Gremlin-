@@ -12,7 +12,7 @@ AddEdgeStartStep::AddEdgeStartStep(std::string label_arg)
 
 // Return something like AddEdgeStarStep(label)
 std::string AddEdgeStartStep::getInfo() {
-	std::string info = "AddVertexStartStep(";
+	std::string info = "AddEdgeStartStep(";
 	info += label + ")";
 	return info;
 }

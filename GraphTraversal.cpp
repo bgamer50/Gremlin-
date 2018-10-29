@@ -8,10 +8,12 @@
 #include "AddEdgeStartStep.h"
 #include "FromStep.h"
 #include "ToStep.h"
+#include "NoOpStep.h"
 #include "Direction.h"
 #include <stdlib.h>
 #include <string.h>
 #include <algorithm>
+#include <iostream>
 
 /*
 	JIT compilation is supposed to check to see if these steps are valid;
@@ -40,6 +42,7 @@ std::vector<TraversalStep*> GraphTraversal::getSteps() {
 }
 
 std::string GraphTraversal::explain() {
+	this->getInitialTraversal();
 	std::string explanation = "GraphTraversal {\n";
 	for(int k = 0; k < steps.size(); k++) explanation += steps[k]->getInfo() + "\n";
 
@@ -186,11 +189,27 @@ void GraphTraversal::getInitialTraversal() {
 			case ADD_EDGE_STEP: {
 				AddEdgeStep* aes = (AddEdgeStep*)currentStep;
 				if(k + 1 < steps.size()) {
-					if(steps[k + 1]->uid == FROM_STEP) aes->set_out_traversal(((FromStep*)steps[++k])->getTraversal());
-					else if(steps[k + 1]->uid == TO_STEP) aes->set_in_traversal(((ToStep*)steps[++k])->getTraversal());
+					if(steps[k + 1]->uid == FROM_STEP) {
+						aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
+						delete steps[k + 1];
+						steps[++k] = new NoOpStep();
+					}
+					else if(steps[k + 1]->uid == TO_STEP) {
+						aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
+						delete steps[k + 1];
+						steps[++k] = new NoOpStep();
+					}
 					if(k + 1 < steps.size()) {
-						if(steps[k + 1]->uid == FROM_STEP) aes->set_out_traversal(((FromStep*)steps[++k])->getTraversal());
-						else if(steps[k + 1]->uid == TO_STEP) aes->set_in_traversal(((ToStep*)steps[++k])->getTraversal());
+						if(steps[k + 1]->uid == FROM_STEP) {
+							aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
+							delete steps[k + 1];
+							steps[++k] = new NoOpStep();
+						}
+						else if(steps[k + 1]->uid == TO_STEP) {
+							aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
+							delete steps[k + 1];
+							steps[++k] = new NoOpStep();
+						}
 					}
 				}
 				break;
@@ -198,11 +217,27 @@ void GraphTraversal::getInitialTraversal() {
 			case ADD_EDGE_START_STEP: {
 				AddEdgeStartStep* aes = (AddEdgeStartStep*)currentStep;
 				if(k + 1 < steps.size()) {
-					if(steps[k + 1]->uid == FROM_STEP) aes->set_out_traversal(((FromStep*)steps[++k])->getTraversal());
-					else if(steps[k + 1]->uid == TO_STEP) aes->set_in_traversal(((ToStep*)steps[++k])->getTraversal());
+					if(steps[k + 1]->uid == FROM_STEP) {
+						aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
+						delete steps[k + 1];
+						steps[++k] = new NoOpStep();
+					}
+					else if(steps[k + 1]->uid == TO_STEP) {
+						aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
+						delete steps[k + 1];
+						steps[++k] = new NoOpStep();
+					}
 					if(k + 1 < steps.size()) {
-						if(steps[k + 1]->uid == FROM_STEP) aes->set_out_traversal(((FromStep*)steps[++k])->getTraversal());
-						else if(steps[k + 1]->uid == TO_STEP) aes->set_in_traversal(((ToStep*)steps[++k])->getTraversal());
+						if(steps[k + 1]->uid == FROM_STEP) {
+							aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
+							delete steps[k + 1];
+							steps[++k] = new NoOpStep();
+						}
+						else if(steps[k + 1]->uid == TO_STEP) {
+							aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
+							delete steps[k + 1];
+							steps[++k] = new NoOpStep();
+						}
 					}
 				}
 				break;

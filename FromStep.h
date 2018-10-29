@@ -27,6 +27,10 @@ class FromStep : public TraversalStep {
 		GraphTraversal* getTraversal() {
 			return from_traversal;
 		}
+
+		virtual std::string getInfo() {
+			return "FromStep {\n" + this->from_traversal->explain() + "\n}";
+		}
 };
 
 #endif

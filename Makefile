@@ -14,63 +14,66 @@ ifeq ($(shell uname -s), Linux)
 	LIBGREMLIN_NAME := libgremlin.so
 endif
 
-lib: Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o AddEdgeStartStep.o AddEdgeStep.o FromStep.o ToStep.o P.o Traverser.o
+lib: Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o AddEdgeStartStep.o AddEdgeStep.o FromStep.o ToStep.o NoOpStep.o P.o Traverser.o
 	$(CC) $(CFLAGS) -shared Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o AddEdgeStartStep.o AddEdgeStep.o FromStep.o ToStep.o P.o Traverser.o -o $(LIBGREMLIN_NAME)
 	mv $(LIBGREMLIN_NAME) $(LIBGREMLIN_PATH)
 	chmod 755 $(LIBGREMLIN_PATH)
 
-TraversalStep.o: TraversalStep.cpp
+TraversalStep.o: TraversalStep.cpp TraversalStep.h
 	$(CC) $(CFLAGS) -c TraversalStep.cpp -o TraversalStep.o
 
-Vertex.o: Vertex.cpp
+Vertex.o: Vertex.cpp Vertex.h
 	$(CC) $(CFLAGS) -c Vertex.cpp -o Vertex.o
 
-Edge.o: Edge.cpp
+Edge.o: Edge.cpp Edge.h
 	$(CC) $(CFLAGS) -c Edge.cpp -o Edge.o
 
-Graph.o: Graph.cpp
+Graph.o: Graph.cpp Graph.h
 	$(CC) $(CFLAGS) -c Graph.cpp -o Graph.o
 
-GraphTraversal.o: GraphTraversal.cpp
+GraphTraversal.o: GraphTraversal.cpp GraphTraversal.h
 	$(CC) $(CFLAGS) -c GraphTraversal.cpp -o GraphTraversal.o
 
-GraphTraversalSource.o: GraphTraversalSource.cpp
+GraphTraversalSource.o: GraphTraversalSource.cpp GraphTraversalSource.h
 	$(CC) $(CFLAGS) -c GraphTraversalSource.cpp -o GraphTraversalSource.o
 
-VertexStep.o: VertexStep.cpp
+VertexStep.o: VertexStep.cpp VertexStep.h
 	$(CC) $(CFLAGS) -c VertexStep.cpp -o VertexStep.o
 
-EdgeStep.o: EdgeStep.cpp
+EdgeStep.o: EdgeStep.cpp EdgeStep.h
 	$(CC) $(CFLAGS) -c EdgeStep.cpp -o EdgeStep.o
 
-GraphStep.o: GraphStep.cpp
+GraphStep.o: GraphStep.cpp GraphStep.h
 	$(CC) $(CFLAGS) -c GraphStep.cpp -o GraphStep.o
 
-HasStep.o: HasStep.cpp
+HasStep.o: HasStep.cpp HasStep.h
 	$(CC) $(CFLAGS) -c HasStep.cpp -o HasStep.o
 
-AddVertexStartStep.o: AddVertexStartStep.cpp
+AddVertexStartStep.o: AddVertexStartStep.cpp AddVertexStep.h
 	$(CC) $(CFLAGS) -c AddVertexStartStep.cpp -o AddVertexStartStep.o
 
-AddVertexStep.o: AddVertexStep.cpp
+AddVertexStep.o: AddVertexStep.cpp AddVertexStep.h
 	$(CC) $(CFLAGS) -c AddVertexStep.cpp -o AddVertexStep.o
 
-AddEdgeStartStep.o: AddEdgeStartStep.cpp
+AddEdgeStartStep.o: AddEdgeStartStep.cpp AddEdgeStartStep.h
 	$(CC) $(CFLAGS) -c AddEdgeStartStep.cpp -o AddEdgeStartStep.o
 
-AddEdgeStep.o: AddEdgeStep.cpp
+AddEdgeStep.o: AddEdgeStep.cpp AddEdgeStep.h
 	$(CC) $(CFLAGS) -c AddEdgeStep.cpp -o AddEdgeStep.o
 
-FromStep.o: FromStep.cpp
+FromStep.o: FromStep.cpp FromStep.h
 	$(CC) $(CFLAGS) -c FromStep.cpp -o FromStep.o
 
-ToStep.o: ToStep.cpp
+ToStep.o: ToStep.cpp ToStep.h
 	$(CC) $(CFLAGS) -c ToStep.cpp -o ToStep.o
 
-P.o: P.cpp
+NoOpStep.o: NoOpStep.cpp NoOpStep.h
+	$(CC) $(CFLAGS) -c NoOpStep.cpp -o NoOpStep.o
+
+P.o: P.cpp P.h
 	$(CC) $(CFLAGS) -c P.cpp -o P.o
 
-Traverser.o: Traverser.cpp
+Traverser.o: Traverser.cpp Traverser.h
 	$(CC) $(CFLAGS) -c Traverser.cpp -o Traverser.o
 
 clean:
