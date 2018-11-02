@@ -29,6 +29,11 @@ GraphTraversal::GraphTraversal(GraphTraversalSource* src) {
 	source = src;
 }
 
+GraphTraversal::GraphTraversal(GraphTraversal* trv) {
+	this->steps = trv.getSteps();
+	this->source = trv->getTraversalSource;
+}
+
 Graph* GraphTraversal::getGraph() {
 	return (*source).getGraph();
 }
