@@ -11,11 +11,11 @@ private:
 public:
 	GraphTraversalSource(Graph* gr);
 	Graph* getGraph();
-	virtual GraphTraversal* V() = 0;
-	virtual GraphTraversal* E() = 0;
-	virtual GraphTraversal* addV() = 0;
-	virtual GraphTraversal* addV(std::string label) = 0;
-	virtual GraphTraversal* addE(std::string label) = 0;
+	virtual GraphTraversal<Vertex, Vertex>* V() = 0;
+	virtual GraphTraversal<Edge, Edge>* E() = 0;
+	virtual GraphTraversal<Vertex, Vertex>* addV() = 0;
+	virtual GraphTraversal<Vertex, Vertex>* addV(std::string label) = 0;
+	virtual GraphTraversal<Edge, Edge>* addE(std::string label) = 0;
 };
 
 #endif
