@@ -1,6 +1,0 @@
-EXPORTS
-    SampleAddInt @1
-    SampleFunction1 @2
-    SampleFunction2 @3
-    __gcc_deregister_frame @4
-    __gcc_register_frame @5
