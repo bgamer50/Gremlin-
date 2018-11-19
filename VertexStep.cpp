@@ -6,7 +6,7 @@
 #include <algorithm>
 
 VertexStep::VertexStep(Direction dir, std::vector<std::string> edge_labels_arg, GraphStepType gsType_arg)
-: TraversalStep(map, VERTEX_STEP) {
+: TraversalStep(MAP, VERTEX_STEP) {
 	direction = dir;
 	this->edge_labels = new std::vector<std::string>;
 	for_each(edge_labels_arg.begin(), edge_labels_arg.end(), [this](std::string str){ this->edge_labels->push_back(str); });
@@ -14,7 +14,7 @@ VertexStep::VertexStep(Direction dir, std::vector<std::string> edge_labels_arg, 
 }
 
 VertexStep::VertexStep(Direction dir, GraphStepType gsType_arg)
-: TraversalStep(map, VERTEX_STEP) {
+: TraversalStep(MAP, VERTEX_STEP) {
 	direction = dir;
 	this->edge_labels = new std::vector<std::string>;
 	this->gsType = gsType_arg;

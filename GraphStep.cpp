@@ -4,7 +4,7 @@
 #include <vector>
 
 GraphStep::GraphStep(GraphStepType gsType_arg, std::vector<void*> eids)
-: TraversalStep(map, GRAPH_STEP) {
+: TraversalStep(MAP, GRAPH_STEP) {
 	this->gs_type = gsType_arg;
 	this->element_ids = eids;
 }

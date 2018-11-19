@@ -1,24 +1,14 @@
 #ifndef PROPERTY_H
 #define PROPERTY_H
 
+#include <string>
+
+template<typename T>
 class Property {
-	private:
-		std::string my_key;
-		void* my_value;
+	public:		
+		virtual std::string key() = 0;
 
-	public:
-		Property(std::string new_key, void* new_value);
-		virtual std::string key();
-		virtual void* value();
+		virtual T value() = 0;
 };
-
-class VertexProperty : public Property {
-	public:
-		VertexProperty(std::string new_key, void* new_value);
-		// TODO VertexProperty(std::string new_key, void* new_value, ...);
-		virtual std::vector<std::string> keys();
-		virtual std::vector<void*> values();
-		virtual st
-}
 
 #endif

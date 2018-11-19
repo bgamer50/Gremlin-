@@ -1,10 +1,11 @@
+#include "GraphTraversal.h"
 #include "AddEdgeStartStep.h"
 #include "TraversalStep.h"
 #include <string>
 #include <vector>
 
 AddEdgeStartStep::AddEdgeStartStep(std::string label_arg)
-: TraversalStep(map, ADD_EDGE_START_STEP) {
+: TraversalStep(MAP, ADD_EDGE_START_STEP) {
 	label = label_arg;
 	out_vertex_traversal = NULL;
 	in_vertex_traversal = NULL;

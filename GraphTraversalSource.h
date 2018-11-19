@@ -1,9 +1,12 @@
 #ifndef GRAPH_TRAVERSAL_SOURCE_H
 #define GRAPH_TRAVERSAL_SOURCE_H
 
-#include "GraphTraversal.h"
 #include <string>
 class Graph;
+class Vertex;
+class Edge;
+template<typename U, typename W>
+class GraphTraversal;
 
 class GraphTraversalSource {
 private:

@@ -12,7 +12,7 @@
 class NoOpStep: public TraversalStep {
 	public:
 		NoOpStep()
-		: TraversalStep(map, NO_OP_STEP) {}
+		: TraversalStep(MAP, NO_OP_STEP) {}
 
 		virtual std::string getInfo() {
 			return "NoOpStep()";

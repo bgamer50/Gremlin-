@@ -4,13 +4,13 @@
 #include <vector>
 
 AddVertexStartStep::AddVertexStartStep(std::string label_arg)
-: TraversalStep(map, ADD_VERTEX_START_STEP) {
+: TraversalStep(MAP, ADD_VERTEX_START_STEP) {
 	label = label_arg;
 	has_label = true;
 }
 
 AddVertexStartStep::AddVertexStartStep()
-: TraversalStep(map, ADD_VERTEX_START_STEP) {
+: TraversalStep(MAP, ADD_VERTEX_START_STEP) {
 	has_label = false;
 }
 

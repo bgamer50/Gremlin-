@@ -14,13 +14,16 @@ ifeq ($(shell uname -s), Linux)
 	LIBGREMLIN_NAME := libgremlin.so
 endif
 
-lib: Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o AddEdgeStartStep.o AddEdgeStep.o FromStep.o ToStep.o NoOpStep.o P.o Traverser.o
-	$(CC) $(CFLAGS) -shared Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o AddEdgeStartStep.o AddEdgeStep.o FromStep.o ToStep.o P.o Traverser.o -o $(LIBGREMLIN_NAME)
+lib: VertexProperty.o Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o AddEdgeStartStep.o AddEdgeStep.o AddPropertyStep.o FromStep.o ToStep.o NoOpStep.o P.o Traverser.o
+	$(CC) $(CFLAGS) -shared VertexProperty.o Vertex.o Edge.o Graph.o GraphTraversalSource.o GraphTraversal.o TraversalStep.o VertexStep.o GraphStep.o HasStep.o AddVertexStartStep.o AddVertexStep.o AddEdgeStartStep.o AddEdgeStep.o AddPropertyStep.o FromStep.o ToStep.o P.o Traverser.o -o $(LIBGREMLIN_NAME)
 	mv $(LIBGREMLIN_NAME) $(LIBGREMLIN_PATH)
 	chmod 755 $(LIBGREMLIN_PATH)
 
 TraversalStep.o: TraversalStep.cpp TraversalStep.h
 	$(CC) $(CFLAGS) -c TraversalStep.cpp -o TraversalStep.o
+
+VertexProperty.o: VertexProperty.cpp VertexProperty.h
+	$(CC) $(CFLAGS) -c VertexProperty.cpp -o VertexProperty.o
 
 Vertex.o: Vertex.cpp Vertex.h
 	$(CC) $(CFLAGS) -c Vertex.cpp -o Vertex.o
@@ -60,6 +63,9 @@ AddEdgeStartStep.o: AddEdgeStartStep.cpp AddEdgeStartStep.h
 
 AddEdgeStep.o: AddEdgeStep.cpp AddEdgeStep.h
 	$(CC) $(CFLAGS) -c AddEdgeStep.cpp -o AddEdgeStep.o
+
+AddPropertyStep.o: AddPropertyStep.cpp AddPropertyStep.h
+	$(CC) $(CFLAGS) -c AddPropertyStep.cpp -o AddPropertyStep.o
 
 FromStep.o: FromStep.cpp FromStep.h
 	$(CC) $(CFLAGS) -c FromStep.cpp -o FromStep.o

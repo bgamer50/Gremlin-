@@ -1,11 +1,11 @@
 #ifndef ADD_EDGE_START_STEP_H
 #define ADD_EDGE_START_STEP_H
 
-#include "TraversalStep.h"
-#include "GraphTraversal.h"
-#include <string>
-
 #define ADD_EDGE_START_STEP 0x72
+
+#include "GraphTraversal.h"
+#include "TraversalStep.h"
+#include <string>
 
 class AddEdgeStartStep: public TraversalStep {
 	private:

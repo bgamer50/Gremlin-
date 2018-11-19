@@ -1,8 +1,8 @@
 #ifndef ADD_EDGE_STEP_H
 #define ADD_EDGE_STEP_H
 
-#include "TraversalStep.h"
 #include "GraphTraversal.h"
+#include "TraversalStep.h"
 #include <string>
 
 #define ADD_EDGE_STEP 0x73
@@ -15,7 +15,7 @@ class AddEdgeStep: public TraversalStep {
 	public:
 		AddEdgeStep(std::string label_arg);
 		virtual std::string getInfo();
-		void addModulator(TraversalStep* modulatorStep);
+		void addMODULATOR(TraversalStep* MODULATORStep);
 		GraphTraversal<void*, Vertex>* get_out_traversal();
 		GraphTraversal<void*, Vertex>* get_in_traversal();
 		void set_out_traversal(GraphTraversal<void*, Vertex>* new_traversal);

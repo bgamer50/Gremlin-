@@ -4,8 +4,9 @@
 #include <stdlib.h>
 #include <string>
 #include "Vertex.h"
+#include "Element.h"
 
-class Edge {
+class Edge : public Element {
 public:
 	/*
 		Create a new Edge; does nothing

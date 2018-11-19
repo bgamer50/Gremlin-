@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-enum TraversalStepType {map, filter, barrier, modulator};
+enum TraversalStepType {MAP, FILTER, BARRIER, MODULATOR};
 
 class TraversalStep {
 private:
