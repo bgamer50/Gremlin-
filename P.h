@@ -6,6 +6,9 @@
 
 enum PType {EQ, LT, GT, BT, LTE, GTE};
 
+/**
+    Equivalent of P in Java-Gremlin.
+**/
 template<typename T>
 class P {
 	public:
@@ -55,7 +58,7 @@ class P {
 	}
 
 	virtual bool apply(T t) {
-		auto cmp = t - first_arg;
+		auto cmp = *(uint64_t*)t - *(uint64_t*)first_arg;
 
 		switch(comparator) {
 			case EQ:
@@ -69,21 +72,24 @@ class P {
 			case GTE:
 				return cmp >= 0;
 			case BT:
-				return cmp >= 0 && t < second_arg;
+				return cmp >= 0 && *(uint64_t*)t < *(uint64_t*)second_arg;
 			default:
 				throw std::runtime_error("Illegal comparator");
 		}
 	}
 };
 
+/**
+    String version of the P template class.
+**/
 template <>
-class P<std::string> {
+class P<std::string*> {
 	public:
-		std::string first_arg;
-		std::string second_arg;
+		std::string* first_arg;
+		std::string* second_arg;
 		PType comparator;
 
-		P(PType type, std::string t0, std::string t1) {
+		P(PType type, std::string* t0, std::string* t1) {
 			comparator = type;
 			first_arg = t0;
 			second_arg = t1;
@@ -94,19 +100,19 @@ class P<std::string> {
 			switch(comparator) {
 				case EQ:
 					info = "eq ";
-					info += first_arg;
+					info += *first_arg;
 					break;
 				case LT:
 					info = "lt ";
-					info += first_arg;
+					info += *first_arg;
 					break;
 				case GT:
 					info = "gt ";
-					info += first_arg;
+					info += *first_arg;
 					break;
 				case BT:
 					info = "bt ";
-					info = info + first_arg + ", " + second_arg;
+					info = info + *first_arg + ", " + *second_arg;
 					break;
 				default:
 					info = "??";
@@ -116,8 +122,8 @@ class P<std::string> {
 			return info;
 		}
 
-		virtual bool apply(std::string s) {
-			auto cmp = s.compare(first_arg);
+		virtual bool apply(std::string* s) {
+			auto cmp = (*s).compare(*first_arg);
 			switch(comparator) {
 				case EQ:
 					return cmp == 0;
@@ -130,7 +136,7 @@ class P<std::string> {
 				case GTE:
 					return cmp >= 0;
 				case BT:
-					return cmp >= 0 && s.compare(second_arg) < 0;
+					return cmp >= 0 && (*s).compare(*second_arg) < 0;
 				default:
 					throw std::runtime_error("Illegal comparator");
 			}

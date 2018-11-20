@@ -73,16 +73,16 @@ public:
 		steps.push_back(step);
 		return this;
 	}
-	
+
 	// Steps
-	GraphTraversal<U, Edge>* addE(std::string label){ 
+	GraphTraversal<U, Edge>* addE(std::string label){
 		return (GraphTraversal<U, Edge>*)this->appendStep(new AddEdgeStep(label));
 	}
 
 	GraphTraversal<U,Vertex>* addV(std::string label) {
 		return this->appendStep(new AddVertexStep(label));
 	}
-	
+
 	GraphTraversal<U,Vertex>* addV() {
 		return this->appendStep(new AddVertexStep());
 	}
@@ -158,12 +158,20 @@ public:
 		return this->appendStep(new HasStep<T>(key, pred));
 	}
 
-	GraphTraversal<U,W>* has(std::string key, int value) {
-		return this->appendStep(new HasStep<int>(key, new P<int>(EQ, value, value)));
+	GraphTraversal<U,W>* has(std::string key, int64_t value) {
+	    auto val = (int64_t*)malloc(sizeof(int64_t));
+	    *val = value;
+		return this->appendStep(new HasStep<int64_t*>(key, new P<int64_t*>(EQ, val, val)));
 	}
 
 	GraphTraversal<U,W>* has(std::string key, std::string value) {
-		return this->appendStep(new HasStep<std::string>(key, new P<std::string>(EQ, value, value)));
+	    auto p = new P<std::string*>(EQ, &value, &value);
+	    std::cout << p->getInfo();
+		return this->appendStep(new HasStep<std::string*>(key, p));
+	}
+
+	GraphTraversal<U,W>* has(std::string key) {
+        return this->appendStep(new HasStep<void*>(key, nullptr));
 	}
 
 	//GraphTraversal<U,W>* has(std::string key, GraphTraversal<U,W>* valueTraversal);
@@ -216,7 +224,7 @@ public:
 	// single-label select is special
 	GraphTraversal<U,W>* select(std::string sideEffectLabel) {
 		//TODO write this
-	}	
+	}
 	//GraphTraversal select(std::vector<std::string> sideEffectLabels);
 	//GraphTraversal select(GraphTraversal selectTraversal);
 	//GraphTraversal<U,W>* simplePath();
@@ -323,7 +331,7 @@ public:
 	//GraphTraversal where(Predicate predicate);
 	//GraphTraversal where(std::string label, Predicate predicate);
 	//GraphTraversal where(GraphTraversal<auto n> whereTraversal);
-	
+
 	// These may replace predicates...
 	//GraphTraversal lt(double max_exclusive);
 	//GraphTraversal gt(double min_exculsive);
@@ -331,11 +339,12 @@ public:
 	//GraphTraversal eq(long equal);
 	//GraphTraversal eq(int equal);
 	//GraphTraversal eq(std::string equal);
-	//GraphTraversal 
+	//GraphTraversal
 
 	// The explain finalizer which works in anonymous GraphTraversals
 	std::string explain() {
 		this->getInitialTraversal();
+
 		std::string explanation = "GraphTraversal {\n";
 		for(int k = 0; k < steps.size(); k++) explanation += steps[k]->getInfo() + "\n";
 
@@ -414,7 +423,7 @@ public:
 					}
 					break;
 				}
-			}	
+			}
 		}
 	}
 };

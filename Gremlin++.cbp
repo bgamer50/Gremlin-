@@ -33,7 +33,52 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="main.cpp" />
+		<Unit filename="AddEdgeStartStep.cpp" />
+		<Unit filename="AddEdgeStartStep.h" />
+		<Unit filename="AddEdgeStep.cpp" />
+		<Unit filename="AddEdgeStep.h" />
+		<Unit filename="AddPropertyStep.cpp" />
+		<Unit filename="AddPropertyStep.h" />
+		<Unit filename="AddVertexStartStep.cpp" />
+		<Unit filename="AddVertexStartStep.h" />
+		<Unit filename="AddVertexStep.cpp" />
+		<Unit filename="AddVertexStep.h" />
+		<Unit filename="ApplicableStep.h" />
+		<Unit filename="ByModulating.h" />
+		<Unit filename="Direction.h" />
+		<Unit filename="Edge.cpp" />
+		<Unit filename="Edge.h" />
+		<Unit filename="Element.h" />
+		<Unit filename="FromStep.cpp" />
+		<Unit filename="FromStep.h" />
+		<Unit filename="Graph.cpp" />
+		<Unit filename="Graph.h" />
+		<Unit filename="GraphStep.cpp" />
+		<Unit filename="GraphStep.h" />
+		<Unit filename="GraphTraversal.cpp" />
+		<Unit filename="GraphTraversal.h" />
+		<Unit filename="GraphTraversalSource.cpp" />
+		<Unit filename="GraphTraversalSource.h" />
+		<Unit filename="HasStep.cpp" />
+		<Unit filename="HasStep.h" />
+		<Unit filename="NoOpStep.cpp" />
+		<Unit filename="NoOpStep.h" />
+		<Unit filename="P.cpp" />
+		<Unit filename="P.h" />
+		<Unit filename="Property.h" />
+		<Unit filename="Scope.h" />
+		<Unit filename="ToStep.cpp" />
+		<Unit filename="ToStep.h" />
+		<Unit filename="TraversalStep.cpp" />
+		<Unit filename="TraversalStep.h" />
+		<Unit filename="Traverser.cpp" />
+		<Unit filename="Traverser.h" />
+		<Unit filename="Vertex.cpp" />
+		<Unit filename="Vertex.h" />
+		<Unit filename="VertexProperty.cpp" />
+		<Unit filename="VertexProperty.h" />
+		<Unit filename="VertexStep.cpp" />
+		<Unit filename="VertexStep.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
