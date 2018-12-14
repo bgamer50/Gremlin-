@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/any.hpp>
 #include "VertexProperty.h"
 #include "Element.h"
 
@@ -31,19 +32,19 @@ public:
 		Get the property corresponding to the given
 		key.
 	*/
-	virtual VertexProperty<void*>* property(std::string key) = 0;
+	virtual VertexProperty<boost::any>* property(std::string key) = 0;
 
 	/*
 		Set the property corresponding to the given
 		key assuming the given cardinality.
 	*/
-	virtual VertexProperty<void*>* property(Cardinality cardinality, std::string key, void* value) = 0;
+	virtual VertexProperty<boost::any>* property(Cardinality cardinality, std::string key, boost::any value) = 0;
 
 	/*
 		Set the property corresponding to the given
 		key.
 	*/
-	virtual VertexProperty<void*>* property(std::string key, void* value) = 0;
+	virtual VertexProperty<boost::any>* property(std::string key, boost::any value) = 0;
 };
 
 #endif

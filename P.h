@@ -2,9 +2,9 @@
 #define P_PREDICATE_H
 
 #include <string>
-#include <stdexcept>
-
-enum PType {EQ, LT, GT, BT, LTE, GTE};
+#include <boost/any.hpp>
+#include <stdlib.h>
+#include <functional>
 
 /**
     Equivalent of P in Java-Gremlin.
@@ -12,135 +12,60 @@ enum PType {EQ, LT, GT, BT, LTE, GTE};
 template<typename T>
 class P {
 	public:
-		T first_arg;
-		T second_arg;
-		PType comparator;
-
-		P(PType type, T t0, T t1) {
-			comparator = type;
-			first_arg = t0;
-			second_arg = t1;
+		static std::function<bool(boost::any)> eq(T b) {
+			return [&b](boost::any a) {
+				return false;
+			};
 		}
+};
 
-		std::string getInfo() {
-			std::string info;
-			switch(comparator) {
-				case EQ:
-					info = "eq ";
-					info += std::to_string(first_arg);
-					break;
-				case LT:
-					info = "lt ";
-					info += std::to_string(first_arg);
-					break;
-				case GT:
-					info = "gt ";
-					info += std::to_string(first_arg);
-					break;
-				case LTE:
-					info = "lte ";
-					info += std::to_string(first_arg);
-					break;
-				case GTE:
-					info = "gte ";
-					info += std::to_string(first_arg);
-					break;
-				case BT:
-					info = "bt ";
-					info = info + std::to_string(first_arg) + ", " + std::to_string(second_arg);
-					break;
-				default:
-					info = "??";
-					break;
-			}
-
-			return info;
-	}
-
-	virtual bool apply(T t) {
-		auto cmp = *(uint64_t*)t - *(uint64_t*)first_arg;
-
-		switch(comparator) {
-			case EQ:
-				return cmp == 0;
-			case LT:
-				return cmp < 0;
-			case GT:
-				return cmp > 0;
-			case LTE:
-				return cmp <= 0;
-			case GTE:
-				return cmp >= 0;
-			case BT:
-				return cmp >= 0 && *(uint64_t*)t < *(uint64_t*)second_arg;
-			default:
-				throw std::runtime_error("Illegal comparator");
+template<>
+class P<uint64_t> {
+	public:
+		static std::function<bool(boost::any)> eq(uint64_t b) {
+			return [&b](boost::any a) {
+				return boost::any_cast<uint64_t>(a) == b;
+			};
 		}
+};
+
+template<>
+class P<int64_t> {
+	public:
+		static std::function<bool(boost::any)> eq(uint64_t b) {
+			return [&b](boost::any a) {
+				return boost::any_cast<int64_t>(a) == b;
+			};
+		}
+};
+
+template<>
+class P<double> {
+	public:
+		static std::function<bool(boost::any)> eq(double b) {
+			return [&b](boost::any a) {
+				return boost::any_cast<double>(a) == b;
+			};
+		}
+};
+
+template<>
+class P<std::string> {
+	static std::function<bool(boost::any)> eq(std::string b) {
+		return [&b](boost::any a) {
+			return boost::any_cast<std::string>(a).compare(b) == 0;
+		};
 	}
 };
 
-/**
-    String version of the P template class.
-**/
-template <>
-class P<std::string*> {
-	public:
-		std::string* first_arg;
-		std::string* second_arg;
-		PType comparator;
-
-		P(PType type, std::string* t0, std::string* t1) {
-			comparator = type;
-			first_arg = t0;
-			second_arg = t1;
-		}
-
-		std::string getInfo() {
-			std::string info;
-			switch(comparator) {
-				case EQ:
-					info = "eq ";
-					info += *first_arg;
-					break;
-				case LT:
-					info = "lt ";
-					info += *first_arg;
-					break;
-				case GT:
-					info = "gt ";
-					info += *first_arg;
-					break;
-				case BT:
-					info = "bt ";
-					info = info + *first_arg + ", " + *second_arg;
-					break;
-				default:
-					info = "??";
-					break;
-			}
-
-			return info;
-		}
-
-		virtual bool apply(std::string* s) {
-			auto cmp = (*s).compare(*first_arg);
-			switch(comparator) {
-				case EQ:
-					return cmp == 0;
-				case LT:
-					return cmp < 0;
-				case GT:
-					return cmp > 0;
-				case LTE:
-					return cmp <= 0;
-				case GTE:
-					return cmp >= 0;
-				case BT:
-					return cmp >= 0 && (*s).compare(*second_arg) < 0;
-				default:
-					throw std::runtime_error("Illegal comparator");
-			}
-		}
+template<>
+class P<char*> {
+	static std::function<bool(boost::any)> eq(char* b) {
+		return [&b](boost::any a) {
+			std::string a_str = boost::any_cast<std::string>(a);
+			return strncmp(a_str.c_str(), b, a_str.length()) == 0;
+		};
+	}
 };
 
 #endif

@@ -6,9 +6,9 @@
 template<typename T>
 class Property {
 	public:		
-		virtual std::string key() = 0;
+		std::string key();
 
-		virtual T value() = 0;
+		T value();
 };
 
 #endif

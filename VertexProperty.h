@@ -6,17 +6,19 @@
 #include <stdexcept>
 #include <vector>
 #include <algorithm>
+#include <functional>
+#include <boost/any.hpp>
 #include "Property.h"
 
 enum Cardinality {SINGLE, LIST, SET};
 
 template<typename T>
-class VertexProperty: public Property<T> {
+class VertexProperty {
 	private:
 		std::string my_key;
 		std::vector<T>* my_values;
 	public:
-		VertexProperty(Cardinality card, std::string new_key, std::vector<T> new_values) {
+		VertexProperty(Cardinality card, std::string new_key, std::vector<T> new_values, std::function<bool(boost::any, boost::any)> comparator) {
 			this->my_key = new_key;
 
 			if(card == SET) {
@@ -34,15 +36,19 @@ class VertexProperty: public Property<T> {
 			}
 		}
 
-		virtual std::string key() {
+		VertexProperty(Cardinality card, std::string new_key, std::vector<T> new_values) {
+			return VertexProperty::VertexProperty(card, new_key, new_values, [](){return false;};);
+		}
+
+		std::string key() {
 			return my_key;
 		}
 
-		virtual std::vector<T> values() {
+		std::vector<T> values() {
 			return *my_values;
 		}
 
-		virtual T value() {
+		T value() {
 			return my_values->at(0);
 		}
 };

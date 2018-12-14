@@ -89,7 +89,7 @@ public:
 
 	template<typename T>
 	GraphTraversal<U, W>* property(std::string property_key, T value) {
-		return this->appendStep(new AddPropertyStep<T>(property_key, value));
+		return this->appendStep(new AddPropertyStep<T*>(property_key, &value));
 	}
 	//GraphTraversal<auto n> aggregate(std::string sideEffectLabel);
 	//GraphTraversal<auto n> _and();
@@ -153,25 +153,20 @@ public:
 	//GraphTraversal groupCount(std::string sideEffectLabel);
 	//GraphTraversal has(std::string key, void* value, size_t size); // dangerous operation
 	//GraphTraversal has(std::string label, std::string key, void* value, size_t size); // dangerous operation
-	template <typename T>
-	GraphTraversal<U,W>* has(std::string key, P<T> pred) {
-		return this->appendStep(new HasStep<T>(key, pred));
+
+	template<typename T>
+	GraphTraversal<U,W>* has(std::string key, std::function<bool(boost::any)> pred) {
+		return this->appendStep(new HasStep(key, pred));
 	}
 
-	GraphTraversal<U,W>* has(std::string key, int64_t value) {
-	    auto val = (int64_t*)malloc(sizeof(int64_t));
-	    *val = value;
-		return this->appendStep(new HasStep<int64_t*>(key, new P<int64_t*>(EQ, val, val)));
+	template<typename T>
+	GraphTraversal<U,W>* has(std::string key, T value) {
+		return this->appendStep(new HasStep(key, P<T>::eq(value)));
 	}
 
-	GraphTraversal<U,W>* has(std::string key, std::string value) {
-	    auto p = new P<std::string*>(EQ, &value, &value);
-	    std::cout << p->getInfo();
-		return this->appendStep(new HasStep<std::string*>(key, p));
-	}
-
+	template<typename T>
 	GraphTraversal<U,W>* has(std::string key) {
-        return this->appendStep(new HasStep<void*>(key, nullptr));
+        return this->appendStep(new HasStep(key, nullptr));
 	}
 
 	//GraphTraversal<U,W>* has(std::string key, GraphTraversal<U,W>* valueTraversal);
@@ -429,23 +424,5 @@ public:
 };
 
 #define __ (new GraphTraversal<void*, void*>())
-
-template<typename T>
-inline P<T>* eq(T t) { return new P<T>(EQ, t, NULL); }
-
-template<typename T>
-inline P<T>* lt(T t) { return new P<T>(LT, t, NULL); }
-
-template<typename T>
-inline P<T>* gt(T t) { return new P<T>(GT, t, NULL); }
-
-template<typename T>
-inline P<T>* gte(T t) { return new P<T>(GTE, t, NULL); }
-
-template<typename T>
-inline P<T>* lte(T t) { return new P<T>(LTE, t, NULL); }
-
-template<typename T>
-inline P<T>* bt(T t0, T t1) { return new P<T>(LTE, t0, t1); }
 
 #endif
