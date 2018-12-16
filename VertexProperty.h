@@ -19,7 +19,7 @@ class VertexProperty {
 		std::string my_key;
 		std::vector<T>* my_values;
 	public:
-		VertexProperty(Cardinality card, std::string new_key, std::vector<T> new_values, std::function<int(boost::any, boost::any)> cmp) {
+		VertexProperty(Cardinality card, std::string new_key, std::vector<T> new_values) {
 			this->my_key = new_key;
 
 			// sets are weird in general, and the default comparator won't work in this method
@@ -33,10 +33,6 @@ class VertexProperty {
 				if(new_values.size() > 1) throw std::runtime_error("Specified single Cardinality but provided a vector of size > 1!");
 				my_values = new std::vector<T>(new_values.begin(), new_values.end());	
 			}
-		}
-
-		VertexProperty(Cardinality card, std::string new_key, std::vector<T> new_values) {
-			VertexProperty::VertexProperty(card, new_key, new_values, [](auto a, auto b){return -1;});
 		}
 
 		std::string key() {
