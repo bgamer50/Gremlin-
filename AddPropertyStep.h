@@ -6,21 +6,20 @@
 #include "ApplicableStep.h"
 #include "Vertex.h"
 
-template<typename T>
 class AddPropertyStep : public TraversalStep {
 	private:
 		Cardinality cardinality;
 		std::string key;
-		T value;
+		boost::any value;
 	public:
-		AddPropertyStep(std::string property_key, T value)
+		AddPropertyStep(std::string property_key, boost::any value)
 		: TraversalStep(MAP, ADD_PROPERTY_STEP) {
 			this->cardinality = SINGLE;
 			this->key = property_key;
 			this->value = value;
 		}
 
-		AddPropertyStep(Cardinality card, std::string property_key, T value)
+		AddPropertyStep(Cardinality card, std::string property_key, boost::any value)
 		: TraversalStep(MAP, ADD_PROPERTY_STEP) {
 			this->cardinality = card;
 			this->key = property_key;
@@ -29,10 +28,10 @@ class AddPropertyStep : public TraversalStep {
 
 		std::string get_key() { return this->key; }
 
-		T get_value() { return this->value; };
+		boost::any get_value() { return this->value; };
 		
 		virtual void apply(Vertex* v) {
-			v->property(cardinality, key, (void*)&value);
+			v->property(cardinality, key, value);
 		}
 };
 

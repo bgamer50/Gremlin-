@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <iostream> // TODO REMOVE
 #include <boost/any.hpp>
 #include "Property.h"
 
@@ -18,14 +19,12 @@ class VertexProperty {
 		std::string my_key;
 		std::vector<T>* my_values;
 	public:
-		VertexProperty(Cardinality card, std::string new_key, std::vector<T> new_values, std::function<bool(boost::any, boost::any)> comparator) {
+		VertexProperty(Cardinality card, std::string new_key, std::vector<T> new_values, std::function<int(boost::any, boost::any)> cmp) {
 			this->my_key = new_key;
 
+			// sets are weird in general, and the default comparator won't work in this method
 			if(card == SET) {
-				std::set<T>* s = new std::set<T>();
-				for_each(new_values.begin(), new_values.end(), [&s](T t){s->insert(t);});
-				my_values = new std::vector<T>(s->begin(), s->end());
-				delete s;
+				throw std::runtime_error("Set cardinality not yet supported!");
 			}
 			else if(card == LIST) {
 				my_values = new std::vector<T>(new_values.begin(), new_values.end());
@@ -37,7 +36,7 @@ class VertexProperty {
 		}
 
 		VertexProperty(Cardinality card, std::string new_key, std::vector<T> new_values) {
-			return VertexProperty::VertexProperty(card, new_key, new_values, [](){return false;};);
+			VertexProperty::VertexProperty(card, new_key, new_values, [](auto a, auto b){return -1;});
 		}
 
 		std::string key() {
@@ -49,7 +48,10 @@ class VertexProperty {
 		}
 
 		T value() {
-			return my_values->at(0);
+			std::cout << "bleh\n";
+			auto z = my_values->at(0);
+			std::cout << "blah\n";
+			return z;
 		}
 };
 

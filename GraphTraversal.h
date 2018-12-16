@@ -52,7 +52,7 @@ public:
 	}
 
 	GraphTraversal(GraphTraversal<void*,void*>* trv) {
-		this->steps = ((GraphTraversal<U, W>*)trv).getSteps();
+		this->steps = ((GraphTraversal<U, W>*)trv)->getSteps();
 		this->source = ((GraphTraversal<U, W>*)trv)->getTraversalSource;
 	}
 
@@ -87,9 +87,8 @@ public:
 		return this->appendStep(new AddVertexStep());
 	}
 
-	template<typename T>
-	GraphTraversal<U, W>* property(std::string property_key, T value) {
-		return this->appendStep(new AddPropertyStep<T*>(property_key, &value));
+	GraphTraversal<U, W>* property(std::string property_key, boost::any value) {
+		return this->appendStep(new AddPropertyStep(property_key, value));
 	}
 	//GraphTraversal<auto n> aggregate(std::string sideEffectLabel);
 	//GraphTraversal<auto n> _and();

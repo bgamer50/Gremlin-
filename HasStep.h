@@ -39,17 +39,11 @@ class HasStep : public TraversalStep {
             It tests whether the Vertex in question has the property/value
             in question and returns true if this is in fact the case.
 		**/
-		bool apply(Vertex* v) {
-		    std::cout << "bvbvbvbv\n";
-		    if(v->property(property_key_or_label) == nullptr) std::cout << "Property was null!\n";
-			std::cout << "key: " << property_key_or_label << "\n";
-		    
+		bool apply(Vertex* v) {		    
 			VertexProperty<boost::any>* vp = v->property(property_key_or_label);
 
-			std::cout << "property retrieved\n";
-		    std::cout << "successfully got property " << boost::any_cast<std::string>(vp->value()) << "\n";
 		    if(predicate == nullptr) return vp == nullptr;
-		    else return predicate(vp->value());
+		    else return vp != nullptr && predicate(vp->value());
 		}
 };
 
