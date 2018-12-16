@@ -51,21 +51,23 @@ class P<double> {
 
 template<>
 class P<std::string> {
-	static std::function<bool(boost::any)> eq(std::string b) {
-		return [&b](boost::any a) {
-			return boost::any_cast<std::string>(a).compare(b) == 0;
-		};
-	}
+	public:
+		static std::function<bool(boost::any)> eq(std::string b) {
+			return [&b](boost::any a) {
+				return boost::any_cast<std::string>(a).compare(b) == 0;
+			};
+		}
 };
 
 template<>
 class P<char*> {
-	static std::function<bool(boost::any)> eq(char* b) {
-		return [&b](boost::any a) {
-			std::string a_str = boost::any_cast<std::string>(a);
-			return strncmp(a_str.c_str(), b, a_str.length()) == 0;
-		};
-	}
+	public:
+		static std::function<bool(boost::any)> eq(char* b) {
+			return [&b](boost::any a) {
+				std::string a_str = boost::any_cast<std::string>(a);
+				return strncmp(a_str.c_str(), b, a_str.length()) == 0;
+			};
+		}
 };
 
 #endif

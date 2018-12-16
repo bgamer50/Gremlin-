@@ -44,10 +44,8 @@ class VertexProperty {
 		}
 
 		T value() {
-			std::cout << "bleh\n";
-			auto z = my_values->at(0);
-			std::cout << "blah\n";
-			return z;
+			if(my_values->empty()) throw std::runtime_error("No values present for the given property key.");
+			return my_values->at(0);
 		}
 };
 

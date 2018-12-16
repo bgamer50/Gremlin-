@@ -42,8 +42,9 @@ class HasStep : public TraversalStep {
 		bool apply(Vertex* v) {		    
 			VertexProperty<boost::any>* vp = v->property(property_key_or_label);
 
+			std::cout << boost::any_cast<std::string>(vp->value());
 		    if(predicate == nullptr) return vp == nullptr;
-		    else return vp != nullptr && predicate(vp->value());
+			else return vp != nullptr && predicate(vp->value());
 		}
 };
 
