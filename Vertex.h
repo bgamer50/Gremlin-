@@ -19,14 +19,14 @@ public:
 		Return a pointer to the Graph's unique 
 		Vertex id for this Vertex.
 	*/
-	virtual void const* id() = 0;
+	virtual boost::any id() = 0;
 
 	/*
 		Return a pointer to the Graph's label
 		for this Vertex.  If this Vertex does
 		not have a label, return NULL.
 	*/
-	virtual std::string const* label() = 0;
+	virtual std::string label() = 0;
 
 	/*
 		Get the property corresponding to the given
@@ -38,13 +38,13 @@ public:
 		Set the property corresponding to the given
 		key assuming the given cardinality.
 	*/
-	virtual VertexProperty<boost::any>* property(Cardinality cardinality, std::string key, boost::any value) = 0;
+	virtual VertexProperty<boost::any>* property(Cardinality cardinality, std::string key, boost::any& value) = 0;
 
 	/*
 		Set the property corresponding to the given
 		key.
 	*/
-	virtual VertexProperty<boost::any>* property(std::string key, boost::any value) = 0;
+	virtual VertexProperty<boost::any>* property(std::string key, boost::any& value) = 0;
 };
 
 #endif

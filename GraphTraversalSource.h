@@ -15,6 +15,7 @@ public:
 	GraphTraversalSource(Graph* gr);
 	Graph* getGraph();
 	virtual GraphTraversal<Vertex, Vertex>* V() = 0;
+	virtual GraphTraversal<Vertex, Vertex>* V(Vertex* v) = 0;
 	virtual GraphTraversal<Edge, Edge>* E() = 0;
 	virtual GraphTraversal<Vertex, Vertex>* addV() = 0;
 	virtual GraphTraversal<Vertex, Vertex>* addV(std::string label) = 0;

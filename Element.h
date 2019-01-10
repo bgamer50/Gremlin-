@@ -1,9 +1,10 @@
 #ifndef ELEMENT_H
 #define ELEMENT_H
+#include <boost/any.hpp>
 
 class Element {
-	virtual void const* id() = 0;
-	virtual std::string const* label() = 0;
+	virtual boost::any id() = 0;
+	virtual std::string label() = 0;
 };
 
 #endif

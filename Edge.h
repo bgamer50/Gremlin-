@@ -18,13 +18,13 @@ public:
 		Return a pointer to the Graph's unique 
 		Edge id for this Edge.
 	*/
-	virtual void const* id() = 0;
+	virtual boost::any id() = 0;
 
 	/*
 		Return a pointer to the Graph's label
 		for this Edge.
 	*/
-	virtual std::string const* label() = 0;
+	virtual std::string label() = 0;
 
 	/*
 		Return the out-Vertex of this Edge

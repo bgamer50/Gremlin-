@@ -3,10 +3,10 @@
 #include <string>
 #include <vector>
 
-GraphStep::GraphStep(GraphStepType gsType_arg, std::vector<void*> eids)
+GraphStep::GraphStep(GraphStepType gsType_arg, std::vector<boost::any> eids)
 : TraversalStep(MAP, GRAPH_STEP) {
 	this->gs_type = gsType_arg;
-	this->element_ids = eids;
+	for(boost::any id_ctr : eids) this->element_ids.push_back(id_ctr);
 }
 
 // Return something like GraphStep(VERTEX, {...}) or GraphStep(Edge, {})
@@ -19,4 +19,4 @@ std::string GraphStep::getInfo() {
 
 GraphStepType GraphStep::getType() { return this->gs_type; }
 
-std::vector<void*> GraphStep::get_element_ids() { return this->element_ids; }
+std::vector<boost::any> GraphStep::get_element_ids() { return this->element_ids; }

@@ -12,18 +12,18 @@ class AddPropertyStep : public TraversalStep {
 		std::string key;
 		boost::any value;
 	public:
-		AddPropertyStep(std::string property_key, boost::any value)
+		AddPropertyStep(std::string property_key, boost::any& value)
 		: TraversalStep(MAP, ADD_PROPERTY_STEP) {
 			this->cardinality = SINGLE;
-			this->key = property_key;
-			this->value = value;
+			this->key = std::string(property_key);
+			this->value = boost::any(value);
 		}
 
-		AddPropertyStep(Cardinality card, std::string property_key, boost::any value)
+		AddPropertyStep(Cardinality card, std::string property_key, boost::any& value)
 		: TraversalStep(MAP, ADD_PROPERTY_STEP) {
 			this->cardinality = card;
-			this->key = property_key;
-			this->value = value;
+			this->key = std::string(property_key);
+			this->value = boost::any(value);
 		}
 
 		std::string get_key() { return this->key; }

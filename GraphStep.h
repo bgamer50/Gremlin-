@@ -2,6 +2,7 @@
 #define GRAPH_STEP_H
 #include <string>
 #include <vector>
+#include <boost/any.hpp>
 #include "TraversalStep.h"
 
 #define GRAPH_STEP 0x81
@@ -11,12 +12,12 @@ enum GraphStepType {VERTEX, EDGE};
 class GraphStep : public TraversalStep {
 	private:
 		GraphStepType gs_type;
-		std::vector<void*> element_ids;
+		std::vector<boost::any> element_ids;
 	public:
-		GraphStep(GraphStepType gsType_arg, std::vector<void*> eids);
+		GraphStep(GraphStepType gsType_arg, std::vector<boost::any> eids);
 		virtual std::string	getInfo();
 		GraphStepType getType();
-		std::vector<void*> get_element_ids();
+		std::vector<boost::any> get_element_ids();
 };
 
 #endif

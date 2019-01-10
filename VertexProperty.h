@@ -27,11 +27,13 @@ class VertexProperty {
 				throw std::runtime_error("Set cardinality not yet supported!");
 			}
 			else if(card == LIST) {
-				my_values = new std::vector<T>(new_values.begin(), new_values.end());
+				my_values = new std::vector<T>;
+				for(T t : new_values) my_values->push_back(T(t));
 			}
 			else {
 				if(new_values.size() > 1) throw std::runtime_error("Specified single Cardinality but provided a vector of size > 1!");
-				my_values = new std::vector<T>(new_values.begin(), new_values.end());	
+				my_values = new std::vector<T>;
+				my_values->push_back(T(new_values[0]));
 			}
 		}
 
@@ -45,7 +47,8 @@ class VertexProperty {
 
 		T value() {
 			if(my_values->empty()) throw std::runtime_error("No values present for the given property key.");
-			return my_values->at(0);
+			T z = my_values->at(0);
+			return z;
 		}
 };
 

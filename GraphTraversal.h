@@ -133,15 +133,12 @@ public:
 	}
 
 	GraphTraversal<U,Vertex>* V(Vertex* vertex) {
-		return (GraphTraversal<U, Vertex>*)this->appendStep(new GraphStep(VERTEX, {(void*)vertex->id()}));
+		return (GraphTraversal<U, Vertex>*)this->appendStep(new GraphStep(VERTEX, {vertex->id()}));
 	}
 
 	GraphTraversal<U,Vertex>* V(std::vector<Vertex*> vertices) {
-		std::vector<void*> ids;
-		for(std::vector<Vertex*>::iterator v = vertices.begin(); v != vertices.end(); v++) {
-			void* id = (void*)((*v)->id());
-			ids.push_back(id);
-		}
+		std::vector<boost::any> ids;
+		for(Vertex* v : vertices) ids.push_back(v->id());
 		return this->appendStep(new GraphStep(VERTEX, ids));
 	}
 
@@ -348,7 +345,7 @@ public:
 	// Finalizing steps; these don't do anything in anonymous GraphTraversals
 	//boolean hasNext();
 	virtual W* next() { return NULL; }
-	virtual void forEachRemaining(std::function<void (W*)> func) {};
+	virtual void forEachRemaining(std::function<void(void*)> func) {};
 	virtual void iterate() {};
 	//std::vector<W*> toVector();
 	//GraphTraversal toSet();
@@ -381,6 +378,7 @@ public:
 								steps[++k] = new NoOpStep();
 							}
 							else if(steps[k + 1]->uid == TO_STEP) {
+								std::cout << "adding the to step\n";
 								aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
 								delete steps[k + 1];
 								steps[++k] = new NoOpStep();
