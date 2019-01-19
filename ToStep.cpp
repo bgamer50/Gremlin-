@@ -3,7 +3,7 @@
 
 ToStep::ToStep(std::string side_effect_label)
 : TraversalStep(MODULATOR, TO_STEP) {
-	to_traversal = (GraphTraversal<void*, Vertex>*)__->select(side_effect_label);
+	to_traversal = (GraphTraversal*)__->select(side_effect_label);
 }
 
 ToStep::ToStep(Vertex* to_vertex)
@@ -11,12 +11,12 @@ ToStep::ToStep(Vertex* to_vertex)
 	to_traversal = __->V(to_vertex);
 }
 
-ToStep::ToStep(GraphTraversal<void*, Vertex>* to_vertex_traversal)
+ToStep::ToStep(GraphTraversal* to_vertex_traversal)
 : TraversalStep(MODULATOR, TO_STEP) {
 	to_traversal = to_vertex_traversal;
 }
 
-GraphTraversal<void*, Vertex>* ToStep::getTraversal() {
+GraphTraversal* ToStep::getTraversal() {
 	return to_traversal;
 }
 

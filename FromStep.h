@@ -9,15 +9,15 @@ class Vertex;
 
 class FromStep : public TraversalStep {
 	private:
-		GraphTraversal<void*, Vertex>* from_traversal;
+		GraphTraversal* from_traversal;
 	public:
 		FromStep(std::string side_effect_label);
 
 		FromStep(Vertex* to_vertex);
 
-		FromStep(GraphTraversal<void*, Vertex>* from_vertex_traversal);
+		FromStep(GraphTraversal* from_vertex_traversal);
 
-		GraphTraversal<void*, Vertex>* getTraversal();
+		GraphTraversal* getTraversal();
 
 		virtual std::string getInfo();
 };

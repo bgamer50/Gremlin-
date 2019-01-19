@@ -49,9 +49,9 @@ class HasStep : public TraversalStep {
 		    if(predicate == nullptr) return vp == nullptr;
 			else { 
 				//std::cout << "need to test predicate\n";
-				//std::cout << "key: " << vp->key() << "\n";
-				//std::string value = boost::any_cast<std::string>(vp->value());
-				//std::cout << "value: " << value << "\n";
+				std::cout << "key: " << vp->key() << "\n";
+				std::string value = boost::any_cast<std::string>(vp->value());
+				std::cout << "value: " << value << "\n";
 				return vp != nullptr && predicate(vp->value());
 			}
 		}

@@ -18,8 +18,8 @@ std::string AddEdgeStartStep::getInfo() {
 	return info;
 }
 
-GraphTraversal<void*, Vertex>* AddEdgeStartStep::get_out_traversal() { return this->out_vertex_traversal; }
-GraphTraversal<void*, Vertex>* AddEdgeStartStep::get_in_traversal() { return this->in_vertex_traversal; }
-void AddEdgeStartStep::set_out_traversal(GraphTraversal<void*, Vertex>* new_traversal) { this->out_vertex_traversal = new_traversal; }
-void AddEdgeStartStep::set_in_traversal(GraphTraversal<void*, Vertex>* new_traversal) { this->in_vertex_traversal = new_traversal; }
+GraphTraversal* AddEdgeStartStep::get_out_traversal() { return this->out_vertex_traversal; }
+GraphTraversal* AddEdgeStartStep::get_in_traversal() { return this->in_vertex_traversal; }
+void AddEdgeStartStep::set_out_traversal(GraphTraversal* new_traversal) { this->out_vertex_traversal = new_traversal; }
+void AddEdgeStartStep::set_in_traversal(GraphTraversal* new_traversal) { this->in_vertex_traversal = new_traversal; }
 std::string AddEdgeStartStep::get_label() { return this->label; }

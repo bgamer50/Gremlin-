@@ -4,26 +4,25 @@
 #include <list>
 #include <map>
 #include <string.h>
+#include <boost/any.hpp>
 
-template<typename T>
 class Traverser {
 	private:
-		T* my_data;
-		std::list<void*> path;
-		std::map<std::string, void*> side_effects;
+		boost::any my_data;
+		std::list<boost::any> path;
+		std::map<std::string, boost::any> side_effects;
 
 	public:
-		Traverser(T t) {
-			my_data = (T*)malloc(sizeof(T));
-			memcpy(my_data, &t, sizeof(T));
+		Traverser(boost::any t) {
+			my_data = boost::any(t);
 		}
 
-		virtual T* get() {
+		virtual boost::any get() {
 			return my_data;
 		}
 
-		virtual void replace_data(T t) {
-			memcpy(my_data, &t, sizeof(T));
+		virtual void replace_data(boost::any t) {
+			my_data = t;
 		}
 };
 
