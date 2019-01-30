@@ -22,8 +22,6 @@
 #include "NoOpStep.h"
 #include "Direction.h"
 #include "HasStep.h"
-#include "FromStep.h"
-#include "ToStep.h"
 #include "P.h"
 #include "Direction.h"
 #include "Scope.h"
@@ -113,20 +111,9 @@ public:
 	//GraphTraversal* fold();
 	//GraphTraversal* from(GraphTraversal* fromTraversal);
 
-	GraphTraversal* from(std::string sideEffectLabel) {
-		// Because from() uses void* (sigh) this awkward memory copy is necessary.
-		const char* base_string = sideEffectLabel.c_str();
-		size_t size = (1 + strlen(base_string));
+	GraphTraversal* from(std::string sideEffectLabel);
 
-		char* sideEffectLabel_cpy = (char*)malloc(sizeof(char) * size);
-		strncpy(sideEffectLabel_cpy, base_string, size);
-
-		return this->appendStep(new FromStep(sideEffectLabel_cpy));
-	}
-
-	GraphTraversal* from(Vertex* fromVertex) {
-		return this->appendStep(new FromStep(fromVertex));
-	}
+	GraphTraversal* from(Vertex* fromVertex);
 
 	GraphTraversal* V() {
 		return this->appendStep(new GraphStep(VERTEX, {}));
@@ -238,21 +225,10 @@ public:
 	//GraphTraversal* to(GraphTraversal* toTraversal); //MODULATOR for addE
 
 	// MODULATOR for addE
-	GraphTraversal* to(std::string sideEffectLabel) {
-		// Because to() uses void* (sigh) this awkward memory copy is necessary.
-		const char* base_string = sideEffectLabel.c_str();
-		size_t size = (1 + strlen(base_string));
-
-		char* sideEffectLabel_cpy = (char*)malloc(sizeof(char) * size);
-		strncpy(sideEffectLabel_cpy, base_string, size);
-
-		return this->appendStep(new ToStep(sideEffectLabel_cpy));
-	}
+	GraphTraversal* to(std::string sideEffectLabel);
 
 	// MODULATOR for addE
-	GraphTraversal* to(Vertex* toVertex) {
-		return this->appendStep(new ToStep(toVertex));
-	}
+	GraphTraversal* to(Vertex* toVertex);
 
 	//GraphTraversal* toV(Direction direction);
 	//GraphTraversal tree(std::string sideEffectLabel);
@@ -334,6 +310,8 @@ public:
 	//GraphTraversal eq(std::string equal);
 	//GraphTraversal
 
+	void getInitialTraversal();
+
 	// The explain finalizer which works in anonymous GraphTraversals
 	std::string explain() {
 		this->getInitialTraversal();
@@ -351,77 +329,112 @@ public:
 	virtual void iterate() {};
 	//std::vector<W*> toVector();
 	//GraphTraversal toSet();
-
-	/*
-		In general this should be called by the finalization steps in
-		classes that extend GraphTraversal.
-	*/
-	void getInitialTraversal() {
-		for(int k = 0; k < steps.size(); k++) {
-			TraversalStep* currentStep = steps[k];
-			switch(currentStep->uid) {
-				case ADD_EDGE_STEP: {
-					AddEdgeStep* aes = (AddEdgeStep*)currentStep;
-					if(k + 1 < steps.size()) {
-						if(steps[k + 1]->uid == FROM_STEP) {
-							aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
-							delete steps[k + 1];
-							steps[++k] = new NoOpStep();
-						}
-						else if(steps[k + 1]->uid == TO_STEP) {
-							aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
-							delete steps[k + 1];
-							steps[++k] = new NoOpStep();
-						}
-						if(k + 1 < steps.size()) {
-							if(steps[k + 1]->uid == FROM_STEP) {
-								aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
-								delete steps[k + 1];
-								steps[++k] = new NoOpStep();
-							}
-							else if(steps[k + 1]->uid == TO_STEP) {
-								std::cout << "adding the to step\n";
-								aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
-								delete steps[k + 1];
-								steps[++k] = new NoOpStep();
-							}
-						}
-					}
-					break;
-				}
-				case ADD_EDGE_START_STEP: {
-					AddEdgeStartStep* aes = (AddEdgeStartStep*)currentStep;
-					if(k + 1 < steps.size()) {
-						if(steps[k + 1]->uid == FROM_STEP) {
-							aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
-							delete steps[k + 1];
-							steps[++k] = new NoOpStep();
-						}
-						else if(steps[k + 1]->uid == TO_STEP) {
-							aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
-							delete steps[k + 1];
-							steps[++k] = new NoOpStep();
-						}
-						if(k + 1 < steps.size()) {
-							if(steps[k + 1]->uid == FROM_STEP) {
-								aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
-								delete steps[k + 1];
-								steps[++k] = new NoOpStep();
-							}
-							else if(steps[k + 1]->uid == TO_STEP) {
-								aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
-								delete steps[k + 1];
-								steps[++k] = new NoOpStep();
-							}
-						}
-					}
-					break;
-				}
-			}
-		}
-	}
 };
 
 #define __ (new GraphTraversal())
+
+#include "FromStep.h"
+#include "ToStep.h"
+
+/*
+	In general this should be called by the finalization steps in
+	classes that extend GraphTraversal.
+*/
+void GraphTraversal::getInitialTraversal() {
+	for(int k = 0; k < steps.size(); k++) {
+		TraversalStep* currentStep = steps[k];
+		switch(currentStep->uid) {
+			case ADD_EDGE_STEP: {
+				AddEdgeStep* aes = (AddEdgeStep*)currentStep;
+				if(k + 1 < steps.size()) {
+					if(steps[k + 1]->uid == FROM_STEP) {
+						aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
+						delete steps[k + 1];
+						steps[++k] = new NoOpStep();
+					}
+					else if(steps[k + 1]->uid == TO_STEP) {
+						aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
+						delete steps[k + 1];
+						steps[++k] = new NoOpStep();
+					}
+					if(k + 1 < steps.size()) {
+						if(steps[k + 1]->uid == FROM_STEP) {
+							aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
+							delete steps[k + 1];
+							steps[++k] = new NoOpStep();
+						}
+						else if(steps[k + 1]->uid == TO_STEP) {
+							std::cout << "adding the to step\n";
+							aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
+							delete steps[k + 1];
+							steps[++k] = new NoOpStep();
+						}
+					}
+				}
+				break;
+			}
+			case ADD_EDGE_START_STEP: {
+				AddEdgeStartStep* aes = (AddEdgeStartStep*)currentStep;
+				if(k + 1 < steps.size()) {
+					if(steps[k + 1]->uid == FROM_STEP) {
+						aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
+						delete steps[k + 1];
+						steps[++k] = new NoOpStep();
+					}
+					else if(steps[k + 1]->uid == TO_STEP) {
+						aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
+						delete steps[k + 1];
+						steps[++k] = new NoOpStep();
+					}
+					if(k + 1 < steps.size()) {
+						if(steps[k + 1]->uid == FROM_STEP) {
+							aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
+							delete steps[k + 1];
+							steps[++k] = new NoOpStep();
+						}
+						else if(steps[k + 1]->uid == TO_STEP) {
+							aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
+							delete steps[k + 1];
+							steps[++k] = new NoOpStep();
+						}
+					}
+				}
+				break;
+			}
+		}
+	}
+}
+
+GraphTraversal* GraphTraversal::from(std::string sideEffectLabel) {
+	// Because from() uses void* (sigh) this awkward memory copy is necessary.
+	const char* base_string = sideEffectLabel.c_str();
+	size_t size = (1 + strlen(base_string));
+
+	char* sideEffectLabel_cpy = (char*)malloc(sizeof(char) * size);
+	strncpy(sideEffectLabel_cpy, base_string, size);
+
+	return this->appendStep(new FromStep(sideEffectLabel_cpy));
+}
+
+GraphTraversal* GraphTraversal::from(Vertex* fromVertex) {
+	return this->appendStep(new FromStep(fromVertex));
+}
+
+// MODULATOR for addE
+GraphTraversal* GraphTraversal::to(std::string sideEffectLabel) {
+	// Because to() uses void* (sigh) this awkward memory copy is necessary.
+	const char* base_string = sideEffectLabel.c_str();
+	size_t size = (1 + strlen(base_string));
+
+	char* sideEffectLabel_cpy = (char*)malloc(sizeof(char) * size);
+	strncpy(sideEffectLabel_cpy, base_string, size);
+
+	return this->appendStep(new ToStep(sideEffectLabel_cpy));
+}
+
+// MODULATOR for addE
+GraphTraversal* GraphTraversal::to(Vertex* toVertex) {
+	return this->appendStep(new ToStep(toVertex));
+}
 
 #endif

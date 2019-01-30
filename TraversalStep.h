@@ -11,8 +11,14 @@ private:
 	TraversalStepType type;
 public:
 	unsigned int uid;
-	TraversalStep(TraversalStepType tsType, unsigned int uid);
-	virtual std::string getInfo();
+	TraversalStep(TraversalStepType tsType, unsigned int id) {
+		type = tsType;
+		uid = id;
+	}
+
+	virtual std::string getInfo() {
+		return "UnknownTraversalStep{}";
+	}
 };
 
 #endif

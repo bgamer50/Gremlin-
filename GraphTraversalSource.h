@@ -2,17 +2,24 @@
 #define GRAPH_TRAVERSAL_SOURCE_H
 
 #include <string>
+
+class GraphTraversal;
 class Graph;
 class Vertex;
 class Edge;
-class GraphTraversal;
 
 class GraphTraversalSource {
 private:
 	Graph* graph;
 public:
-	GraphTraversalSource(Graph* gr);
-	Graph* getGraph();
+	GraphTraversalSource(Graph* gr) {
+		graph = gr;
+	}
+	
+	Graph* getGraph() {
+		return graph;
+	}
+
 	virtual GraphTraversal* V() = 0;
 	virtual GraphTraversal* V(Vertex* v) = 0;
 	virtual GraphTraversal* E() = 0;

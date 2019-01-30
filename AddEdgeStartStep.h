@@ -5,7 +5,6 @@
 
 #include "GraphTraversal.h"
 #include "TraversalStep.h"
-#include "AddEdgeStartStep.h"
 #include <string>
 #include <vector>
 

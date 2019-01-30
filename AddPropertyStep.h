@@ -3,7 +3,6 @@
 
 #define ADD_PROPERTY_STEP 0x75
 #include "TraversalStep.h"
-#include "ApplicableStep.h"
 #include "Vertex.h"
 
 class AddPropertyStep : public TraversalStep {

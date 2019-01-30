@@ -10,10 +10,13 @@ using namespace std;
 
 class Graph {
 public:
-	Graph();
+	Graph(){}
 	virtual GraphTraversalSource* traversal() = 0;
 	virtual vector<Vertex*> vertices() = 0;
 	virtual vector<Edge*> edges() = 0;
+	virtual Vertex* add_vertex(std::string label) = 0;
+	virtual Vertex* add_vertex() = 0;
+	virtual Edge* add_edge(Vertex* from_vertex, Vertex* to_vertex, std::string label) = 0;
 };
 
 #endif

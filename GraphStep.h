@@ -14,10 +14,22 @@ class GraphStep : public TraversalStep {
 		GraphStepType gs_type;
 		std::vector<boost::any> element_ids;
 	public:
-		GraphStep(GraphStepType gsType_arg, std::vector<boost::any> eids);
-		virtual std::string	getInfo();
-		GraphStepType getType();
-		std::vector<boost::any> get_element_ids();
+		GraphStep(GraphStepType gsType_arg, std::vector<boost::any> eids)
+		: TraversalStep(MAP, GRAPH_STEP) {
+			this->gs_type = gsType_arg;
+			for(boost::any id_ctr : eids) this->element_ids.push_back(id_ctr);
+		}
+
+		virtual std::string	getInfo() {
+			std::string info = "GraphStep(";
+			info += this->gs_type == VERTEX ? "VERTEX" : "EDGE";
+			info = info + ", " + (element_ids.size() > 0 ? "{...}" : "{}");
+			return info + ")";
+		}
+
+		GraphStepType getType() { return this->gs_type; }
+
+		std::vector<boost::any> get_element_ids() { return this->element_ids; }
 };
 
 #endif
