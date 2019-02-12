@@ -19,10 +19,12 @@
 #include "AddEdgeStartStep.h"
 #include "AddVertexStartStep.h"
 #include "AddPropertyStep.h"
+#include "PropertyStep.h"
 #include "NoOpStep.h"
 #include "Direction.h"
 #include "HasStep.h"
 #include "P.h"
+#include "MinStep.h"
 #include "Direction.h"
 #include "Scope.h"
 
@@ -178,7 +180,12 @@ public:
 	//GraphTraversal max(Scope scope);
 	//GraphTraversal* mean();
 	//GraphTraversal mean(Scope scope);
-	//GraphTraversal* min();
+	GraphTraversal* min(std::function<int(Traverser*, Traverser*)> c) {
+		return this->appendStep(new MinStep(c));
+	};
+	GraphTraversal* min() {
+		return this->appendStep(new MinStep(nullptr));
+	}
 	//GraphTraversal min(Scope scope);
 	//GraphTraversal _not(GraphTraversal notTraversal);
 	//GraphTraversal option(GraphTraversal optionTraversal);
@@ -243,7 +250,9 @@ public:
 	//GraphTraversal valueMap(bool includeIdLabelKeyValue);
 	//GraphTraversal valueMap(bool includeIdLabelKeyValue, std::vector<std::string> labels);
 	//GraphTraversal values();
-	//GraphTraversal values(std::vector<std::string> labels);
+	GraphTraversal* values(std::vector<std::string> labels) {
+		return this->appendStep(new PropertyStep(VALUE, labels));
+	}
 
 	GraphTraversal* both() {
 		return this->appendStep(new VertexStep(BOTH, {}, VERTEX));
