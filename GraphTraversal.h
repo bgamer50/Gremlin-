@@ -21,6 +21,8 @@
 #include "AddPropertyStep.h"
 #include "PropertyStep.h"
 #include "NoOpStep.h"
+#include "CoalesceStep.h"
+#include "IdentityStep.h"
 #include "Direction.h"
 #include "HasStep.h"
 #include "P.h"
@@ -100,7 +102,10 @@ public:
 	//GraphTraversal* cap(std::vector<std::string> sideEffectLabels);
 	//GraphTraversal<auto n> choose(GraphTraversal<A> ifTraversal, GraphTraversal<B> trueTraversal, GraphTraversal<C> falseTraversal);
 	//GraphTraversal<auto n> choose(GraphTraversal<A> withOptionTraversal);
-	//GraphTraversal<auto n> coalesce(std::vector<GraphTraversal<A>> traversals);
+	
+	GraphTraversal* coalesce(std::vector<GraphTraversal*> traversals) {
+		return this->appendStep(new CoalesceStep(traversals));
+	}
 	//GraphTraversal* coin(float chance);
 	//GraphTraversal constant(void* value, size_t size);
 	//GraphTraversal* count();
@@ -146,7 +151,7 @@ public:
 
 	template<typename T>
 	GraphTraversal* has(std::string key, T value) {
-		return this->appendStep(new HasStep(key, P<T>::eq(value)));
+		return this->appendStep(new HasStep(key, value, P<T>::eq(value)));
 	}
 
 	template<typename T>
@@ -161,10 +166,14 @@ public:
 	//GraphTraversal* hasLabel(std::string label);
 	//GraphTraversal* hasId(void* ids, size_t sizeOfEach, int length); // dangerous operation
 	//GraphTraversal* hasValue(void* values, size_t* sizesOfEach, int length); // dangerous operation
+	
 	GraphTraversal* id() {
 		return this->appendStep(new IdStep());
-	};
-	//GraphTraversal* identity();
+	}
+
+	GraphTraversal* identity() {
+		return this->appendStep(new IdentityStep());
+	}
 	//GraphTraversal inject(void* object, size_t size);
 	//GraphTraversal* is(void* val, size_t size);
 	//GraphTraversal is(Predicate predicate);
@@ -180,9 +189,11 @@ public:
 	//GraphTraversal max(Scope scope);
 	//GraphTraversal* mean();
 	//GraphTraversal mean(Scope scope);
+	
 	GraphTraversal* min(std::function<int(Traverser*, Traverser*)> c) {
 		return this->appendStep(new MinStep(c));
-	};
+	}
+
 	GraphTraversal* min() {
 		return this->appendStep(new MinStep(nullptr));
 	}
@@ -252,6 +263,10 @@ public:
 	//GraphTraversal values();
 	GraphTraversal* values(std::vector<std::string> labels) {
 		return this->appendStep(new PropertyStep(VALUE, labels));
+	}
+
+	GraphTraversal* values(std::string label) {
+		return this->appendStep(new PropertyStep(VALUE, {label}));
 	}
 
 	GraphTraversal* both() {

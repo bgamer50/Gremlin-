@@ -23,8 +23,9 @@ class C<uint64_t> {
     public:
         static std::function<int(Traverser*, Traverser*)> compare() {
             return [](Traverser* t1, Traverser* t2) {
-                uint64_t d = boost::any_cast<uint64_t>(t1->get()) - boost::any_cast<uint64_t>(t2->get());
-                return d == 0 ? 0 : d > 0 ? 1 : -1;
+                uint64_t u1 = boost::any_cast<uint64_t>(t1->get());
+                uint64_t u2 = boost::any_cast<uint64_t>(t2->get());
+                return u1 == u2 ? 0 : (u1 < u2 ? -1 : 1);
             };
         }
 };

@@ -29,7 +29,7 @@ class GraphStep : public TraversalStep {
 
 		GraphStepType getType() { return this->gs_type; }
 
-		std::vector<boost::any> get_element_ids() { return this->element_ids; }
+		std::vector<boost::any>& get_element_ids() { return this->element_ids; }
 };
 
 #endif
