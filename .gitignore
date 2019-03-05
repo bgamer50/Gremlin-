@@ -4,3 +4,4 @@
 *.exe
 *.stackdump
 .vscode/*
+bin/*
