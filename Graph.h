@@ -12,7 +12,7 @@ class Graph {
 public:
 	Graph(){}
 	virtual GraphTraversalSource* traversal() = 0;
-	virtual std::list<Vertex*>& vertices() = 0;
+	virtual std::list<Vertex*> vertices() = 0;
 	virtual std::list<Edge*>& edges() = 0;
 	virtual Vertex* add_vertex(std::string label) = 0;
 	virtual Vertex* add_vertex() = 0;
