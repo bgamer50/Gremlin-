@@ -25,12 +25,15 @@
 #include "IdentityStep.h"
 #include "Direction.h"
 #include "HasStep.h"
+#include "CountStep.h"
 #include "P.h"
 #include "MinStep.h"
 #include "Direction.h"
 #include "Scope.h"
+#include "TraversalStrategy.h"
 
 #include "Vertex.h"
+
 
 class Edge;
 class Graph;
@@ -38,25 +41,21 @@ class Graph;
 class GraphTraversal {
 protected:
 	std::vector<TraversalStep*> steps;
+	std::vector<TraversalStrategy> strategies;
 private:
 	GraphTraversalSource* source;
 public:
 	/*
+		The "default" constructor.
+	*/
+	GraphTraversal();
+
+	/*
 		The given traversal source is allowed to be null, in the case of an
 		anomymous traversal.
 	*/
-	GraphTraversal(GraphTraversalSource* src) {
-		source = src;
-	}
-
-	GraphTraversal() {
-		source = NULL;
-	}
-
-	GraphTraversal(GraphTraversal* trv) {
-		this->steps = trv->getSteps();
-		this->source = trv->getTraversalSource();
-	}
+	GraphTraversal(GraphTraversalSource* src);
+	GraphTraversal(GraphTraversal* trv);
 
 	Graph* getGraph() {
 		return (*source).getGraph();
@@ -108,7 +107,9 @@ public:
 	}
 	//GraphTraversal* coin(float chance);
 	//GraphTraversal constant(void* value, size_t size);
-	//GraphTraversal* count();
+	GraphTraversal* count() {
+		return this->appendStep(new CountStep());
+	}
 	//GraphTraversal* cyclicPath();
 	//GraphTraversal* dedup();
 	//GraphTraversal* drop();
@@ -355,78 +356,44 @@ public:
 	//GraphTraversal toSet();
 };
 
+#ifndef __
 #define __ (new GraphTraversal())
+#endif
 
 #include "FromStep.h"
 #include "ToStep.h"
+#include "AddEdgeStepCompletionStrategy.h"
+
+/*
+	The "default" constructor.
+*/
+GraphTraversal::GraphTraversal() {
+	this->strategies.push_back(add_edge_step_completion_strategy);
+	source = NULL;
+}
+
+/*
+	The given traversal source is allowed to be null, in the case of an
+	anomymous traversal.
+*/
+GraphTraversal::GraphTraversal(GraphTraversalSource* src) : GraphTraversal() {
+	source = src;
+}
+
+GraphTraversal::GraphTraversal(GraphTraversal* trv) : GraphTraversal() {
+	this->steps = trv->getSteps();
+	this->source = trv->getTraversalSource();
+}
 
 /*
 	In general this should be called by the finalization steps in
 	classes that extend GraphTraversal.
 */
 void GraphTraversal::getInitialTraversal() {
-	for(int k = 0; k < steps.size(); k++) {
-		TraversalStep* currentStep = steps[k];
-		switch(currentStep->uid) {
-			case ADD_EDGE_STEP: {
-				AddEdgeStep* aes = (AddEdgeStep*)currentStep;
-				if(k + 1 < steps.size()) {
-					if(steps[k + 1]->uid == FROM_STEP) {
-						aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
-						delete steps[k + 1];
-						steps[++k] = new NoOpStep();
-					}
-					else if(steps[k + 1]->uid == TO_STEP) {
-						aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
-						delete steps[k + 1];
-						steps[++k] = new NoOpStep();
-					}
-					if(k + 1 < steps.size()) {
-						if(steps[k + 1]->uid == FROM_STEP) {
-							aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
-							delete steps[k + 1];
-							steps[++k] = new NoOpStep();
-						}
-						else if(steps[k + 1]->uid == TO_STEP) {
-							std::cout << "adding the to step\n";
-							aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
-							delete steps[k + 1];
-							steps[++k] = new NoOpStep();
-						}
-					}
-				}
-				break;
-			}
-			case ADD_EDGE_START_STEP: {
-				AddEdgeStartStep* aes = (AddEdgeStartStep*)currentStep;
-				if(k + 1 < steps.size()) {
-					if(steps[k + 1]->uid == FROM_STEP) {
-						aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
-						delete steps[k + 1];
-						steps[++k] = new NoOpStep();
-					}
-					else if(steps[k + 1]->uid == TO_STEP) {
-						aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
-						delete steps[k + 1];
-						steps[++k] = new NoOpStep();
-					}
-					if(k + 1 < steps.size()) {
-						if(steps[k + 1]->uid == FROM_STEP) {
-							aes->set_out_traversal(((FromStep*)steps[k + 1])->getTraversal());
-							delete steps[k + 1];
-							steps[++k] = new NoOpStep();
-						}
-						else if(steps[k + 1]->uid == TO_STEP) {
-							aes->set_in_traversal(((ToStep*)steps[k + 1])->getTraversal());
-							delete steps[k + 1];
-							steps[++k] = new NoOpStep();
-						}
-					}
-				}
-				break;
-			}
-		}
-	}
+	// Apply each strategy to this traversal's traversers.
+	std::for_each(this->strategies.begin(), this->strategies.end(), [this](TraversalStrategy strategy) {
+		strategy(this->steps);
+	});
 }
 
 GraphTraversal* GraphTraversal::from(std::string sideEffectLabel) {
