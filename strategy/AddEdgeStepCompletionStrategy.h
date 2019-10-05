@@ -8,16 +8,17 @@ class ToStep;
 class AddEdgeStep;
 class AddEdgeStartStep;
 class TraversalStep;
-class GraphTraversal;
 
 inline bool add_edge_gather(AddEdgeStep* aes, TraversalStep* next_step);
 bool add_edge_start_gather(AddEdgeStartStep* aes, TraversalStep* next_step);
 void add_edge_step_completion_strategy(std::vector<TraversalStep*>& steps);
 
-#include "FromStep.h"
-#include "ToStep.h"
-#include "AddEdgeStep.h"
-#include "AddEdgeStartStep.h"
+#include "GraphTraversal.h"
+#include "step/modulate/FromStep.h"
+#include "step/modulate/ToStep.h"
+#include "step/edge/AddEdgeStep.h"
+#include "step/edge/AddEdgeStartStep.h"
+#include "step/logic/NoOpStep.h"
 
 /*
     Grabs the from or to step immediately following the AddEdgeStep.

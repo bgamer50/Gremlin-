@@ -7,7 +7,6 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
-#include <iostream> // TODO REMOVE
 #include <boost/any.hpp>
 #include "Property.h"
 

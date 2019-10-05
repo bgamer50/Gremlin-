@@ -3,7 +3,8 @@
 
 #include <functional>
 #include <vector>
-#include "TraversalStep.h"
+#include "GraphTraversal.h"
+#include "step/TraversalStep.h"
 
 /*
     Traversal Strategies operate on a vector of steps, mutating it as necessary.

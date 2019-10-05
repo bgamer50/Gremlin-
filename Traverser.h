@@ -26,4 +26,6 @@ class Traverser {
 		}
 };
 
+typedef std::vector<Traverser*> TraverserSet;
+
 #endif

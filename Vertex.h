@@ -6,6 +6,9 @@
 #include <boost/any.hpp>
 #include "VertexProperty.h"
 #include "Element.h"
+#include "Direction.h"
+
+class Graph;
 
 class Vertex : public Element {
 public:
@@ -14,6 +17,11 @@ public:
 		Vertex is just an interface
 	*/
 	Vertex(){};
+
+	/*
+		Get the Graph this Vertex belongs to.
+	*/
+	virtual Graph* getGraph() = 0;
 
 	/*
 		Return a pointer to the Graph's unique 
@@ -27,6 +35,11 @@ public:
 		not have a label, return NULL.
 	*/
 	virtual std::string label() = 0;
+
+	/*
+		Get the edges for this Vertex in the given direction.
+	*/
+	virtual std::vector<Edge*> edges(Direction dir) = 0;
 
 	/*
 		Get the property corresponding to the given
@@ -46,5 +59,7 @@ public:
 	*/
 	virtual VertexProperty<boost::any>* property(std::string key, boost::any& value) = 0;
 };
+
+#include "Graph.h"
 
 #endif

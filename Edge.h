@@ -3,8 +3,10 @@
 
 #include <stdlib.h>
 #include <string>
-#include "Vertex.h"
 #include "Element.h"
+#include "Graph.h"
+
+class Vertex;
 
 class Edge : public Element {
 public:
@@ -13,6 +15,11 @@ public:
 		since Edge is just an interface.
 	*/
 	Edge() {};
+
+	/*
+		Get the Graph this Edge belongs to.
+	*/
+	virtual Graph* getGraph() = 0;
 
 	/*
 		Return a pointer to the Graph's unique 
@@ -40,12 +47,20 @@ public:
 		Return the pair of Vertices related
 		to this edge as an (outV, inV) pair.
 	*/
-	virtual Vertex** bothV() {
-		Vertex** vertices = (Vertex**)malloc(sizeof(Vertex*) * 2);
-		vertices[0] = outV();
-		vertices[1] = inV();
-		return vertices;
-	}
+	virtual Vertex** bothV();
 };
+
+#include "Vertex.h"
+
+/*
+	Return the pair of Vertices related
+	to this edge as an (outV, inV) pair.
+*/
+Vertex** Edge::bothV() {
+	Vertex** vertices = (Vertex**)malloc(sizeof(Vertex*) * 2);
+	vertices[0] = outV();
+	vertices[1] = inV();
+	return vertices;
+}
 
 #endif
