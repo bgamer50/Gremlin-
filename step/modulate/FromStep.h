@@ -24,7 +24,7 @@ class FromStep : public TraversalStep {
 		virtual std::string getInfo();
 };
 
-#include "GraphTraversal.h"
+#include "traversal/GraphTraversal.h"
 #include "step/TraversalStep.h"
 
 FromStep::FromStep(GraphTraversal* from_vertex_traversal)

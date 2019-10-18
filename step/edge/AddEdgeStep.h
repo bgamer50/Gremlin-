@@ -1,7 +1,7 @@
 #ifndef ADD_EDGE_STEP_H
 #define ADD_EDGE_STEP_H
 
-#include "GraphTraversal.h"
+#include "traversal/GraphTraversal.h"
 #include "step/TraversalStep.h"
 #include "step/InjectStep.h"
 #include <string>

@@ -2,7 +2,7 @@
 #define PROPERTY_STEP_H
 
 #include "step/TraversalStep.h"
-#include "Property.h"
+#include "structure/Property.h"
 #include <vector>
 #include <string>
 #include <boost/any.hpp>
@@ -31,17 +31,20 @@ class PropertyStep: public TraversalStep {
             std::vector<Traverser*> new_traversers;
             bool get_value = this->ps_type == VALUE;
 
-            for(auto it = traversers.begin(); it != traversers.end(); ++it) {
+            for(Traverser* trv : traversers) {
                 for(std::string key : keys) {
-                    try {
-                        Vertex* v = boost::any_cast<Vertex*>((*it)->get());
-                        VertexProperty<boost::any>* p = v->property(key); //TODO multiproperties?
-                        if(p == nullptr) new_traversers.push_back(new Traverser(boost::any()));
-                        else if(get_value && !p->value().empty()) new_traversers.push_back(new Traverser(p->value()));
-                        else if(!get_value) new_traversers.push_back(new Traverser(boost::any(p)));
-                    } catch(const std::exception& err) {
+                    boost::any x = trv->get();
+                    /*
+                    if(x.type() != typeid(Vertex*)) {
                         throw std::runtime_error("Error: Traverser does not appear to contain a Vertex.");
                     }
+                    */
+
+                    Vertex* v = boost::any_cast<Vertex*>(x);
+                    VertexProperty<boost::any>* p = v->property(key); //TODO multiproperties?
+                    if(p == nullptr) new_traversers.push_back(new Traverser(boost::any()));
+                    else if(get_value && !p->value().empty()) new_traversers.push_back(new Traverser(p->value()));
+                    else if(!get_value) new_traversers.push_back(new Traverser(boost::any(p)));
                 }
             }
 

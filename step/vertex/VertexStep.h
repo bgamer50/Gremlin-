@@ -5,10 +5,12 @@
 #include <set>
 #include <algorithm>
 #include "step/TraversalStep.h"
-#include "Direction.h"
+#include "structure/Direction.h"
 #include "step/graph/GraphStep.h"
-#include "Traverser.h"
-#include "GraphTraversal.h"
+#include "traversal/Traverser.h"
+#include "traversal/GraphTraversal.h"
+
+#include <boost/lockfree/stack.hpp>
 
 #define VERTEX_STEP 0x80
 
@@ -58,9 +60,14 @@ class VertexStep : public TraversalStep {
 			bool label_required = !this->edge_labels.empty();
 
 			std::vector<Traverser*> new_traversers;
+			
+			//boost::lockfree::stack<Traverser*> new_traversers(8);
 			std::for_each(traversers.begin(), traversers.end(), [&, this](Traverser* trv) {
 				Vertex* v = boost::any_cast<Vertex*>(trv->get());
-				for(Edge* e : v->edges(direction)) {
+				std::vector<Edge*> edges = v->edges(direction);
+				//#pragma omp for
+				for(size_t k = 0; k < edges.size(); ++k) {
+					Edge* e = edges[k];
 					if(label_required && this->edge_labels.count(e->label()) == 0) continue;
 
 					switch(direction) {
@@ -84,9 +91,12 @@ class VertexStep : public TraversalStep {
 
 				}
 			});
+		
 
 			traversers.swap(new_traversers);
 			std::for_each(new_traversers.begin(), new_traversers.end(), [](Traverser* trav){delete trav;});
+			//traversers.clear();
+			//new_traversers.consume_all([&](Traverser* trv){ traversers.push_back(trv); }); 
 		}
 };
 

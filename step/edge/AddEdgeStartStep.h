@@ -36,12 +36,12 @@ class AddEdgeStartStep: public TraversalStep {
 		virtual void apply(GraphTraversal* trv, TraverserSet& traversers);
 };
 
-#include "GraphTraversal.h"
+#include "traversal/GraphTraversal.h"
 #include "step/TraversalStep.h"
-#include "Traverser.h"
-#include "Graph.h"
-#include "Vertex.h"
-#include "Edge.h"
+#include "traversal/Traverser.h"
+#include "structure/Graph.h"
+#include "structure/Vertex.h"
+#include "structure/Edge.h"
 
 AddEdgeStartStep::AddEdgeStartStep(std::string label_arg)
 : TraversalStep(MAP, ADD_EDGE_START_STEP) {

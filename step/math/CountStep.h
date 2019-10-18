@@ -9,7 +9,7 @@
 class CountStep : public TraversalStep {
     public:
         CountStep()
-        : TraversalStep(MAP, COUNT_STEP) {
+        : TraversalStep(true, MAP, COUNT_STEP) {
             // empty constructor
         }
 

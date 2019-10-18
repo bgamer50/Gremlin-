@@ -2,8 +2,8 @@
 #define ID_STEP_H
 
 #include "step/TraversalStep.h"
-#include "Vertex.h"
-#include "Edge.h"
+#include "structure/Vertex.h"
+#include "structure/Edge.h"
 
 #define ID_STEP 0x66
 

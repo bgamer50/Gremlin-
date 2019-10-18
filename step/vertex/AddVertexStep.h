@@ -2,8 +2,8 @@
 #define ADD_VERTEX_STEP_H
 
 #include "step/TraversalStep.h"
-#include "Traverser.h"
-#include "GraphTraversal.h"
+#include "traversal/Traverser.h"
+#include "traversal/GraphTraversal.h"
 #include <string>
 #include <vector>
 

@@ -3,7 +3,7 @@
 
 #include <functional>
 #include <vector>
-#include "GraphTraversal.h"
+#include "traversal/GraphTraversal.h"
 #include "step/TraversalStep.h"
 
 /*

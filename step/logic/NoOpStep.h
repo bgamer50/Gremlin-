@@ -4,8 +4,8 @@
 #define NO_OP_STEP 0x00
 
 #include "step/TraversalStep.h"
-#include "GraphTraversal.h"
-#include "Traverser.h"
+#include "traversal/GraphTraversal.h"
+#include "traversal/Traverser.h"
 
 // Not technically part of Gremlin; just for
 // use as a intermediate representation.

@@ -4,7 +4,7 @@
 #define ADD_PROPERTY_STEP 0x75
 #include "step/TraversalStep.h"
 #include "step/InjectStep.h"
-#include "Vertex.h"
+#include "structure/Vertex.h"
 #include <boost/any.hpp>
 
 // Edge properties currently not supported.
@@ -43,7 +43,10 @@ class AddPropertyStep : public TraversalStep {
 			if(this->value.type() == typeid(GraphTraversal*)) {
 				GraphTraversal* ap_anonymous_trv = boost::any_cast<GraphTraversal*>(value);
 				
-				std::for_each(traversers.begin(), traversers.end(), [&](Traverser* trv) {
+				#pragma omp for
+				//std::for_each(traversers.begin(), traversers.end(), [&](Traverser* trv) {
+				for(int k = 0; k < traversers.size(); ++k) {
+					Traverser* trv = traversers[k];
 					//Element* e = get_element(trv->get());
 					Vertex* e = boost::any_cast<Vertex*>(trv->get());
 					GraphTraversal new_trv(current_traversal->getTraversalSource(), ap_anonymous_trv);
@@ -57,7 +60,8 @@ class AddPropertyStep : public TraversalStep {
 					// Store the property; TODO deal w/ edges
 					e->property(this->cardinality, this->key, prop_value);
 					//std::cout << "property stored!\n";
-				});
+				}
+				//});
 			} 
 			else {
 				// Store the propety; TODO deal w/ edges

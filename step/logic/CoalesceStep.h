@@ -17,7 +17,7 @@ class CoalesceStep: public TraversalStep {
         virtual void apply(GraphTraversal* parent_traversal, TraverserSet& traversers);
 };
 
-#include "GraphTraversal.h"
+#include "traversal/GraphTraversal.h"
 #include "step/TraversalStep.h"
 #include "step/InjectStep.h"
 

@@ -4,7 +4,7 @@
 #include <vector>
 #include <boost/any.hpp>
 #include "step/TraversalStep.h"
-#include "Traverser.h"
+#include "traversal/Traverser.h"
 
 #define GRAPH_STEP 0x81
 

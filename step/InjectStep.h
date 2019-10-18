@@ -3,7 +3,7 @@
 
 #define INJECT_STEP 0x74
 
-#include "Traverser.h"
+#include "traversal/Traverser.h"
 #include <boost/any.hpp>
 #include <vector>
 #include <algorithm>

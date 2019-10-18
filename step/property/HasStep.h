@@ -6,8 +6,8 @@
 #include <iostream>
 #include <boost/any.hpp>
 #include "step/TraversalStep.h"
-#include "P.h"
-#include "Vertex.h"
+#include "traversal/P.h"
+#include "structure/Vertex.h"
 
 #define HAS_STEP 0x83
 

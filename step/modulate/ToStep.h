@@ -28,7 +28,7 @@ class ToStep : public TraversalStep {
 		virtual std::string getInfo();
 };
 
-#include "GraphTraversal.h"
+#include "traversal/GraphTraversal.h"
 
 ToStep::ToStep(std::string side_effect_label)
 : TraversalStep(MODULATOR, TO_STEP) {

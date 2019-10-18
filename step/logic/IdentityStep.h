@@ -3,8 +3,8 @@
 
 #define IDENTITY_STEP 0x01
 #include "step/TraversalStep.h"
-#include "Traverser.h"
-#include "GraphTraversal.h"
+#include "traversal/Traverser.h"
+#include "traversal/GraphTraversal.h"
 
 class IdentityStep: public TraversalStep {
     public:
