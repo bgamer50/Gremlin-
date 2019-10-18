@@ -346,7 +346,7 @@ void GraphTraversal::getInitialTraversal() {
 #include "step/edge/AddEdgeStartStep.h"
 #include "step/vertex/AddVertexStartStep.h"
 #include "step/logic/CoalesceStep.h"
-#include "step/IDStep.h"
+#include "step/IdStep.h"
 #include "step/property/PropertyStep.h"
 #include "step/logic/NoOpStep.h"
 #include "step/logic/IdentityStep.h"
