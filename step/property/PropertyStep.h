@@ -42,9 +42,10 @@ class PropertyStep: public TraversalStep {
 
                     Vertex* v = boost::any_cast<Vertex*>(x);
                     VertexProperty<boost::any>* p = v->property(key); //TODO multiproperties?
-                    if(p == nullptr) new_traversers.push_back(new Traverser(boost::any()));
-                    else if(get_value && !p->value().empty()) new_traversers.push_back(new Traverser(p->value()));
-                    else if(!get_value) new_traversers.push_back(new Traverser(boost::any(p)));
+                    if(p != nullptr) {
+                        if(get_value) new_traversers.push_back(new Traverser(p->value()));
+                        else new_traversers.push_back(new Traverser(boost::any(p)));
+                    }
                 }
             }
 

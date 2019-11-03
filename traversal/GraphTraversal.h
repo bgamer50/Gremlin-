@@ -582,6 +582,7 @@ void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
 	std::for_each(traversers.begin(), traversers.end(), [&](Traverser* trv){
 		boost::any obj = trv->get();
 		func(obj);
+		delete trv;
 	});
 }
 
@@ -593,6 +594,8 @@ void GraphTraversal::iterate() {
 	std::for_each(this->steps.begin(), this->steps.end(), [&](TraversalStep* step){
 		step->apply(this, traversers);
 	});
+
+	std::for_each(traversers.begin(), traversers.end(), [](Traverser* trv) { delete trv; });
 }
 
 #endif
