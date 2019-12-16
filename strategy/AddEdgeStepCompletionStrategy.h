@@ -27,17 +27,19 @@ void add_edge_step_completion_strategy(std::vector<TraversalStep*>& steps);
 */
 inline bool add_edge_gather(AddEdgeStep* aes, TraversalStep* next_step) {
     if(next_step->uid == FROM_STEP) {
-        FromStep* fs = static_cast<FromStep*>(next_step);
+        FromStep* fs = reinterpret_cast<FromStep*>(next_step);
         aes->set_out_traversal(fs->getTraversal());
         delete next_step;
         return true;
     }
     else if(next_step->uid == TO_STEP) {
-        ToStep* ts = static_cast<ToStep*>(next_step);
+        ToStep* ts = reinterpret_cast<ToStep*>(next_step);
         aes->set_in_traversal(ts->getTraversal());
         delete next_step;
         return true;
     }
+
+    return false;
 }
 
 /*
@@ -61,6 +63,8 @@ inline bool add_edge_start_gather(AddEdgeStartStep* aes, TraversalStep* next_ste
         delete next_step;
         return true;
     }
+
+    return false;
 }
 
 /*

@@ -46,13 +46,13 @@ class AddPropertyStep : public TraversalStep {
 				#pragma omp for
 				//std::for_each(traversers.begin(), traversers.end(), [&](Traverser* trv) {
 				for(int k = 0; k < traversers.size(); ++k) {
-					Traverser* trv = traversers[k];
+					Traverser& trv = traversers[k];
 					//Element* e = get_element(trv->get());
-					Vertex* e = boost::any_cast<Vertex*>(trv->get());
+					Vertex* e = boost::any_cast<Vertex*>(trv.get());
 					GraphTraversal new_trv(current_traversal->getTraversalSource(), ap_anonymous_trv);
 					
 					// Execute traversal
-					std::vector<boost::any> inj; inj.push_back(trv->get());
+					std::vector<boost::any> inj; inj.push_back(trv.get());
 					InjectStep inject_step(inj);
 					new_trv.insertStep(0, &inject_step);
 					boost::any prop_value = new_trv.next();
@@ -65,8 +65,8 @@ class AddPropertyStep : public TraversalStep {
 			} 
 			else {
 				// Store the propety; TODO deal w/ edges
-				std::for_each(traversers.begin(), traversers.end(), [&](Traverser* trv){
-					Vertex* e = boost::any_cast<Vertex*>(trv->get());
+				std::for_each(traversers.begin(), traversers.end(), [&](Traverser& trv){
+					Vertex* e = boost::any_cast<Vertex*>(trv.get());
 					e->property(this->cardinality, this->key, this->value);	
 				});
 				//std::cout << "property stored!\n";

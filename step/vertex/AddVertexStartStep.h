@@ -34,7 +34,7 @@ class AddVertexStartStep: public TraversalStep {
 
 		virtual void apply(GraphTraversal* trv, TraverserSet& traversers) {
 			Vertex* v = this->has_label ? trv->getGraph()->add_vertex(this->label) : trv->getGraph()->add_vertex();
-			traversers.push_back(new Traverser(v));
+			traversers.push_back(Traverser(v));
 		}
 };
 

@@ -28,12 +28,12 @@ class PropertyStep: public TraversalStep {
         PropertyStepType get_type() { return ps_type; }
 
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers) {
-            std::vector<Traverser*> new_traversers;
+            TraverserSet new_traversers;
             bool get_value = this->ps_type == VALUE;
 
-            for(Traverser* trv : traversers) {
+            for(Traverser& trv : traversers) {
                 for(std::string key : keys) {
-                    boost::any x = trv->get();
+                    boost::any x = trv.get();
                     /*
                     if(x.type() != typeid(Vertex*)) {
                         throw std::runtime_error("Error: Traverser does not appear to contain a Vertex.");
@@ -43,14 +43,13 @@ class PropertyStep: public TraversalStep {
                     Vertex* v = boost::any_cast<Vertex*>(x);
                     VertexProperty<boost::any>* p = v->property(key); //TODO multiproperties?
                     if(p != nullptr) {
-                        if(get_value) new_traversers.push_back(new Traverser(p->value()));
-                        else new_traversers.push_back(new Traverser(boost::any(p)));
+                        if(get_value) new_traversers.push_back(Traverser(p->value()));
+                        else new_traversers.push_back(Traverser(boost::any(p)));
                     }
                 }
             }
 
             traversers.swap(new_traversers);
-            std::for_each(new_traversers.begin(), new_traversers.end(), [](Traverser* trav){delete trav;});
         }
 };
 

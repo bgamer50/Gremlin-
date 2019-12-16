@@ -90,7 +90,7 @@ public:
 	//GraphTraversal* drop();
 	//GraphTraversal* emit();
 	//GraphTraversal emit(Predicate predicate);
-	//GraphTraversal* emit(GraphTraversal* emitTraversal);
+	GraphTraversal* emit(GraphTraversal* emitTraversal);
 	//GraphTraversal* fold();
 	//GraphTraversal* from(GraphTraversal* fromTraversal);
 
@@ -148,7 +148,7 @@ public:
 	//GraphTraversal* mean();
 	//GraphTraversal mean(Scope scope);
 	
-	GraphTraversal* min(std::function<int(Traverser*, Traverser*)> c);
+	GraphTraversal* min(std::function<int(Traverser&, Traverser&)> c);
 
 	GraphTraversal* min();
 	//GraphTraversal min(Scope scope);
@@ -169,14 +169,12 @@ public:
 	//GraphTraversal propertyMap(std::vector<std::string> labels);
 	//GraphTraversal propertyMap();
 	//GraphTraversal range(long low, long high);
-	//GraphTraversal repeat(GraphTraversal repeatTraversal);
+	GraphTraversal* repeat(GraphTraversal* repeatTraversal);
 	// sack step not supported
 	//GraphTraversal* sample(int sampleSize);
 	//GraphTraversal sample(Scope scope, int sampleSize);
 	// single-label select is special
-	GraphTraversal* select(std::string sideEffectLabel) {
-		//TODO write this
-	}
+	GraphTraversal* select(std::string sideEffectLabel){}
 	//GraphTraversal select(std::vector<std::string> sideEffectLabels);
 	//GraphTraversal select(GraphTraversal selectTraversal);
 	//GraphTraversal* simplePath();
@@ -208,7 +206,7 @@ public:
 	//GraphTraversal unfold();
 	//GraphTraversal _union(std::vector<GraphTraversal> unionTraversals);
 	//GraphTraversal until(Predicate predicate);
-	//GraphTraversal until(GraphTraversal untilTraversal);
+	GraphTraversal* until(GraphTraversal* untilTraversal);
 	//GraphTraversal value();
 	//GraphTraversal valueMap();
 	//GraphTraversal valueMap(std::vector<std::string> labels);
@@ -254,7 +252,11 @@ public:
 	std::string explain();
 
 	// Finalizing steps
-	//boolean hasNext();
+
+	// TODO; this is a really bad implementation of hasNext but will likely be changed in the Traverser refactor.
+	bool hasNext() {
+		return !this->toVector().empty();
+	}
 
 	std::vector<boost::any> toVector() {
 		std::vector<boost::any> results;
@@ -353,6 +355,7 @@ void GraphTraversal::getInitialTraversal() {
 #include "step/property/HasStep.h"
 #include "step/math/CountStep.h"
 #include "step/math/MinStep.h"
+#include "step/logic/RepeatStep.h"
 
 GraphTraversal* GraphTraversal::addE(std::string label){
 	return this->appendStep(new AddEdgeStep(label));
@@ -480,7 +483,7 @@ GraphTraversal* GraphTraversal::identity() {
 	return this->appendStep(new IdentityStep());
 }
 
-GraphTraversal* GraphTraversal::min(std::function<int(Traverser*, Traverser*)> c) {
+GraphTraversal* GraphTraversal::min(std::function<int(Traverser&, Traverser&)> c) {
 	return this->appendStep(new MinStep(c));
 }
 
@@ -513,6 +516,18 @@ GraphTraversal* GraphTraversal::values(std::vector<std::string> labels) {
 
 GraphTraversal* GraphTraversal::values(std::string label) {
 	return this->appendStep(new PropertyStep(VALUE, {label}));
+}
+
+GraphTraversal* GraphTraversal::repeat(GraphTraversal* repeatTraversal) {
+	return this->appendStep(new RepeatStep(repeatTraversal));
+}
+
+GraphTraversal* GraphTraversal::emit(GraphTraversal* emitTraversal) {
+	return this->appendStep(new EmitStep(emitTraversal));
+}
+
+GraphTraversal* GraphTraversal::until(GraphTraversal* untilTraversal) {
+	return this->appendStep(new UntilStep(untilTraversal));
 }
 
 std::string GraphTraversal::explain() {
@@ -576,13 +591,12 @@ void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
 		}
 
 		traversers.swap(new_traversers);
-		//TODO delete
+	
 	}
 
-	std::for_each(traversers.begin(), traversers.end(), [&](Traverser* trv){
-		boost::any obj = trv->get();
+	std::for_each(traversers.begin(), traversers.end(), [&](Traverser& trv){
+		boost::any obj = trv.get();
 		func(obj);
-		delete trv;
 	});
 }
 
@@ -595,7 +609,6 @@ void GraphTraversal::iterate() {
 		step->apply(this, traversers);
 	});
 
-	std::for_each(traversers.begin(), traversers.end(), [](Traverser* trv) { delete trv; });
 }
 
 #endif

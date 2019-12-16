@@ -10,7 +10,7 @@ class GraphTraversalSource;
 class GraphTraversal;
 class Traverser;
 class TraversalStep;
-typedef std::vector<Traverser*> TraverserSet;
+typedef std::vector<Traverser> TraverserSet; // TODO remove this forward dec?
 
 class AddEdgeStartStep: public TraversalStep {
 	private:
@@ -69,7 +69,7 @@ void AddEdgeStartStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
 	Vertex* to_vertex = boost::any_cast<Vertex*>(to_traversal.next());
 
 	Edge* new_edge = trv->getGraph()->add_edge(from_vertex, to_vertex, label);
-	traversers.push_back(new Traverser(new_edge));
+	traversers.push_back(Traverser(new_edge));
 }
 
 #endif

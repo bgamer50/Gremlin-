@@ -10,27 +10,27 @@
 
 class MinStep : public TraversalStep {
     private:
-        std::function<int(Traverser*, Traverser*)> compare;
+        std::function<int(Traverser&, Traverser&)> compare;
 
     public:
-        MinStep(std::function<int(Traverser*, Traverser*)> c)
+        MinStep(std::function<int(Traverser&, Traverser&)> c)
         : TraversalStep(true, MAP, MIN_STEP) {
             compare = c;
         }
 
-        Traverser* min(Traverser* t1, Traverser* t2) {
+        Traverser min(Traverser& t1, Traverser& t2) {
             int cmp = compare(t1, t2);
             return cmp < 0 ? t1 : t2;
         }
 
         // TODO this is naive; there is no guarantee there will be N/2 threads.
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers) {
-            Traverser* min_value;
+            Traverser min_value;
             size_t N = traversers.size();
 
             if(0==1) {
-                std::vector<Traverser*> values(traversers.begin(), traversers.end());
-                std::vector<Traverser*> values2(values);
+                TraverserSet values(traversers.begin(), traversers.end());
+                TraverserSet values2(values);
 
                 omp_set_dynamic(0);
                 omp_set_num_threads(N/2 + 1);
@@ -78,8 +78,8 @@ class MinStep : public TraversalStep {
             }
             else {
                 min_value = traversers.front();
-                for(auto it = traversers.begin(); it != traversers.end(); ++it) {
-                    min_value = this->min(*it, min_value);
+                for(Traverser t : traversers) {
+                    min_value = this->min(t, min_value);
                 }
             }
 

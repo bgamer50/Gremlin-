@@ -17,15 +17,18 @@ class Traverser {
 			my_data = boost::any(t);
 		}
 
+		Traverser() : Traverser(boost::any()){}
+
 		virtual boost::any get() {
 			return my_data;
 		}
 
-		virtual void replace_data(boost::any t) {
+		virtual Traverser replace_data(boost::any t) {
 			my_data = t;
+			return *this;
 		}
 };
 
-typedef std::vector<Traverser*> TraverserSet;
+typedef std::vector<Traverser> TraverserSet;
 
 #endif

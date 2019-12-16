@@ -20,7 +20,7 @@ public:
 	TraversalStep(TraversalStepType tsType, unsigned int id);
 	TraversalStep(bool is_barrier, TraversalStepType tsType, unsigned int id);
 	virtual std::string getInfo();
-	virtual void apply(GraphTraversal* trv, std::vector<Traverser*>& traversers);
+	virtual void apply(GraphTraversal* trv, std::vector<Traverser>& traversers);
 
 };
 

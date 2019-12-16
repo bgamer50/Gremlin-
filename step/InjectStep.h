@@ -17,9 +17,13 @@ class InjectStep : public TraversalStep {
             std::copy(injects.begin(), injects.end(), std::back_inserter(objects));
         }
 
+        InjectStep(boost::any& b) : TraversalStep(SIDE_EFFECT, INJECT_STEP) {
+            objects.push_back(b);
+        }
+
         virtual void apply(GraphTraversal* trv, TraverserSet& traversers) {
             std::for_each(objects.begin(), objects.end(), [&](boost::any obj){
-                traversers.push_back(new Traverser(obj));
+                traversers.push_back(Traverser(obj));
             });
         }
 };

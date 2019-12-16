@@ -77,11 +77,10 @@ class HasStep : public TraversalStep {
 		virtual void apply(GraphTraversal* trv, TraverserSet& traversers) {
 			TraverserSet new_traversers;
 
-			for(auto it = traversers.begin(); it != traversers.end(); ++it) {
-				Traverser* trv = *it;
-				Vertex* v = boost::any_cast<Vertex*>(trv->get());
+			for(Traverser& trv : traversers) {
+				Vertex* v = boost::any_cast<Vertex*>(trv.get());
 				bool advance = this->test(v);
-				if(advance) new_traversers.push_back(trv); else delete trv;
+				if(advance) new_traversers.push_back(trv);
 			}
 
 			traversers.swap(new_traversers);
