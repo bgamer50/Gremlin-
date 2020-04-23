@@ -112,13 +112,10 @@ public:
 	//GraphTraversal has(std::string key, void* value, size_t size); // dangerous operation
 	//GraphTraversal has(std::string label, std::string key, void* value, size_t size); // dangerous operation
 
-	template<typename T>
-	GraphTraversal* has(std::string key, std::function<bool(boost::any)> pred);
+	GraphTraversal* has(std::string key, P pred);
 
-	template<typename T>
-	GraphTraversal* has(std::string key, T value);
+	GraphTraversal* has(std::string key, boost::any value);
 
-	template<typename T>
 	GraphTraversal* has(std::string key);
 
 	//GraphTraversal* has(std::string key, GraphTraversal* valueTraversal);
@@ -392,14 +389,7 @@ GraphTraversal* GraphTraversal::V(std::vector<Vertex*> vertices) {
 }
 
 GraphTraversal* GraphTraversal::from(std::string sideEffectLabel) {
-	// Because from() uses void* (sigh) this awkward memory copy is necessary.
-	const char* base_string = sideEffectLabel.c_str();
-	size_t size = (1 + strlen(base_string));
-
-	char* sideEffectLabel_cpy = (char*)malloc(sizeof(char) * size);
-	strncpy(sideEffectLabel_cpy, base_string, size);
-
-	return this->appendStep(new FromStep(sideEffectLabel_cpy));
+	return this->appendStep(new FromStep(sideEffectLabel));
 }
 
 GraphTraversal* GraphTraversal::from(Vertex* fromVertex) {
@@ -408,14 +398,7 @@ GraphTraversal* GraphTraversal::from(Vertex* fromVertex) {
 
 // MODULATOR for addE
 GraphTraversal* GraphTraversal::to(std::string sideEffectLabel) {
-	// Because to() uses void* (sigh) this awkward memory copy is necessary.
-	const char* base_string = sideEffectLabel.c_str();
-	size_t size = (1 + strlen(base_string));
-
-	char* sideEffectLabel_cpy = (char*)malloc(sizeof(char) * size);
-	strncpy(sideEffectLabel_cpy, base_string, size);
-
-	return this->appendStep(new ToStep(sideEffectLabel_cpy));
+	return this->appendStep(new ToStep(sideEffectLabel));
 }
 
 // MODULATOR for addE
@@ -495,19 +478,16 @@ GraphTraversal* GraphTraversal::count() {
 	return this->appendStep(new CountStep());
 }
 
-template<typename T>
-GraphTraversal* GraphTraversal::has(std::string key, std::function<bool(boost::any)> pred) {
+GraphTraversal* GraphTraversal::has(std::string key, P pred) {
 	return this->appendStep(new HasStep(key, pred));
 }
 
-template<typename T>
-GraphTraversal* GraphTraversal::has(std::string key, T value) {
-	return this->appendStep(new HasStep(key, value, P<T>::eq(value)));
+GraphTraversal* GraphTraversal::has(std::string key, boost::any value) {
+	return this->appendStep(new HasStep(key, P::eq(value)));
 }
 
-template<typename T>
 GraphTraversal* GraphTraversal::has(std::string key) {
-	return this->appendStep(new HasStep(key, nullptr));
+	return this->appendStep(new HasStep(key, P::neq(boost::any())));
 }
 
 GraphTraversal* GraphTraversal::values(std::vector<std::string> labels) {
@@ -567,6 +547,7 @@ void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
 	size_t num_steps = steps.size();
 	
 	while(current_step < num_steps) {
+		//std::cout << steps[current_step]->uid << std::endl;;
 		steps[current_step++]->apply(this, traversers);
 		TraverserSet new_traversers;
 
