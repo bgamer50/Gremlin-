@@ -75,7 +75,7 @@ public:
 	//GraphTraversal<auto n> _and(std::vector<GraphTraversal<auto m>> traversals);
 	//GraphTraversal* as(std::string sideEffectLabel);
 	//GraphTraversal* barrier();
-	//GraphTraversal* by(GraphTraversal* byTraversal);
+	GraphTraversal* by(GraphTraversal* byTraversal);
 	//GraphTraversal* by(std::string label);
 	//GraphTraversal* cap(std::vector<std::string> sideEffectLabels);
 	//GraphTraversal<auto n> choose(GraphTraversal<A> ifTraversal, GraphTraversal<B> trueTraversal, GraphTraversal<C> falseTraversal);
@@ -200,13 +200,13 @@ public:
 	//GraphTraversal* toV(Direction direction);
 	//GraphTraversal tree(std::string sideEffectLabel);
 	//GraphTraversal tree();
-	//GraphTraversal unfold();
+	GraphTraversal* unfold();
 	//GraphTraversal _union(std::vector<GraphTraversal> unionTraversals);
 	//GraphTraversal until(Predicate predicate);
 	GraphTraversal* until(GraphTraversal* untilTraversal);
 	//GraphTraversal value();
 	//GraphTraversal valueMap();
-	//GraphTraversal valueMap(std::vector<std::string> labels);
+	GraphTraversal* valueMap(std::vector<std::string> labels);
 	//GraphTraversal valueMap(bool includeIdLabelKeyValue);
 	//GraphTraversal valueMap(bool includeIdLabelKeyValue, std::vector<std::string> labels);
 	//GraphTraversal values();
@@ -231,7 +231,7 @@ public:
 	GraphTraversal* inE(std::vector<std::string> labels);
 
 	//GraphTraversal where(Predicate predicate);
-	//GraphTraversal where(std::string label, Predicate predicate);
+	GraphTraversal* where(std::string label, P predicate);
 	//GraphTraversal where(GraphTraversal<auto n> whereTraversal);
 
 	// These may replace predicates...
@@ -353,6 +353,8 @@ void GraphTraversal::getInitialTraversal() {
 #include "step/math/CountStep.h"
 #include "step/math/MinStep.h"
 #include "step/logic/RepeatStep.h"
+#include "step/logic/WhereStep.h"
+#include "step/logic/UnfoldStep.h"
 
 GraphTraversal* GraphTraversal::addE(std::string label){
 	return this->appendStep(new AddEdgeStep(label));
@@ -404,6 +406,15 @@ GraphTraversal* GraphTraversal::to(std::string sideEffectLabel) {
 // MODULATOR for addE
 GraphTraversal* GraphTraversal::to(Vertex* toVertex) {
 	return this->appendStep(new ToStep(toVertex));
+}
+
+// Modulator for valuemap and others
+GraphTraversal* GraphTraversal::by(GraphTraversal* byTraversal) {
+	return this->appendStep(new ByStep(byTraversal));
+}
+
+GraphTraversal* GraphTraversal::unfold() {
+	return this->appendStep(new UnfoldStep());
 }
 
 GraphTraversal* GraphTraversal::both() {
@@ -490,12 +501,20 @@ GraphTraversal* GraphTraversal::has(std::string key) {
 	return this->appendStep(new HasStep(key, P::neq(boost::any())));
 }
 
+GraphTraversal* GraphTraversal::where(std::string label, P predicate) {
+	return this->appendStep(new WhereStep(label, predicate));
+}
+
 GraphTraversal* GraphTraversal::values(std::vector<std::string> labels) {
 	return this->appendStep(new PropertyStep(VALUE, labels));
 }
 
 GraphTraversal* GraphTraversal::values(std::string label) {
 	return this->appendStep(new PropertyStep(VALUE, {label}));
+}
+
+GraphTraversal* GraphTraversal::valueMap(std::vector<std::string> labels) {
+	return this->appendStep(new ValueMapStep(labels));
 }
 
 GraphTraversal* GraphTraversal::repeat(GraphTraversal* repeatTraversal) {

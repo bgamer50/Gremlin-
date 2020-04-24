@@ -53,11 +53,13 @@ public:
 #include "structure/Edge.h"
 #include "strategy/AddEdgeStepCompletionStrategy.h"
 #include "strategy/RepeatStepCompletionStrategy.h"
+#include "strategy/ValueMapStepCompletionStrategy.h"
 
 GraphTraversalSource::GraphTraversalSource(Graph* gr) {
 	graph = gr;
 	this->withStrategy(add_edge_step_completion_strategy);
 	this->withStrategy(repeat_step_completion_strategy);
+	this->withStrategy(valuemap_step_completion_strategy);
 	
 	this->withTypeRegistration(
 		std::type_index(typeid(int)), 
