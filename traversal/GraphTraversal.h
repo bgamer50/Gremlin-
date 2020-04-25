@@ -10,6 +10,7 @@
 #include <functional>
 #include <algorithm>
 #include <iostream>
+#include <typeindex>
 
 #include "structure/Direction.h"
 #include "traversal/P.h"
@@ -130,8 +131,8 @@ public:
 
 	GraphTraversal* identity();
 	//GraphTraversal inject(void* object, size_t size);
-	//GraphTraversal* is(void* val, size_t size);
-	//GraphTraversal is(Predicate predicate);
+	GraphTraversal* is(boost::any val);
+	GraphTraversal* is(P predicate);
 	//GraphTraversal key();
 	//GraphTraversal* label();
 	//GraphTraversal* limit(unsigned long theLimit);
@@ -355,6 +356,7 @@ void GraphTraversal::getInitialTraversal() {
 #include "step/logic/RepeatStep.h"
 #include "step/logic/WhereStep.h"
 #include "step/logic/UnfoldStep.h"
+#include "step/logic/IsStep.h"
 
 GraphTraversal* GraphTraversal::addE(std::string label){
 	return this->appendStep(new AddEdgeStep(label));
@@ -477,6 +479,14 @@ GraphTraversal* GraphTraversal::identity() {
 	return this->appendStep(new IdentityStep());
 }
 
+GraphTraversal* GraphTraversal::is(boost::any val) {
+	return this->is(P::eq(val));
+}
+
+GraphTraversal* GraphTraversal::is(P predicate) {
+	return this->appendStep(new IsStep(predicate));
+}
+
 GraphTraversal* GraphTraversal::min(std::function<int(Traverser&, Traverser&)> c) {
 	return this->appendStep(new MinStep(c));
 }
@@ -541,23 +551,24 @@ std::string GraphTraversal::explain() {
 #include "traversal/Traverser.h"
 #include <omp.h>
 
-/*
+
 void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
 	this->getInitialTraversal();
 	
 	TraverserSet traversers;
 	std::for_each(this->steps.begin(), this->steps.end(), [&](TraversalStep* step){
+		//std::cout << step->uid << std::endl;
 		step->apply(this, traversers);
 	});
 
-	std::for_each(traversers.begin(), traversers.end(), [&](Traverser* trv){
-		boost::any obj = trv->get();
+	std::for_each(traversers.begin(), traversers.end(), [&](Traverser& trv){
+		boost::any obj = trv.get();
 		func(obj);
 	});
 }
-*/
 
 
+/*
 void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
 	this->getInitialTraversal();
 	
@@ -566,7 +577,7 @@ void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
 	size_t num_steps = steps.size();
 	
 	while(current_step < num_steps) {
-		//std::cout << steps[current_step]->uid << std::endl;;
+		std::cout << steps[current_step]->uid << std::endl;;
 		steps[current_step++]->apply(this, traversers);
 		TraverserSet new_traversers;
 
@@ -598,17 +609,20 @@ void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
 		boost::any obj = trv.get();
 		func(obj);
 	});
-}
+}*/
 
 
 void GraphTraversal::iterate() {
+	//std::cout << "in iterate" << std::endl;
 	this->getInitialTraversal();
 
 	TraverserSet traversers;
 	std::for_each(this->steps.begin(), this->steps.end(), [&](TraversalStep* step){
+		//std::cout << step->uid << std::endl;;
 		step->apply(this, traversers);
 	});
 
+	//this->forEachRemaining([](boost::any& t){;});
 }
 
 #endif

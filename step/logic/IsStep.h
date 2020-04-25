@@ -1,37 +1,34 @@
-#ifndef WHERE_STEP_H
-#define WHERE_STEP_H
+#ifndef IS_STEP_H
+#define IS_STEP_H
 
-#define WHERE_STEP 0x45
+#define IS_STEP 0x46
 
 #include "step/TraversalStep.h"
 #include <unordered_map>
 #include <string>
 
-class WhereStep: public TraversalStep {
+class IsStep: public TraversalStep {
     private:
-        std::string label;
         P predicate = P(P::Comparison::EQ, boost::any());
 
     public:
-        WhereStep(std::string label, P predicate)
-        : TraversalStep(FILTER, WHERE_STEP) {
-            this->label = label;
+        IsStep(P predicate)
+        : TraversalStep(FILTER, IS_STEP) {
             this->predicate = predicate;
         }
 
-        std::string getLabel() { return this->label; }
         P getPredicate() { return this->predicate; }
 
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
 };
 
-void WhereStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
+void IsStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
     GraphTraversalSource* src = traversal->getTraversalSource();
     boost::any val = this->predicate.operand;
 
     TraverserSet new_traversers;
     for(Traverser& traverser: traversers)  {
-        boost::any t = boost::any_cast<std::unordered_map<std::string, boost::any>>(traverser.get())[this->label];
+        boost::any t = traverser.get();
         switch(this->predicate.comparison) {
             case P::Comparison::EQ:
                 if(src->test_equals(t, val)) new_traversers.push_back(traverser);
@@ -57,7 +54,7 @@ void WhereStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
                 break;
             }
             default:
-                throw std::runtime_error("Comparison type not supported by WhereStep.");
+                throw std::runtime_error("Comparison type not supported by IsStep.");
         }
     }
 

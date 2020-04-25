@@ -9,7 +9,6 @@
 void valuemap_step_completion_strategy(std::vector<TraversalStep*>& steps) {
     for(size_t k = 0; k < steps.size() - 1; ++k) {
         if(steps[k]->uid == VALUEMAP_STEP && steps[k+1]->uid == BY_STEP) {
-            std::cout << "here we are" << std::endl;
             ValueMapStep* valuemap_step = dynamic_cast<ValueMapStep*>(steps[k]);
             ByStep* by_step = dynamic_cast<ByStep*>(steps[k+1]);
 

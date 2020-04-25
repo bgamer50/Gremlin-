@@ -7,13 +7,13 @@
 class RepeatStep: public TraversalStep {
     private:
         // Will emit anything out of the loop that passes through this traversal.
-        GraphTraversal* emitTraversal;
+        GraphTraversal* emitTraversal = nullptr;
         
         // Will end the loop when this traversal is completed.
-        GraphTraversal* untilTraversal;
+        GraphTraversal* untilTraversal = nullptr;
 
         // The action to be repeated.
-        GraphTraversal* actionTraversal;
+        GraphTraversal* actionTraversal = nullptr;
 
     public:
         RepeatStep(GraphTraversal* actionTraversal);
@@ -28,7 +28,7 @@ class RepeatStep: public TraversalStep {
 };
 
 RepeatStep::RepeatStep(GraphTraversal* actionTraversal) 
-: TraversalStep(MAP, REPEAT_STEP) {
+: TraversalStep(true, MAP, REPEAT_STEP) {
     this->actionTraversal = actionTraversal;
 }
 
@@ -66,11 +66,11 @@ void RepeatStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
         }
         
         // Build and evaulate the action traversal
-        std::cout << "action " << actionTraversal->getSteps()[0]->uid << std::endl;
+        //std::cout << "action " << actionTraversal->getSteps()[0]->uid << std::endl;
         GraphTraversal currentActionTraversal(src, actionTraversal);
         currentActionTraversal.insertStep(0, &injectStep);
         std::vector<boost::any> new_objects = currentActionTraversal.toVector();
-        std::cout << "got " << new_objects.size() << " objects\n";
+        //std::cout << "got " << new_objects.size() << " objects\n";
 
         traversers.resize(new_objects.size());
         for(size_t k = 0; k < new_objects.size(); ++k) traversers[k] = Traverser(new_objects[k]);
@@ -79,7 +79,7 @@ void RepeatStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
     } while(traversers.size() > 0 && cont);
 
     traversers.insert(traversers.end(), emittedTraversers.begin(), emittedTraversers.end());
-    std::cout << "repeat step done" << std::endl;
+    //std::cout << "repeat step done" << std::endl;
 }
 
 #endif

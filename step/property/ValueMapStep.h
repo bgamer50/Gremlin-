@@ -27,6 +27,7 @@ class ValueMapStep: public TraversalStep {
 #include "structure/Vertex.h"
 #include "structure/Edge.h"
 #include "util/gremlin_utils.hpp"
+#include <boost/format.hpp>
 
 ValueMapStep::ValueMapStep(std::vector<std::string>& keys)
 : TraversalStep(MAP, VALUEMAP_STEP) {
@@ -46,9 +47,12 @@ void ValueMapStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
 
         std::unordered_map<std::string, boost::any> vmap;
         Vertex* v = boost::any_cast<Vertex*>(data);
-        for(std::string& key : this->keys) {
+        for(std::string key : this->keys) {
             std::vector<boost::any> vec;
-            vec.push_back(v->property(key)->value());
+
+            auto* prop = v->property(key);
+            if(prop == nullptr) throw std::runtime_error(str(boost::format("Property %1% does not exist on vertex.") % key));
+            vec.push_back(prop->value());
             
             if(this->by_traversal == nullptr) {
                 vmap[key] = vec;
