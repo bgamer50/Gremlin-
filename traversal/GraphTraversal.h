@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <iostream>
 #include <typeindex>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "structure/Direction.h"
 #include "traversal/P.h"
