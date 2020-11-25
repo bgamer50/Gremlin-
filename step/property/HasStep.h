@@ -45,7 +45,7 @@ class HasStep : public TraversalStep {
             in question and returns true if this is in fact the case.
 		**/
 		bool test(Vertex* v, GraphTraversalSource* src) {
-			VertexProperty<boost::any>* vp = v->property(property_key_or_label);
+			VertexProperty* vp = static_cast<VertexProperty*>(v->property(property_key_or_label));
 			boost::any val = this->predicate.operand;
 			switch(this->predicate.comparison) { // betting on a good branch predictor here
 				case P::Comparison::EQ:

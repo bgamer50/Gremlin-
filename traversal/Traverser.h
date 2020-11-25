@@ -27,6 +27,13 @@ class Traverser {
 			my_data = t;
 			return *this;
 		}
+
+		/**
+		 * Returns a reference to this traverser's side effect map.
+		 * **/
+		virtual std::map<std::string, boost::any>& get_side_effects() {
+			return this->side_effects;
+		}
 };
 
 typedef std::vector<Traverser> TraverserSet;

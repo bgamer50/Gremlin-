@@ -21,6 +21,7 @@ private:
 protected:
 	std::vector<TraversalStrategy> strategies;
 	std::unordered_map<std::type_index, std::pair<compare_func_t, equals_func_t>> type_registrations;
+	std::unordered_map<std::string, std::string> options;
 
 public:
 	GraphTraversalSource(Graph* gr);
@@ -32,6 +33,9 @@ public:
 	GraphTraversalSource* withTypeRegistration(std::type_index tid, compare_func_t cmp, equals_func_t eql);
 	GraphTraversalSource* withTypeRegistration(std::type_index tid, compare_func_t cmp);
 	//GraphTraversalSource* withoutTypeRegistration(typeid_t tid); TODO
+	
+	GraphTraversalSource* withAdminOption(std::string option_name, std::string value);
+	std::string getOptionValue(std::string option_name);
 
 	std::vector<TraversalStrategy>& getStrategies();
 
@@ -113,6 +117,16 @@ GraphTraversalSource* GraphTraversalSource::withTypeRegistration(std::type_index
 		return bool(cmp(a,b) == 0);
 	};
 	return this->withTypeRegistration(tid, cmp, eql);
+}
+
+GraphTraversalSource* GraphTraversalSource::withAdminOption(std::string option_name, std::string value) {
+	this->options[option_name] = value;
+}
+
+std::string GraphTraversalSource::getOptionValue(std::string option_name) {
+	auto kv = this->options.find(option_name);
+	if(kv == this->options.end()) return "";
+	else return kv->second;
 }
 
 bool GraphTraversalSource::test_equals(boost::any a, boost::any b) {

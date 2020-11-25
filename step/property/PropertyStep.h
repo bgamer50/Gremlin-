@@ -34,17 +34,19 @@ class PropertyStep: public TraversalStep {
             for(Traverser& trv : traversers) {
                 for(std::string key : keys) {
                     boost::any x = trv.get();
-                    /*
-                    if(x.type() != typeid(Vertex*)) {
-                        throw std::runtime_error("Error: Traverser does not appear to contain a Vertex.");
+                    if(x.type() == typeid(Vertex*)) {
+                        Vertex* v = boost::any_cast<Vertex*>(x);
+                        VertexProperty* p = static_cast<VertexProperty*>(v->property(key)); //TODO multiproperties?
+                        if(p != nullptr) {
+                            if(get_value) new_traversers.push_back(Traverser(p->value()));
+                            else new_traversers.push_back(Traverser(boost::any(p)));
+                        }
                     }
-                    */
-
-                    Vertex* v = boost::any_cast<Vertex*>(x);
-                    VertexProperty<boost::any>* p = v->property(key); //TODO multiproperties?
-                    if(p != nullptr) {
-                        if(get_value) new_traversers.push_back(Traverser(p->value()));
-                        else new_traversers.push_back(Traverser(boost::any(p)));
+                    else if(x.type() == typeid(Edge*)) {
+                        Edge* e = boost::any_cast<Edge*>(x);
+                        Property* p = e->property(key);
+                    } else {
+                        throw std::runtime_error("Can only access properties on Vertices or Edges.");
                     }
                 }
             }

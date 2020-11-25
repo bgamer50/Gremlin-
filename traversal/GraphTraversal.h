@@ -76,7 +76,9 @@ public:
 	//GraphTraversal<auto n> aggregate(std::string sideEffectLabel);
 	//GraphTraversal<auto n> _and();
 	//GraphTraversal<auto n> _and(std::vector<GraphTraversal<auto m>> traversals);
-	//GraphTraversal* as(std::string sideEffectLabel);
+	
+	GraphTraversal* as(std::string sideEffectLabel);
+	
 	//GraphTraversal* barrier();
 	GraphTraversal* by(GraphTraversal* byTraversal);
 	//GraphTraversal* by(std::string label);
@@ -94,7 +96,7 @@ public:
 	//GraphTraversal* emit();
 	//GraphTraversal emit(Predicate predicate);
 	GraphTraversal* emit(GraphTraversal* emitTraversal);
-	//GraphTraversal* fold();
+	GraphTraversal* fold();
 	//GraphTraversal* from(GraphTraversal* fromTraversal);
 
 	GraphTraversal* from(std::string sideEffectLabel);
@@ -174,7 +176,7 @@ public:
 	//GraphTraversal* sample(int sampleSize);
 	//GraphTraversal sample(Scope scope, int sampleSize);
 	// single-label select is special
-	GraphTraversal* select(std::string sideEffectLabel){}
+	GraphTraversal* select(std::string sideEffectLabel);
 	//GraphTraversal select(std::vector<std::string> sideEffectLabels);
 	//GraphTraversal select(GraphTraversal selectTraversal);
 	//GraphTraversal* simplePath();
@@ -234,6 +236,10 @@ public:
 	GraphTraversal* inE(std::vector<std::string> labels);
 
 	//GraphTraversal where(Predicate predicate);
+	/**
+	 * Used for comparison of two objects stored as side effects.
+	 * TODO Current implementation is incorrect; used only as a temporary timesaver
+	 * **/
 	GraphTraversal* where(std::string label, P predicate);
 	//GraphTraversal where(GraphTraversal<auto n> whereTraversal);
 
@@ -338,32 +344,17 @@ void GraphTraversal::getInitialTraversal() {
 	});
 }
 
-#include "step/property/AddPropertyStep.h"
-#include "step/vertex/VertexStep.h"
-#include "step/graph/GraphStep.h"
-#include "step/modulate/FromStep.h"
-#include "step/modulate/ToStep.h"
-#include "step/edge/AddEdgeStep.h"
-#include "step/vertex/AddVertexStep.h"
 #include "step/edge/AddEdgeStartStep.h"
 #include "step/vertex/AddVertexStartStep.h"
-#include "step/logic/CoalesceStep.h"
-#include "step/IdStep.h"
-#include "step/property/PropertyStep.h"
 #include "step/logic/NoOpStep.h"
-#include "step/logic/IdentityStep.h"
-#include "step/property/HasStep.h"
-#include "step/math/CountStep.h"
-#include "step/math/MinStep.h"
-#include "step/logic/RepeatStep.h"
-#include "step/logic/WhereStep.h"
-#include "step/logic/UnfoldStep.h"
-#include "step/logic/IsStep.h"
 
+
+#include "step/edge/AddEdgeStep.h"
 GraphTraversal* GraphTraversal::addE(std::string label){
 	return this->appendStep(new AddEdgeStep(label));
 }
 
+#include "step/vertex/AddVertexStep.h"
 GraphTraversal* GraphTraversal::addV(std::string label) {
 	return this->appendStep(new AddVertexStep(label));
 }
@@ -372,14 +363,17 @@ GraphTraversal* GraphTraversal::addV() {
 	return this->appendStep(new AddVertexStep());
 }
 
+#include "step/logic/CoalesceStep.h"
 GraphTraversal* GraphTraversal::coalesce(std::vector<GraphTraversal*> traversals) {
 	return this->appendStep(new CoalesceStep(traversals));
 }
 
+#include "step/property/AddPropertyStep.h"
 GraphTraversal* GraphTraversal::property(std::string property_key, boost::any value) {
 	return this->appendStep(new AddPropertyStep(property_key, value));
 }
 
+#include "step/graph/GraphStep.h"
 GraphTraversal* GraphTraversal::V() {
 	return this->appendStep(new GraphStep(VERTEX, {}));
 }
@@ -394,6 +388,7 @@ GraphTraversal* GraphTraversal::V(std::vector<Vertex*> vertices) {
 	return this->appendStep(new GraphStep(VERTEX, ids));
 }
 
+#include "step/modulate/FromStep.h"
 GraphTraversal* GraphTraversal::from(std::string sideEffectLabel) {
 	return this->appendStep(new FromStep(sideEffectLabel));
 }
@@ -402,25 +397,32 @@ GraphTraversal* GraphTraversal::from(Vertex* fromVertex) {
 	return this->appendStep(new FromStep(fromVertex));
 }
 
-// MODULATOR for addE
+#include "step/modulate/ToStep.h"
 GraphTraversal* GraphTraversal::to(std::string sideEffectLabel) {
 	return this->appendStep(new ToStep(sideEffectLabel));
 }
 
-// MODULATOR for addE
 GraphTraversal* GraphTraversal::to(Vertex* toVertex) {
 	return this->appendStep(new ToStep(toVertex));
 }
 
+#include "step/modulate/ByStep.h"
 // Modulator for valuemap and others
 GraphTraversal* GraphTraversal::by(GraphTraversal* byTraversal) {
 	return this->appendStep(new ByStep(byTraversal));
 }
 
+#include "step/logic/UnfoldStep.h"
 GraphTraversal* GraphTraversal::unfold() {
 	return this->appendStep(new UnfoldStep());
 }
 
+#include "step/logic/FoldStep.h"
+GraphTraversal* GraphTraversal::fold() {
+	return this->appendStep(new FoldStep());
+}
+
+#include "step/vertex/VertexStep.h"
 GraphTraversal* GraphTraversal::both() {
 	return this->appendStep(new VertexStep(BOTH, {}, VERTEX));
 }
@@ -473,14 +475,17 @@ GraphTraversal* GraphTraversal::inE(std::vector<std::string> labels) {
 	return this->appendStep(new VertexStep(IN, labels, EDGE));
 }
 
+#include "step/IdStep.h"
 GraphTraversal* GraphTraversal::id() {
 	return this->appendStep(new IdStep());
 }
 
+#include "step/logic/IdentityStep.h"
 GraphTraversal* GraphTraversal::identity() {
 	return this->appendStep(new IdentityStep());
 }
 
+#include "step/logic/IsStep.h"
 GraphTraversal* GraphTraversal::is(boost::any val) {
 	return this->is(P::eq(val));
 }
@@ -489,6 +494,7 @@ GraphTraversal* GraphTraversal::is(P predicate) {
 	return this->appendStep(new IsStep(predicate));
 }
 
+#include "step/math/MinStep.h"
 GraphTraversal* GraphTraversal::min(std::function<int(Traverser&, Traverser&)> c) {
 	return this->appendStep(new MinStep(c));
 }
@@ -497,10 +503,12 @@ GraphTraversal* GraphTraversal::min() {
 	return this->appendStep(new MinStep(nullptr));
 }
 
+#include "step/math/CountStep.h"
 GraphTraversal* GraphTraversal::count() {
 	return this->appendStep(new CountStep());
 }
 
+#include "step/property/HasStep.h"
 GraphTraversal* GraphTraversal::has(std::string key, P pred) {
 	return this->appendStep(new HasStep(key, pred));
 }
@@ -513,10 +521,12 @@ GraphTraversal* GraphTraversal::has(std::string key) {
 	return this->appendStep(new HasStep(key, P::neq(boost::any())));
 }
 
+#include "step/logic/WhereStep.h"
 GraphTraversal* GraphTraversal::where(std::string label, P predicate) {
 	return this->appendStep(new WhereStep(label, predicate));
 }
 
+#include "step/property/PropertyStep.h"
 GraphTraversal* GraphTraversal::values(std::vector<std::string> labels) {
 	return this->appendStep(new PropertyStep(VALUE, labels));
 }
@@ -525,20 +535,34 @@ GraphTraversal* GraphTraversal::values(std::string label) {
 	return this->appendStep(new PropertyStep(VALUE, {label}));
 }
 
+#include "step/property/ValueMapStep.h"
 GraphTraversal* GraphTraversal::valueMap(std::vector<std::string> labels) {
 	return this->appendStep(new ValueMapStep(labels));
 }
 
+#include "step/logic/RepeatStep.h"
 GraphTraversal* GraphTraversal::repeat(GraphTraversal* repeatTraversal) {
 	return this->appendStep(new RepeatStep(repeatTraversal));
 }
 
+#include "step/logic/EmitStep.h"
 GraphTraversal* GraphTraversal::emit(GraphTraversal* emitTraversal) {
 	return this->appendStep(new EmitStep(emitTraversal));
 }
 
+#include "step/logic/UntilStep.h"
 GraphTraversal* GraphTraversal::until(GraphTraversal* untilTraversal) {
 	return this->appendStep(new UntilStep(untilTraversal));
+}
+
+#include "step/sideeffect/AsStep.h"
+GraphTraversal* GraphTraversal::as(std::string sideEffectLabel) {
+	return this->appendStep(new AsStep(sideEffectLabel));
+}
+
+#include "step/sideeffect/SelectStep.h"
+GraphTraversal* GraphTraversal::select(std::string sideEffectLabel) {
+	return this->appendStep(new SelectStep(sideEffectLabel));
 }
 
 std::string GraphTraversal::explain() {
@@ -559,7 +583,7 @@ void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
 	
 	TraverserSet traversers;
 	std::for_each(this->steps.begin(), this->steps.end(), [&](TraversalStep* step){
-		//std::cout << step->uid << std::endl;
+		if(this->source->getOptionValue("verbose") == "True") std::cout << step->uid << std::endl;
 		step->apply(this, traversers);
 	});
 
