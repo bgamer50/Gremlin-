@@ -38,8 +38,8 @@ class PropertyStep: public TraversalStep {
                         Vertex* v = boost::any_cast<Vertex*>(x);
                         VertexProperty* p = static_cast<VertexProperty*>(v->property(key)); //TODO multiproperties?
                         if(p != nullptr) {
-                            if(get_value) new_traversers.push_back(Traverser(p->value()));
-                            else new_traversers.push_back(Traverser(boost::any(p)));
+                            if(get_value) new_traversers.push_back(Traverser(p->value(), trv.get_side_effects()));
+                            else new_traversers.push_back(Traverser(boost::any(p), trv.get_side_effects()));
                         }
                     }
                     else if(x.type() == typeid(Edge*)) {

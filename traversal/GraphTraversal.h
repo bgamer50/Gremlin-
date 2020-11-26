@@ -29,6 +29,7 @@ class Traverser;
 class GraphTraversal {
 protected:
 	std::vector<TraversalStep*> steps;
+	std::vector<Traverser> traversers;
 private:
 	GraphTraversalSource* source;
 public:
@@ -93,7 +94,7 @@ public:
 	//GraphTraversal* cyclicPath();
 	//GraphTraversal* dedup();
 	//GraphTraversal* drop();
-	//GraphTraversal* emit();
+	GraphTraversal* emit();
 	//GraphTraversal emit(Predicate predicate);
 	GraphTraversal* emit(GraphTraversal* emitTraversal);
 	GraphTraversal* fold();
@@ -139,7 +140,7 @@ public:
 	GraphTraversal* is(P predicate);
 	//GraphTraversal key();
 	//GraphTraversal* label();
-	//GraphTraversal* limit(unsigned long theLimit);
+	GraphTraversal* limit(uint64_t the_limit);
 	//GraphTraversal limit(Scope scope, unsigned long theLimit);
 	//GraphTraversal* local(GraphTraversal* localTraversal);
 	//GraphTraversal* loops();
@@ -253,6 +254,7 @@ public:
 	//GraphTraversal
 
 	void getInitialTraversal();
+	void setInitialTraversers(std::vector<Traverser> initial_traversers);
 
 	// The explain finalizer which works in anonymous GraphTraversals
 	std::string explain();
@@ -285,6 +287,8 @@ public:
 	void forEachRemaining(std::function<void(boost::any&)> func);
 
 	void iterate();
+
+	std::vector<Traverser> getTraversers();
 
 	//GraphTraversal toSet();
 };
@@ -342,6 +346,14 @@ void GraphTraversal::getInitialTraversal() {
 	std::for_each(this->source->getStrategies().begin(), this->source->getStrategies().end(), [this](TraversalStrategy strategy) {
 		strategy(this->steps);
 	});
+}
+
+/*
+
+*/
+void GraphTraversal::setInitialTraversers(TraverserSet initial_traversers) {
+	this->traversers.clear();
+	this->traversers.insert(this->traversers.begin(), initial_traversers.begin(), initial_traversers.end());
 }
 
 #include "step/edge/AddEdgeStartStep.h"
@@ -550,6 +562,10 @@ GraphTraversal* GraphTraversal::emit(GraphTraversal* emitTraversal) {
 	return this->appendStep(new EmitStep(emitTraversal));
 }
 
+GraphTraversal* GraphTraversal::emit() {
+	return this->appendStep(new EmitStep(__->identity()));
+}
+
 #include "step/logic/UntilStep.h"
 GraphTraversal* GraphTraversal::until(GraphTraversal* untilTraversal) {
 	return this->appendStep(new UntilStep(untilTraversal));
@@ -563,6 +579,11 @@ GraphTraversal* GraphTraversal::as(std::string sideEffectLabel) {
 #include "step/sideeffect/SelectStep.h"
 GraphTraversal* GraphTraversal::select(std::string sideEffectLabel) {
 	return this->appendStep(new SelectStep(sideEffectLabel));
+}
+
+#include "step/logic/LimitStep.h"
+GraphTraversal* GraphTraversal::limit(uint64_t the_limit) {
+	return this->appendStep(new LimitStep(the_limit));
 }
 
 std::string GraphTraversal::explain() {
@@ -581,13 +602,12 @@ std::string GraphTraversal::explain() {
 void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
 	this->getInitialTraversal();
 	
-	TraverserSet traversers;
 	std::for_each(this->steps.begin(), this->steps.end(), [&](TraversalStep* step){
-		if(this->source->getOptionValue("verbose") == "True") std::cout << step->uid << std::endl;
-		step->apply(this, traversers);
+		std::cout << "step: " << step->uid << std::endl;
+		step->apply(this, this->traversers);
 	});
 
-	std::for_each(traversers.begin(), traversers.end(), [&](Traverser& trv){
+	std::for_each(this->traversers.begin(), this->traversers.end(), [&](Traverser& trv){
 		boost::any obj = trv.get();
 		func(obj);
 	});
@@ -598,7 +618,6 @@ void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
 void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
 	this->getInitialTraversal();
 	
-	TraverserSet traversers;
 	size_t current_step = 0;
 	size_t num_steps = steps.size();
 	
@@ -642,13 +661,16 @@ void GraphTraversal::iterate() {
 	//std::cout << "in iterate" << std::endl;
 	this->getInitialTraversal();
 
-	TraverserSet traversers;
 	std::for_each(this->steps.begin(), this->steps.end(), [&](TraversalStep* step){
 		//std::cout << step->uid << std::endl;;
-		step->apply(this, traversers);
+		step->apply(this, this->traversers);
 	});
 
 	//this->forEachRemaining([](boost::any& t){;});
+}
+
+TraverserSet GraphTraversal::getTraversers() {
+	return this->traversers;
 }
 
 #endif

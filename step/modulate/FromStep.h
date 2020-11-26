@@ -34,7 +34,7 @@ FromStep::FromStep(GraphTraversal* from_vertex_traversal)
 
 FromStep::FromStep(std::string side_effect_label)
 : TraversalStep(MODULATOR, FROM_STEP) {
-	this->from_traversal = (GraphTraversal*)__->select(side_effect_label);
+	this->from_traversal = __->select(side_effect_label);
 }
 
 FromStep::FromStep(Vertex* to_vertex) 

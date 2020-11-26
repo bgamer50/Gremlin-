@@ -50,9 +50,9 @@ class AddEdgeStep: public TraversalStep {
 					used_current_traverser = true;
 				} else { 
 					GraphTraversal from_traversal(my_traversal_source, this->out_vertex_traversal);
-					std::vector<boost::any> inj; inj.push_back(trv.get());
-					InjectStep inject_step(inj);
-					from_traversal.insertStep(0, &inject_step);
+					from_traversal.setInitialTraversers(traversers);
+					std::cout << "about to call from_traversal.next()" << std::endl;
+					std::cout << from_traversal.explain() << std::endl;
 					from_vertex = boost::any_cast<Vertex*>(from_traversal.next());
 				}
 
@@ -63,9 +63,7 @@ class AddEdgeStep: public TraversalStep {
 					to_vertex = boost::any_cast<Vertex*>(trv.get());
 				} else { 
 					GraphTraversal to_traversal(my_traversal_source, this->in_vertex_traversal);
-					std::vector<boost::any> inj; inj.push_back(trv.get());
-					InjectStep inject_step(inj);
-					to_traversal.insertStep(0, &inject_step);
+					to_traversal.setInitialTraversers(traversers);
 					to_vertex = boost::any_cast<Vertex*>(to_traversal.next()); 
 				}
 

@@ -73,18 +73,18 @@ class VertexStep : public TraversalStep {
 					switch(direction) {
 						case IN: {
 							Vertex* w = e->outV();
-							new_traversers.push_back(Traverser(w));
+							new_traversers.push_back(Traverser(w, trv.get_side_effects()));
 							break;
 						}
 						case OUT: {
 							Vertex* w = e->inV();
-							new_traversers.push_back(Traverser(w));
+							new_traversers.push_back(Traverser(w, trv.get_side_effects()));
 							break;
 						}
 						case BOTH: {
 							Vertex* u = e->outV();
 							Vertex* w = u == v ? e->inV() : u;
-							new_traversers.push_back(Traverser(w));
+							new_traversers.push_back(Traverser(w, trv.get_side_effects()));
 							break;
 						}
 					}

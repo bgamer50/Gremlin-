@@ -17,6 +17,11 @@ class Traverser {
 			my_data = boost::any(t);
 		}
 
+		Traverser(boost::any t, std::map<std::string, boost::any>& new_side_effects) {
+			my_data = boost::any(t);
+			this->side_effects = new_side_effects;
+		}
+
 		Traverser() : Traverser(boost::any()){}
 
 		virtual boost::any get() {

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <typeindex>
 
 class Graph;
 class Vertex;
@@ -100,6 +101,11 @@ GraphTraversalSource::GraphTraversalSource(Graph* gr) {
 		[](boost::any a, boost::any b){return boost::any_cast<std::string>(a).compare(boost::any_cast<std::string>(b));}, 
 		[](boost::any a, boost::any b){return (a.type() == typeid(std::string) && b.type() == typeid(std::string)) ? boost::any_cast<std::string>(a) == boost::any_cast<std::string>(b) : false;}
 	);
+	this->withTypeRegistration(
+		std::type_index(typeid(const char*)),
+		[](boost::any a, boost::any b){return std::string(boost::any_cast<const char*>(a)).compare(boost::any_cast<const char*>(b));},
+		[](boost::any a, boost::any b){return (a.type() == typeid(const char*) && b.type() == typeid(const char*)) ? std::string(boost::any_cast<const char*>(a)) == std::string(boost::any_cast<const char*>(b)) : false;}
+	);
 }
 
 GraphTraversalSource* GraphTraversalSource::withStrategy(TraversalStrategy strategy) {
@@ -131,11 +137,19 @@ std::string GraphTraversalSource::getOptionValue(std::string option_name) {
 
 bool GraphTraversalSource::test_equals(boost::any a, boost::any b) {
 	const std::type_index type = std::type_index(a.type());
+	auto reg = this->type_registrations.find(type);
+	if(reg == this->type_registrations.end()) {
+		throw std::runtime_error("No registration for type " + std::string(type.name()));
+	}
 	return this->type_registrations[type].second(a,b);
 }
 
 int GraphTraversalSource::test_compare(boost::any a, boost::any b) {
 	const std::type_index type = std::type_index(a.type());
+	auto reg = this->type_registrations.find(type);
+	if(reg == this->type_registrations.end()) {
+		throw std::runtime_error("No registration for type " + std::string(type.name()));
+	}
 	return this->type_registrations[type].first(a,b);
 }
 

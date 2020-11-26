@@ -20,7 +20,9 @@ class AsStep: public TraversalStep {
 };
 
 inline void AsStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    for(Traverser& trv : traversers) trv.get_side_effects()[sideEffectLabel] = trv.get();
+    for(Traverser& trv : traversers) {
+        trv.get_side_effects()[sideEffectLabel] = trv.get();
+    }
 }
 
 #endif
