@@ -11,7 +11,7 @@ class Vertex;
 
 class FromStep : public TraversalStep {
 	private:
-		GraphTraversal* from_traversal;
+		boost::any arg;
 	public:
 		FromStep(std::string side_effect_label);
 
@@ -19,9 +19,9 @@ class FromStep : public TraversalStep {
 
 		FromStep(GraphTraversal* from_vertex_traversal);
 
-		GraphTraversal* getTraversal();
-
 		virtual std::string getInfo();
+
+		boost::any get() { return arg; }
 };
 
 #include "traversal/GraphTraversal.h"
@@ -29,25 +29,21 @@ class FromStep : public TraversalStep {
 
 FromStep::FromStep(GraphTraversal* from_vertex_traversal)
 : TraversalStep(MODULATOR, FROM_STEP) {
-	from_traversal = from_vertex_traversal;
+	arg = from_vertex_traversal;
 }
 
 FromStep::FromStep(std::string side_effect_label)
 : TraversalStep(MODULATOR, FROM_STEP) {
-	this->from_traversal = __->select(side_effect_label);
+	arg = __->select(side_effect_label);
 }
 
 FromStep::FromStep(Vertex* to_vertex) 
 : TraversalStep(MODULATOR, FROM_STEP) {
-	this->from_traversal = __->V(to_vertex);
-}
-
-GraphTraversal* FromStep::getTraversal() {
-	return this->from_traversal;
+	arg = __->V(to_vertex);
 }
 
 std::string FromStep::getInfo() {
-	return "FromStep {\n" + this->from_traversal->explain() + "\n}";
+	return "FromStep {?}";
 }
 
 #endif

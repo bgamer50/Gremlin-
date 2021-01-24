@@ -3,8 +3,10 @@
 
 #include <string>
 #include <vector>
+#include <tuple>
 #include <functional>
 #include <typeindex>
+#include <boost/any.hpp>
 
 class Graph;
 class Vertex;
@@ -14,6 +16,7 @@ class GraphTraversal;
 typedef std::function<void(std::vector<TraversalStep*>&)> TraversalStrategy;
 typedef std::function<int(boost::any,boost::any)> compare_func_t;
 typedef std::function<bool(boost::any,boost::any)> equals_func_t;
+typedef std::function<size_t(boost::any)> hash_func_t;
 
 class GraphTraversalSource {
 private:
@@ -21,7 +24,7 @@ private:
 
 protected:
 	std::vector<TraversalStrategy> strategies;
-	std::unordered_map<std::type_index, std::pair<compare_func_t, equals_func_t>> type_registrations;
+	std::unordered_map<std::type_index, std::tuple<compare_func_t, equals_func_t, hash_func_t>> type_registrations;
 	std::unordered_map<std::string, std::string> options;
 
 public:
@@ -31,8 +34,8 @@ public:
 
 	GraphTraversalSource* withStrategy(TraversalStrategy strategy);
 	//GraphTraversalSource* withoutStrategy(TraversalStrategy strategy); TODO
-	GraphTraversalSource* withTypeRegistration(std::type_index tid, compare_func_t cmp, equals_func_t eql);
-	GraphTraversalSource* withTypeRegistration(std::type_index tid, compare_func_t cmp);
+	GraphTraversalSource* withTypeRegistration(std::type_index tid, compare_func_t cmp, equals_func_t eql, hash_func_t hsh);
+	GraphTraversalSource* withTypeRegistration(std::type_index tid, compare_func_t cmp, hash_func_t hsh);
 	//GraphTraversalSource* withoutTypeRegistration(typeid_t tid); TODO
 	
 	GraphTraversalSource* withAdminOption(std::string option_name, std::string value);
@@ -42,13 +45,15 @@ public:
 
 	bool test_equals(boost::any a, boost::any b);
 	int test_compare(boost::any a, boost::any b);
+	size_t test_hash(boost::any v);
 
-	virtual GraphTraversal* V() = 0;
-	virtual GraphTraversal* V(Vertex* v) = 0;
-	virtual GraphTraversal* E() = 0;
-	virtual GraphTraversal* addV() = 0;
-	virtual GraphTraversal* addV(std::string label) = 0;
-	virtual GraphTraversal* addE(std::string label) = 0;
+	GraphTraversal* V();
+	GraphTraversal* V(Vertex* v) ;
+	GraphTraversal* E();
+	GraphTraversal* addV();
+	GraphTraversal* addV(std::string label);
+	GraphTraversal* addE(std::string label);
+	GraphTraversal* inject(std::vector<boost::any> injects);
 };
 
 #include "traversal/GraphTraversal.h"
@@ -56,55 +61,63 @@ public:
 #include "structure/Graph.h"
 #include "structure/Vertex.h"
 #include "structure/Edge.h"
-#include "strategy/AddEdgeStepCompletionStrategy.h"
 #include "strategy/RepeatStepCompletionStrategy.h"
-#include "strategy/ValueMapStepCompletionStrategy.h"
+#include "strategy/ByModulatingStrategy.h"
+#include "strategy/FromToModulatingStrategy.h"
 
 GraphTraversalSource::GraphTraversalSource(Graph* gr) {
 	graph = gr;
-	this->withStrategy(add_edge_step_completion_strategy);
 	this->withStrategy(repeat_step_completion_strategy);
-	this->withStrategy(valuemap_step_completion_strategy);
+	this->withStrategy(by_modulating_strategy);
+	this->withStrategy(from_to_modulating_strategy);
 	
 	this->withTypeRegistration(
 		std::type_index(typeid(int)), 
 		[](boost::any a, boost::any b){return boost::any_cast<int>(a) - boost::any_cast<int>(b);}, 
-		[](boost::any a, boost::any b){return (a.type() == typeid(int) && b.type() == typeid(int)) ? boost::any_cast<int>(a) == boost::any_cast<int>(b) : false;}
+		[](boost::any a, boost::any b){return (a.type() == typeid(int) && b.type() == typeid(int)) ? boost::any_cast<int>(a) == boost::any_cast<int>(b) : false;},
+		[](boost::any v){return std::hash<int>()(boost::any_cast<int>(v));}
 	);
 	this->withTypeRegistration(
 		std::type_index(typeid(long)), 
 		[](boost::any a, boost::any b){return boost::any_cast<long>(a) - boost::any_cast<long>(b);}, 
-		[](boost::any a, boost::any b){return (a.type() == typeid(long) && b.type() == typeid(long)) ? boost::any_cast<long>(a) == boost::any_cast<long>(b) : false;}
+		[](boost::any a, boost::any b){return (a.type() == typeid(long) && b.type() == typeid(long)) ? boost::any_cast<long>(a) == boost::any_cast<long>(b) : false;},
+		[](boost::any v){return std::hash<long>()(boost::any_cast<long>(v));}
 	);
 	this->withTypeRegistration(
 		std::type_index(typeid(unsigned int)), 
-		[](boost::any a, boost::any b){return boost::any_cast<unsigned int>(a) - boost::any_cast<unsigned int>(b);}, 
-		[](boost::any a, boost::any b){return (a.type() == typeid(unsigned int) && b.type() == typeid(unsigned int)) ? boost::any_cast<unsigned int>(a) == boost::any_cast<unsigned int>(b) : false;}
+		[](boost::any a, boost::any b){return (long)boost::any_cast<unsigned int>(a) - (long)boost::any_cast<unsigned int>(b);}, 
+		[](boost::any a, boost::any b){return (a.type() == typeid(unsigned int) && b.type() == typeid(unsigned int)) ? boost::any_cast<unsigned int>(a) == boost::any_cast<unsigned int>(b) : false;},
+		[](boost::any v){return std::hash<unsigned int>()(boost::any_cast<unsigned int>(v));}
 	);
 	this->withTypeRegistration(
 		std::type_index(typeid(unsigned long)), 
-		[](boost::any a, boost::any b){return boost::any_cast<unsigned long>(a) - boost::any_cast<unsigned long>(b);}, 
-		[](boost::any a, boost::any b){return (a.type() == typeid(unsigned long) && b.type() == typeid(unsigned long)) ? boost::any_cast<unsigned long>(a) == boost::any_cast<unsigned long>(b) : false;}
+		[](boost::any a, boost::any b){return (long)boost::any_cast<unsigned long>(a) - (long)boost::any_cast<unsigned long>(b);}, 
+		[](boost::any a, boost::any b){return (a.type() == typeid(unsigned long) && b.type() == typeid(unsigned long)) ? boost::any_cast<unsigned long>(a) == boost::any_cast<unsigned long>(b) : false;},
+		[](boost::any v){return std::hash<unsigned long>()(boost::any_cast<unsigned long>(v));}
 	);
 	this->withTypeRegistration(
 		std::type_index(typeid(float)), 
 		[](boost::any a, boost::any b){return boost::any_cast<float>(a) - boost::any_cast<float>(b);}, 
-		[](boost::any a, boost::any b){return (a.type() == typeid(float) && b.type() == typeid(float)) ? boost::any_cast<float>(a) == boost::any_cast<float>(b) : false;}
+		[](boost::any a, boost::any b){return (a.type() == typeid(float) && b.type() == typeid(float)) ? boost::any_cast<float>(a) == boost::any_cast<float>(b) : false;},
+		[](boost::any v){return std::hash<float>()(boost::any_cast<float>(v));}
 	);
 	this->withTypeRegistration(
 		std::type_index(typeid(double)), 
 		[](boost::any a, boost::any b){return boost::any_cast<double>(a) - boost::any_cast<double>(b);}, 
-		[](boost::any a, boost::any b){return (a.type() == typeid(double) && b.type() == typeid(double)) ? boost::any_cast<double>(a) == boost::any_cast<double>(b) : false;}
+		[](boost::any a, boost::any b){return (a.type() == typeid(double) && b.type() == typeid(double)) ? boost::any_cast<double>(a) == boost::any_cast<double>(b) : false;},
+		[](boost::any v){return std::hash<double>()(boost::any_cast<double>(v));}
 	);
 	this->withTypeRegistration(
 		std::type_index(typeid(std::string)), 
 		[](boost::any a, boost::any b){return boost::any_cast<std::string>(a).compare(boost::any_cast<std::string>(b));}, 
-		[](boost::any a, boost::any b){return (a.type() == typeid(std::string) && b.type() == typeid(std::string)) ? boost::any_cast<std::string>(a) == boost::any_cast<std::string>(b) : false;}
+		[](boost::any a, boost::any b){return (a.type() == typeid(std::string) && b.type() == typeid(std::string)) ? boost::any_cast<std::string>(a) == boost::any_cast<std::string>(b) : false;},
+		[](boost::any v){return std::hash<std::string>()(boost::any_cast<std::string>(v));}
 	);
 	this->withTypeRegistration(
 		std::type_index(typeid(const char*)),
 		[](boost::any a, boost::any b){return std::string(boost::any_cast<const char*>(a)).compare(boost::any_cast<const char*>(b));},
-		[](boost::any a, boost::any b){return (a.type() == typeid(const char*) && b.type() == typeid(const char*)) ? std::string(boost::any_cast<const char*>(a)) == std::string(boost::any_cast<const char*>(b)) : false;}
+		[](boost::any a, boost::any b){return (a.type() == typeid(const char*) && b.type() == typeid(const char*)) ? std::string(boost::any_cast<const char*>(a)) == std::string(boost::any_cast<const char*>(b)) : false;},
+		[](boost::any v){return std::hash<std::string>()(std::string(boost::any_cast<const char*>(v)));}
 	);
 }
 
@@ -113,20 +126,21 @@ GraphTraversalSource* GraphTraversalSource::withStrategy(TraversalStrategy strat
 	return this;
 }
 
-GraphTraversalSource* GraphTraversalSource::withTypeRegistration(std::type_index tid, compare_func_t cmp, equals_func_t eql) {
-	this->type_registrations[tid] = std::make_pair(cmp, eql);
+GraphTraversalSource* GraphTraversalSource::withTypeRegistration(std::type_index tid, compare_func_t cmp, equals_func_t eql, hash_func_t hsh) {
+	this->type_registrations[tid] = std::make_tuple(cmp, eql, hsh);
 	return this;
 }
 
-GraphTraversalSource* GraphTraversalSource::withTypeRegistration(std::type_index tid, compare_func_t cmp) {
+GraphTraversalSource* GraphTraversalSource::withTypeRegistration(std::type_index tid, compare_func_t cmp, hash_func_t hsh) {
 	std::function<bool(boost::any, boost::any)> eql = [&](boost::any a, boost::any b){
 		return bool(cmp(a,b) == 0);
 	};
-	return this->withTypeRegistration(tid, cmp, eql);
+	return this->withTypeRegistration(tid, cmp, eql, hsh);
 }
 
 GraphTraversalSource* GraphTraversalSource::withAdminOption(std::string option_name, std::string value) {
 	this->options[option_name] = value;
+	return this;
 }
 
 std::string GraphTraversalSource::getOptionValue(std::string option_name) {
@@ -141,7 +155,7 @@ bool GraphTraversalSource::test_equals(boost::any a, boost::any b) {
 	if(reg == this->type_registrations.end()) {
 		throw std::runtime_error("No registration for type " + std::string(type.name()));
 	}
-	return this->type_registrations[type].second(a,b);
+	return std::get<1>(this->type_registrations[type])(a,b);
 }
 
 int GraphTraversalSource::test_compare(boost::any a, boost::any b) {
@@ -150,15 +164,69 @@ int GraphTraversalSource::test_compare(boost::any a, boost::any b) {
 	if(reg == this->type_registrations.end()) {
 		throw std::runtime_error("No registration for type " + std::string(type.name()));
 	}
-	return this->type_registrations[type].first(a,b);
+	return std::get<0>(this->type_registrations[type])(a,b);
+}
+
+size_t GraphTraversalSource::test_hash(boost::any v) {
+	const std::type_index type = std::type_index(v.type());
+	auto reg = this->type_registrations.find(type);
+	if(reg == this->type_registrations.end()) {
+		throw std::runtime_error("No registration for type " + std::string(type.name()));
+	}
+	return std::get<2>(this->type_registrations[type])(v);
 }
 
 std::vector<TraversalStrategy>& GraphTraversalSource::getStrategies() {
 		return this->strategies;
-	}
+}
 
 Graph* GraphTraversalSource::getGraph() {
 		return graph;
-	}
+}
+
+#include "step/graph/GraphStep.h"
+#include "step/vertex/AddVertexStartStep.h"
+#include "step/edge/AddEdgeStartStep.h"
+#include "step/controlflow/InjectStep.h"
+
+GraphTraversal* GraphTraversalSource::V() {
+	GraphTraversal* trv = new GraphTraversal(this);
+	trv->appendStep(new GraphStep(VERTEX, {}));
+	return trv;
+}
+
+GraphTraversal* GraphTraversalSource::V(Vertex* v) {
+	GraphTraversal* trv = new GraphTraversal(this);
+	trv->appendStep(new GraphStep(VERTEX, {v->id()}));
+	return trv;
+}
+
+//TODO should be a version of the Graph Step
+GraphTraversal* GraphTraversalSource::E() {
+	return this->V()->outE();
+}
+
+GraphTraversal* GraphTraversalSource::addV() {
+	GraphTraversal* trv = new GraphTraversal(this);
+	trv->appendStep(new AddVertexStartStep());
+	return trv;
+}
+
+GraphTraversal* GraphTraversalSource::addV(std::string label) {
+	GraphTraversal* trv = new GraphTraversal(this);
+	trv->appendStep(new AddVertexStartStep(label));
+	return trv;
+}
+
+GraphTraversal* GraphTraversalSource::addE(std::string label) {
+	GraphTraversal* trv = new GraphTraversal(this);
+	trv->appendStep(new AddEdgeStartStep(label));
+	return trv;
+}
+
+GraphTraversal* GraphTraversalSource::inject(std::vector<boost::any> injects) {
+	GraphTraversal* trv = new GraphTraversal(this);
+	return trv->appendStep(new InjectStep(injects));
+}
 
 #endif

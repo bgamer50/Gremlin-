@@ -7,10 +7,12 @@
 #include <vector>
 #include <unordered_map>
 
+#include "step/modulate/ByModulating.h"
+
 class GraphTraversal;
 class TraversalStep;
 
-class ValueMapStep: public TraversalStep {
+class ValueMapStep: public TraversalStep, virtual public ByModulating {
     private:
         std::vector<std::string> keys;
         GraphTraversal* by_traversal = nullptr;
@@ -18,7 +20,8 @@ class ValueMapStep: public TraversalStep {
     public:
         ValueMapStep(std::vector<std::string>& keys);
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
-        void set_by_traversal(GraphTraversal* by_traversal);
+        
+        void modulate_by(boost::any arg) { this->by_traversal = boost::any_cast<GraphTraversal*>(arg); }
 };
 
 #include "traversal/GraphTraversal.h"
@@ -32,10 +35,6 @@ class ValueMapStep: public TraversalStep {
 ValueMapStep::ValueMapStep(std::vector<std::string>& keys)
 : TraversalStep(MAP, VALUEMAP_STEP) {
     this->keys = std::vector<std::string>(keys.begin(), keys.end());
-}
-
-void ValueMapStep::set_by_traversal(GraphTraversal* by_traversal) {
-    this->by_traversal = by_traversal;
 }
 
 void ValueMapStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
@@ -59,9 +58,7 @@ void ValueMapStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
             }
             else {
                 GraphTraversal new_trv(traversal->getTraversalSource(), by_traversal);
-                std::vector<boost::any> inj; inj.push_back(vec);
-                InjectStep inject_step(inj);
-                new_trv.insertStep(0, &inject_step);
+                new_trv.setInitialTraversers({Traverser(vec)});
                 vmap[key] = new_trv.next();
             }
         }

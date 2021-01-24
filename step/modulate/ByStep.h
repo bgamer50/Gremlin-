@@ -5,16 +5,16 @@ class GraphTraversal;
 class TraversalStep;
 
 #include <string>
+#include <boost/any.hpp>
 
 #define BY_STEP 0x92
 
 class ByStep : public TraversalStep {
 	private:
-		GraphTraversal* by_traversal;
+		boost::any arg;
 	public:
-		ByStep(GraphTraversal* by_traversal);
-
-		GraphTraversal* getTraversal();
+		ByStep(boost::any arg);
+		boost::any get() { return arg; }
 
 		virtual std::string getInfo();
 };
@@ -22,17 +22,13 @@ class ByStep : public TraversalStep {
 #include "traversal/GraphTraversal.h"
 #include "step/TraversalStep.h"
 
-ByStep::ByStep(GraphTraversal* by_traversal)
+ByStep::ByStep(boost::any arg)
 : TraversalStep(MODULATOR, BY_STEP) {
-	this->by_traversal = by_traversal;
-}
-
-GraphTraversal* ByStep::getTraversal() {
-	return this->by_traversal;
+	this->arg = arg;
 }
 
 std::string ByStep::getInfo() {
-	return "ByStep {\n" + this->by_traversal->explain() + "\n}";
+	return "ByStep(?)";
 }
 
 #endif

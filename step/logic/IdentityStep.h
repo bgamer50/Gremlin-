@@ -11,7 +11,7 @@ class IdentityStep: public TraversalStep {
         IdentityStep()
         : TraversalStep(MAP, IDENTITY_STEP) {}
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet traversers){}
+        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers){}
 };
 
 #endif

@@ -19,7 +19,7 @@ class CoalesceStep: public TraversalStep {
 
 #include "traversal/GraphTraversal.h"
 #include "step/TraversalStep.h"
-#include "step/InjectStep.h"
+#include "step/controlflow/InjectStep.h"
 
 CoalesceStep::CoalesceStep(std::vector<GraphTraversal*>& traversals)
     : TraversalStep(MAP, COALESCE_STEP) {

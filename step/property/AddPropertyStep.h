@@ -3,7 +3,7 @@
 
 #define ADD_PROPERTY_STEP 0x75
 #include "step/TraversalStep.h"
-#include "step/InjectStep.h"
+#include "step/controlflow/InjectStep.h"
 #include "structure/Vertex.h"
 #include <boost/any.hpp>
 

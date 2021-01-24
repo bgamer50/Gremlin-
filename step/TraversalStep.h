@@ -38,6 +38,8 @@ std::string TraversalStep::getInfo() {
 	return "UnknownTraversalStep{}";
 }
 
-void TraversalStep::apply(GraphTraversal* trv, TraverserSet& traversers) {};
+void TraversalStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
+	throw std::runtime_error("Non-executable traversal step! (" + std::to_string(uid) + ")");
+};
 
 #endif
