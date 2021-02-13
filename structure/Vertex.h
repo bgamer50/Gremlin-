@@ -69,6 +69,10 @@ public:
 		multiproperties and need to handle these appropriately.
 	*/
 	virtual std::vector<Property*> properties(std::vector<std::string> keys) = 0;
+
+	virtual std::vector<Property*> properties() {
+		return this->properties({});
+	}
 };
 
 #include "structure/Graph.h"
