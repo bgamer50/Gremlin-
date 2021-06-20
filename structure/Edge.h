@@ -69,7 +69,7 @@ public:
 		no such property exists, returns
 		an empty Property object.
 	*/
-	virtual Property* property(std::string key, boost::any value) = 0;
+	virtual Property* property(std::string key, boost::any& value) = 0;
 
 	/*
 		Return a vector of

@@ -3,6 +3,7 @@
 
 #include <list>
 #include <map>
+#include <vector>
 #include <string.h>
 #include <boost/any.hpp>
 

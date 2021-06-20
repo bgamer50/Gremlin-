@@ -10,8 +10,6 @@
 #include "traversal/Traverser.h"
 #include "traversal/GraphTraversal.h"
 
-#include <boost/lockfree/stack.hpp>
-
 #define VERTEX_STEP 0x80
 
 class VertexStep : public TraversalStep {
@@ -39,6 +37,10 @@ class VertexStep : public TraversalStep {
 
 		std::set<std::string> get_labels() {
 			return this->edge_labels;
+		}
+
+		GraphStepType get_type() {
+			return this->gsType;
 		}
 
 		virtual std::string getInfo() {
