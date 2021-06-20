@@ -32,7 +32,7 @@ class ReferenceEdge : public Edge {
 		virtual Vertex* inV() { return this->in_vertex; }
 
 		virtual Property* property(std::string key) { throw std::runtime_error(STR_NOT_SUPPORTED); }
-		virtual Property* property(std::string key, boost::any value) { throw std::runtime_error(STR_NOT_SUPPORTED); }
+		virtual Property* property(std::string key, boost::any& value) { throw std::runtime_error(STR_NOT_SUPPORTED); }
 		virtual std::vector<Property*> properties(std::vector<std::string> keys) { throw std::runtime_error(STR_NOT_SUPPORTED); }
 };
 

@@ -58,7 +58,7 @@ public:
 		no such property exists, returns
 		an empty Property object.
 	*/
-	virtual Property* property(std::string key, boost::any value) {
+	virtual Property* property(std::string key, boost::any& value) {
 		return this->property(SINGLE, key, value);
 	}
 
