@@ -53,6 +53,13 @@ class PropertyStep: public TraversalStep {
 
             traversers.swap(new_traversers);
         }
+
+        std::string getInfo() {
+            std::string s = "PropertyStep{";
+            s += (this->ps_type == VALUE ? "Value" : "Property");
+            s += "}";
+            return s;
+        }
 };
 
 #endif

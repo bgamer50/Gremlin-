@@ -49,8 +49,8 @@ class AddEdgeStep: public TraversalStep, virtual public FromToModulating {
 				} else { 
 					GraphTraversal from_traversal(my_traversal_source, this->out_vertex_traversal);
 					from_traversal.setInitialTraversers({trv});
-					std::cout << "about to call from_traversal.next()" << std::endl;
-					std::cout << from_traversal.explain() << std::endl;
+					//std::cout << "about to call from_traversal.next()" << std::endl;
+					//std::cout << from_traversal.explain() << std::endl;
 					from_vertex = boost::any_cast<Vertex*>(from_traversal.next());
 				}
 
