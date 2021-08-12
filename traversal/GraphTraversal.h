@@ -219,6 +219,8 @@ public:
 
 	GraphTraversal* values(std::string label);
 
+	GraphTraversal* map(GraphTraversal* map_traversal);
+
 	GraphTraversal* both();
 	GraphTraversal* both(std::vector<std::string> labels);
 	GraphTraversal* bothE();
@@ -598,6 +600,11 @@ GraphTraversal* GraphTraversal::limit(uint64_t the_limit) {
 #include "step/controlflow/InjectStep.h"
 GraphTraversal* GraphTraversal::inject(std::vector<boost::any> injects) {
 	return this->appendStep(new InjectStep(injects));
+}
+
+#include "step/logic/MapStep.h"
+GraphTraversal* GraphTraversal::map(GraphTraversal* map_traversal) {
+	return this->appendStep(new MapStep(map_traversal));
 }
 
 std::string GraphTraversal::explain() {
