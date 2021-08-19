@@ -119,6 +119,18 @@ GraphTraversalSource::GraphTraversalSource(Graph* gr) {
 		[](boost::any a, boost::any b){return (a.type() == typeid(const char*) && b.type() == typeid(const char*)) ? std::string(boost::any_cast<const char*>(a)) == std::string(boost::any_cast<const char*>(b)) : false;},
 		[](boost::any v){return std::hash<std::string>()(std::string(boost::any_cast<const char*>(v)));}
 	);
+	this->withTypeRegistration(
+		std::type_index(typeid(Vertex*)),
+		[](boost::any a, boost::any b){return reinterpret_cast<long>(boost::any_cast<Vertex*>(a)) - reinterpret_cast<long>(boost::any_cast<Vertex*>(a));},
+		[](boost::any a, boost::any b){return reinterpret_cast<long>(boost::any_cast<Vertex*>(a)) == reinterpret_cast<long>(boost::any_cast<Vertex*>(a));},
+		[](boost::any v){return std::hash<long>()(reinterpret_cast<long>(boost::any_cast<Vertex*>(v)));}
+	);
+	this->withTypeRegistration(
+		std::type_index(typeid(Edge*)),
+		[](boost::any a, boost::any b){return reinterpret_cast<long>(boost::any_cast<Edge*>(a)) - reinterpret_cast<long>(boost::any_cast<Edge*>(a));},
+		[](boost::any a, boost::any b){return reinterpret_cast<long>(boost::any_cast<Edge*>(a)) == reinterpret_cast<long>(boost::any_cast<Edge*>(a));},
+		[](boost::any v){return std::hash<long>()(reinterpret_cast<long>(boost::any_cast<Edge*>(v)));}
+	);
 }
 
 GraphTraversalSource* GraphTraversalSource::withStrategy(TraversalStrategy strategy) {
