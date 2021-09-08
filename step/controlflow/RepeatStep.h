@@ -23,6 +23,15 @@ class RepeatStep: public TraversalStep {
         void setUntilTraversal(GraphTraversal* untilTraversal) { this->untilTraversal = untilTraversal; }
 
         virtual void apply(GraphTraversal* trv, TraverserSet& traversers);
+
+        virtual std::string getInfo() { 
+            std::string info = "RepeatStep{\n" /* + actionTraversal->explain() */;
+            //if(this->emitTraversal != nullptr) info += ",\nemit = " + emitTraversal->explain();
+            //if(this->untilTraversal != nullptr) info += ",\nuntil = " + untilTraversal->explain();
+            info += "\n}";
+
+            return info;
+        }
         
 
 };

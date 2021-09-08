@@ -25,7 +25,7 @@ class SelectStep: public TraversalStep {
 
 inline void SelectStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
     //std::cout << traversers.size() << " traversers." << std::endl;
-    std::for_each(traversers[0].get_side_effects().begin(), traversers[0].get_side_effects().end(), [](std::pair<std::string, boost::any> r){std::cout << r.first << "\t" << (r.second.type() == typeid(Vertex*)) << std::endl;});
+    //std::for_each(traversers[0].get_side_effects().begin(), traversers[0].get_side_effects().end(), [](std::pair<std::string, boost::any> r){std::cout << r.first << "\t" << (r.second.type() == typeid(Vertex*)) << std::endl;});
     for(Traverser& trv : traversers) {
         auto p = trv.get_side_effects().find(this->sideEffectLabel);
         if(p == trv.get_side_effects().end()) {
