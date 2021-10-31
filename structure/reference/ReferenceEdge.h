@@ -13,11 +13,11 @@ class ReferenceEdge : public Edge {
 		boost::any edge_id;
         std::string edge_label; // not optional
 
-		ReferenceVertex* out_vertex;
-		ReferenceVertex* in_vertex;
+		Vertex* out_vertex;
+		Vertex* in_vertex;
 
 	public:
-        ReferenceEdge(boost::any edge_id, std::string edge_label, ReferenceVertex* out_vertex, ReferenceVertex* in_vertex) {
+        ReferenceEdge(boost::any edge_id, std::string edge_label, Vertex* out_vertex, Vertex* in_vertex) {
             this->edge_id = edge_id;
             this->edge_label = edge_label;
             this->out_vertex = out_vertex;

@@ -14,19 +14,21 @@ class AddPropertyStep : public TraversalStep {
 		std::string key;
 		boost::any value;
 	public:
-		AddPropertyStep(std::string property_key, boost::any& value)
+		AddPropertyStep(std::string property_key, boost::any value)
 		: TraversalStep(MAP, ADD_PROPERTY_STEP) {
 			this->cardinality = SINGLE;
 			this->key = std::string(property_key);
 			this->value = boost::any(value);
 		}
 
-		AddPropertyStep(Cardinality card, std::string property_key, boost::any& value)
+		AddPropertyStep(Cardinality card, std::string property_key, boost::any value)
 		: TraversalStep(MAP, ADD_PROPERTY_STEP) {
 			this->cardinality = card;
 			this->key = std::string(property_key);
 			this->value = boost::any(value);
 		}
+
+		Cardinality get_cardinality() { return this->cardinality; }
 
 		std::string get_key() { return this->key; }
 
@@ -50,7 +52,7 @@ class AddPropertyStep : public TraversalStep {
 					
 					// Execute traversal
 					new_trv.setInitialTraversers({Traverser(trv)});
-					boost::any prop_value = new_trv.next();
+					boost::any prop_value = new_trv.first();
 
 					// Store the property; TODO deal w/ edges
 					e->property(this->cardinality, this->key, prop_value);

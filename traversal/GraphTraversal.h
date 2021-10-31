@@ -32,6 +32,7 @@ protected:
 	std::vector<Traverser> traversers;
 private:
 	GraphTraversalSource* source;
+	bool has_iterated = false;
 public:
 	/*
 		The "default" constructor.
@@ -262,12 +263,12 @@ public:
 
 	// Finalizing steps
 
-	// TODO; this is a really bad implementation of hasNext but will likely be changed in the Traverser refactor.
 	bool hasNext() {
-		return !this->toVector().empty();
+		if(!this->has_iterated) this->iterate();
+		return !this->traversers.empty();
 	}
 
-	std::vector<boost::any> toVector() {
+	std::vector<boost::any> toVector() {		
 		std::vector<boost::any> results;
 		this->forEachRemaining([&](boost::any& a){results.push_back(a);});
 		return results;
@@ -281,9 +282,10 @@ public:
 		return results;
 	}
 
-	boost::any next() { 
-		return this->toVector()[0];
-	}
+	// much more efficient & memory-safe for getting the first result than next()
+	boost::any first();
+
+	boost::any next();
 
 	void forEachRemaining(std::function<void(boost::any&)> func);
 
@@ -619,76 +621,48 @@ std::string GraphTraversal::explain() {
 #include "traversal/Traverser.h"
 #include <omp.h>
 
+boost::any GraphTraversal::first() {
+	this->iterate();
+	if(this->traversers.empty()) throw std::runtime_error("Traversal produced an empty set of final traversers!");
+
+	boost::any next_result = this->traversers.front().get();
+	traversers.clear();
+	return next_result;
+}
+
+boost::any GraphTraversal::next() { 
+	if(!this->has_iterated) this->iterate();
+	if(this->traversers.empty()) throw std::runtime_error("No traversers available when calling next()");
+
+	boost::any next_result = this->traversers.front().get();
+	traversers.erase(traversers.begin());
+
+	return next_result;
+}
 
 void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
-	this->getInitialTraversal();
-	
-	std::for_each(this->steps.begin(), this->steps.end(), [&](TraversalStep* step){
-		//std::cout << "step: " << step->uid << std::endl;
-		step->apply(this, this->traversers);
-	});
+	if(!this->has_iterated) this->iterate();
 
 	std::for_each(this->traversers.begin(), this->traversers.end(), [&](Traverser& trv){
 		boost::any obj = trv.get();
 		func(obj);
 	});
+
+	traversers.clear();
 }
 
-
-/*
-void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
-	this->getInitialTraversal();
-	
-	size_t current_step = 0;
-	size_t num_steps = steps.size();
-	
-	while(current_step < num_steps) {
-		std::cout << steps[current_step]->uid << std::endl;;
-		steps[current_step++]->apply(this, traversers);
-		TraverserSet new_traversers;
-
-		size_t step = current_step;
-		size_t k = 0;
-		size_t sz = traversers.size();
-		size_t thread;
-		#pragma omp for private(step, k, thread)
-		for(size_t k = 0; k < sz; ++k) {
-			thread = omp_get_thread_num();
-			TraverserSet local_traversers(traversers.begin() + k, traversers.begin() + k + 1);
-			while(step < num_steps && !steps[step]->is_barrier) {
-				steps[step]->apply(this, local_traversers);
-				step++;
-				if(thread == 0) current_step = step;
-			}
-
-			#pragma omp critical 
-			{
-				new_traversers.insert(new_traversers.end(), local_traversers.begin(), local_traversers.end());
-			}
-		}
-
-		traversers.swap(new_traversers);
-	
-	}
-
-	std::for_each(traversers.begin(), traversers.end(), [&](Traverser& trv){
-		boost::any obj = trv.get();
-		func(obj);
-	});
-}*/
-
-
 void GraphTraversal::iterate() {
-	//std::cout << "in iterate" << std::endl;
+	if(this->has_iterated) throw std::runtime_error("Traversal has already iterated!");
+	
 	this->getInitialTraversal();
-
+	
 	std::for_each(this->steps.begin(), this->steps.end(), [&](TraversalStep* step){
-		//std::cout << "iterate " << step->uid << std::endl;
+		//std::cout << "step: " << step->uid << std::endl;
 		//std::cout << step->getInfo() << std::endl;
 		step->apply(this, this->traversers);
 	});
 
-	//this->forEachRemaining([](boost::any& t){;});
+	this->has_iterated = true;
 }
 
 TraverserSet GraphTraversal::getTraversers() {
