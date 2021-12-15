@@ -207,7 +207,7 @@ public:
 	//GraphTraversal tree(std::string sideEffectLabel);
 	//GraphTraversal tree();
 	GraphTraversal* unfold();
-	//GraphTraversal _union(std::vector<GraphTraversal> unionTraversals);
+	GraphTraversal* _union(std::vector<GraphTraversal*> unionTraversals);
 	//GraphTraversal until(Predicate predicate);
 	GraphTraversal* until(GraphTraversal* untilTraversal);
 	//GraphTraversal value();
@@ -381,6 +381,11 @@ GraphTraversal* GraphTraversal::addV() {
 #include "step/controlflow/CoalesceStep.h"
 GraphTraversal* GraphTraversal::coalesce(std::vector<GraphTraversal*> traversals) {
 	return this->appendStep(new CoalesceStep(traversals));
+}
+
+#include "step/controlflow/UnionStep.h"
+GraphTraversal* GraphTraversal::_union(std::vector<GraphTraversal*> traversals) {
+	return this->appendStep(new UnionStep(traversals));
 }
 
 #include "step/property/AddPropertyStep.h"

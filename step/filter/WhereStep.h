@@ -27,11 +27,14 @@ class WhereStep: public TraversalStep {
 
 void WhereStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
     GraphTraversalSource* src = traversal->getTraversalSource();
-    boost::any val = this->predicate.operand;
+    std::string val_label;
+    try { val_label = boost::any_cast<std::string>(this->predicate.operand); }
+    catch(const std::exception& err) { val_label =  boost::any_cast<const char*>(this->predicate.operand);}
 
     TraverserSet new_traversers;
     for(Traverser& traverser: traversers)  {
         boost::any t = boost::any_cast<std::unordered_map<std::string, boost::any>>(traverser.get())[this->label];
+        boost::any val = boost::any_cast<std::unordered_map<std::string, boost::any>>(traverser.get())[val_label];
         switch(this->predicate.comparison) {
             case P::Comparison::EQ:
                 if(src->test_equals(t, val)) new_traversers.push_back(traverser);

@@ -67,7 +67,7 @@ class VertexStep : public TraversalStep {
 			std::for_each(traversers.begin(), traversers.end(), [&, this](Traverser& trv) {
 				Vertex* v = boost::any_cast<Vertex*>(trv.get());
 				std::vector<Edge*> edges = v->edges(direction);
-				//#pragma omp for
+				
 				for(size_t k = 0; k < edges.size(); ++k) {
 					Edge* e = edges[k];
 					if(label_required && this->edge_labels.count(e->label()) == 0) continue;
