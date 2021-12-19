@@ -260,6 +260,7 @@ public:
 
 	// The explain finalizer which works in anonymous GraphTraversals
 	std::string explain();
+	std::string explain(size_t indent);
 
 	// Finalizing steps
 
@@ -332,7 +333,7 @@ GraphTraversal::GraphTraversal(GraphTraversalSource* src, GraphTraversal* trv) {
 }
 
 Graph* GraphTraversal::getGraph() {
-	return (*source).getGraph();
+	return source->getGraph();
 }
 
 
@@ -615,10 +616,17 @@ GraphTraversal* GraphTraversal::map(GraphTraversal* map_traversal) {
 }
 
 std::string GraphTraversal::explain() {
-	this->getInitialTraversal();
+	return this->explain(0);
+}
+
+std::string GraphTraversal::explain(size_t indent) {
+	std::string ind = "";
+	for(size_t k = 0; k < indent; ++k) ind += "  ";
+
+	if(this->source != nullptr) this->getInitialTraversal();
 
 	std::string explanation = "GraphTraversal {\n";
-	for(int k = 0; k < this->steps.size(); k++) explanation += this->steps[k]->getInfo() + "\n";
+	for(int k = 0; k < this->steps.size(); k++) explanation += ind + this->steps[k]->getInfo() + "\n";
 
 	return explanation + "}";
 }

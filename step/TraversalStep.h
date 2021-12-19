@@ -20,6 +20,7 @@ public:
 	TraversalStep(TraversalStepType tsType, unsigned int id);
 	TraversalStep(bool is_barrier, TraversalStepType tsType, unsigned int id);
 	virtual std::string getInfo();
+	virtual std::string getInfo(size_t indent);
 	virtual void apply(GraphTraversal* trv, std::vector<Traverser>& traversers);
 
 };
@@ -36,6 +37,13 @@ TraversalStep::TraversalStep(TraversalStepType tsType, unsigned int id) : Traver
 
 std::string TraversalStep::getInfo() {
 	return "UnknownTraversalStep{}";
+}
+
+std::string TraversalStep::getInfo(size_t indent) {
+	std::string s = "";
+	for(size_t k = 0; k < indent; ++k) s += "  ";
+
+	return s + getInfo();
 }
 
 void TraversalStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
