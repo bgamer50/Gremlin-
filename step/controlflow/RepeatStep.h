@@ -54,7 +54,6 @@ void RepeatStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
     bool cont;
     size_t loops = 0;
     do {
-        std::cout << "loop " << loops << std::endl;
         // Build and evaulate the until traversal
         if(this->untilTraversal != nullptr) {
             GraphTraversal currentUntilTraversal(src, untilTraversal);
@@ -64,13 +63,11 @@ void RepeatStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
 
         // Build and evalulate the emit traversals
         if(this->emitTraversal != nullptr) {
-            std::cout << "evaluating emit" << std::endl;
             for(Traverser& trv : traversers) {
                 GraphTraversal currentEmitTraversal(src, emitTraversal);
                 currentEmitTraversal.setInitialTraversers({trv});
                 if(currentEmitTraversal.hasNext()) emittedTraversers.push_back(trv);
             }
-            std::cout << "done with emit!" << std::endl;
         }
         
         // Build and evaulate the action traversal
@@ -86,7 +83,6 @@ void RepeatStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
     } while(traversers.size() > 0 && cont);
 
     traversers.insert(traversers.end(), emittedTraversers.begin(), emittedTraversers.end());
-    std::cout << "repeat step done" << std::endl;
 }
 
 #endif
