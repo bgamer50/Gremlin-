@@ -21,6 +21,7 @@ class SelectStep: public TraversalStep {
 
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
         virtual std::string getInfo();
+        inline std::string get_side_effect_label() { return this->sideEffectLabel; }
 };
 
 inline void SelectStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {

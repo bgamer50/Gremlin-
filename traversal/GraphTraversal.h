@@ -30,6 +30,7 @@ class GraphTraversal {
 protected:
 	std::vector<TraversalStep*> steps;
 	std::vector<Traverser> traversers;
+	std::unordered_map<std::string, boost::any> traversal_properties;
 private:
 	GraphTraversalSource* source;
 	bool has_iterated = false;
@@ -66,6 +67,17 @@ public:
 		return this;
 	}
 
+	inline void setTraversalProperty(std::string property_name, boost::any property_value) { this->traversal_properties[property_name] = property_value; }
+	inline boost::any getTraversalProperty(std::string property_name) {
+		auto f = this->traversal_properties.find(property_name);
+		if(f == traversal_properties.end()) return boost::any();
+		return f->second;
+	}
+	inline void removeTraversalProperty(std::string property_name) {
+		auto f = this->traversal_properties.find(property_name);
+		if(f != traversal_properties.end()) this->traversal_properties.erase(f);
+	}
+
 	// Steps
 	GraphTraversal* addE(std::string label);
 
@@ -83,7 +95,7 @@ public:
 	
 	//GraphTraversal* barrier();
 	GraphTraversal* by(boost::any arg);
-	//GraphTraversal* cap(std::vector<std::string> sideEffectLabels);
+	GraphTraversal* cap(std::string sideEffectLabel);
 	//GraphTraversal<auto n> choose(GraphTraversal<A> ifTraversal, GraphTraversal<B> trueTraversal, GraphTraversal<C> falseTraversal);
 	//GraphTraversal<auto n> choose(GraphTraversal<A> withOptionTraversal);
 	
@@ -184,7 +196,7 @@ public:
 	//GraphTraversal* skip(unsigned long toSkip);
 	//GraphTraversal skip(Scope scope, unsigned long toSkip);
 	//GraphTraversal* store(std::string sideEffectLabel);
-	//GraphTraversal subgraph(std::string sideEffectLabel);
+	GraphTraversal subgraph(std::string sideEffectLabel);
 	//GraphTraversal* sum();
 	//GraphTraversal sum(Scope scope);
 	//GraphTraversal tail();
@@ -496,6 +508,11 @@ GraphTraversal* GraphTraversal::inE(std::vector<std::string> labels) {
 	return this->appendStep(new VertexStep(IN, labels, EDGE));
 }
 
+#include "step/graph/SubgraphStep.h"
+GraphTraversal GraphTraversal::subgraph(std::string sideEffectLabel) {
+	return this->appendStep(new SubgraphStep(sideEffectLabel));
+}
+
 #include "step/graph/IdStep.h"
 GraphTraversal* GraphTraversal::id() {
 	return this->appendStep(new IdStep());
@@ -597,6 +614,10 @@ GraphTraversal* GraphTraversal::as(std::string sideEffectLabel) {
 
 #include "step/sideeffect/SelectStep.h"
 GraphTraversal* GraphTraversal::select(std::string sideEffectLabel) {
+	return this->appendStep(new SelectStep(sideEffectLabel));
+}
+
+GraphTraversal* GraphTraversal::cap(std::string sideEffectLabel) {
 	return this->appendStep(new SelectStep(sideEffectLabel));
 }
 
