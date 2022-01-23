@@ -8,7 +8,7 @@
 typedef std::unordered_map<std::string, boost::any> valuemap_t;
 typedef std::vector<boost::any> anyvec_t;
 
-void string_any(boost::any& a) {
+std::string string_any(boost::any& a) {
     auto& id = a.type();
     if(id == typeid(int)) return std::to_string(boost::any_cast<int>(a));
     else if (id == typeid(long)) return std::to_string(boost::any_cast<long>(a));
