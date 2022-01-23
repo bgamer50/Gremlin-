@@ -125,7 +125,7 @@ public:
 	//GraphTraversal* V(void* objects, size_t sizeOfEach, int length);
 	//GraphTraversal group();
 	//GraphTraversal group(std::string sideEffectLabel);
-	//GraphTraversal groupCount();
+	GraphTraversal* groupCount();
 	//GraphTraversal groupCount(std::string sideEffectLabel);
 	//GraphTraversal has(std::string key, void* value, size_t size); // dangerous operation
 	//GraphTraversal has(std::string label, std::string key, void* value, size_t size); // dangerous operation
@@ -544,6 +544,11 @@ GraphTraversal* GraphTraversal::min() {
 #include "step/math/CountStep.h"
 GraphTraversal* GraphTraversal::count() {
 	return this->appendStep(new CountStep());
+}
+
+#include "step/math/GroupCountStep.h"
+GraphTraversal* GraphTraversal::groupCount() {
+	return this->appendStep(new GroupCountStep());
 }
 
 #include "step/property/HasStep.h"

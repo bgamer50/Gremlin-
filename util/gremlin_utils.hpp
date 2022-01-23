@@ -8,19 +8,23 @@
 typedef std::unordered_map<std::string, boost::any> valuemap_t;
 typedef std::vector<boost::any> anyvec_t;
 
-void print_any(boost::any& a) {
+void string_any(boost::any& a) {
     auto& id = a.type();
-    if(id == typeid(int)) std::cout << boost::any_cast<int>(a);
-    else if (id == typeid(long)) std::cout << boost::any_cast<long>(a);
-    else if(id == typeid(unsigned int)) std::cout << boost::any_cast<unsigned int>(a);
-    else if(id == typeid(unsigned long)) std::cout << boost::any_cast<unsigned long>(a);
-    else if(id == typeid(float)) std::cout << boost::any_cast<float>(a);
-    else if(id == typeid(double)) std::cout << boost::any_cast<double>(a);
-    else if(id == typeid(std::string)) std::cout << boost::any_cast<std::string>(a);
-    else if(id == typeid(unsigned char*)) std::cout << boost::any_cast<unsigned char*>(a);
-    else if(id == typeid(char*)) std::cout << boost::any_cast<char*>(a);
-    else if(id == typeid(const char*)) std::cout << boost::any_cast<const char*>(a);
+    if(id == typeid(int)) return std::to_string(boost::any_cast<int>(a));
+    else if (id == typeid(long)) return std::to_string(boost::any_cast<long>(a));
+    else if(id == typeid(unsigned int)) return std::to_string(boost::any_cast<unsigned int>(a));
+    else if(id == typeid(unsigned long)) return std::to_string(boost::any_cast<unsigned long>(a));
+    else if(id == typeid(float)) return std::to_string(boost::any_cast<float>(a));
+    else if(id == typeid(double)) return std::to_string(boost::any_cast<double>(a));
+    else if(id == typeid(std::string)) return boost::any_cast<std::string>(a);
+    else if(id == typeid(unsigned char*)) return std::string(boost::any_cast<unsigned char*>(a));
+    else if(id == typeid(char*)) return std::string(boost::any_cast<char*>(a));
+    else if(id == typeid(const char*)) return std::string(boost::any_cast<const char*>(a));
     else std::cout << "?";
+}
+
+void print_any(boost::any& a) {
+    std::cout << string_any(a) << std::endl;
 }
 
 void print_valuemap(boost::any vm) {
