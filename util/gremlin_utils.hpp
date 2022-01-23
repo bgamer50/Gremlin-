@@ -17,10 +17,10 @@ std::string string_any(boost::any& a) {
     else if(id == typeid(float)) return std::to_string(boost::any_cast<float>(a));
     else if(id == typeid(double)) return std::to_string(boost::any_cast<double>(a));
     else if(id == typeid(std::string)) return boost::any_cast<std::string>(a);
-    else if(id == typeid(unsigned char*)) return std::string(boost::any_cast<unsigned char*>(a));
+    //else if(id == typeid(unsigned char*)) return std::string(boost::any_cast<unsigned char*>(a));
     else if(id == typeid(char*)) return std::string(boost::any_cast<char*>(a));
     else if(id == typeid(const char*)) return std::string(boost::any_cast<const char*>(a));
-    else std::cout << "?";
+    else return std::string("?");
 }
 
 void print_any(boost::any& a) {
