@@ -122,8 +122,8 @@ GraphTraversalSource::GraphTraversalSource(Graph* gr) {
 	this->withTypeRegistration(
 		std::type_index(typeid(Vertex*)),
 		[](boost::any a, boost::any b){return reinterpret_cast<long>(boost::any_cast<Vertex*>(a)) - reinterpret_cast<long>(boost::any_cast<Vertex*>(a));},
-		[](boost::any a, boost::any b){return reinterpret_cast<long>(boost::any_cast<Vertex*>(a)) == reinterpret_cast<long>(boost::any_cast<Vertex*>(a));},
-		[](boost::any v){return std::hash<long>()(reinterpret_cast<long>(boost::any_cast<Vertex*>(v)));}
+		[](boost::any a, boost::any b){return boost::any_cast<Vertex*>(a) == boost::any_cast<Vertex*>(a);},
+		[](boost::any v){return std::hash<Vertex*>()(boost::any_cast<Vertex*>(v));}
 	);
 	this->withTypeRegistration(
 		std::type_index(typeid(Edge*)),
