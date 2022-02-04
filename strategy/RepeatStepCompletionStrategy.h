@@ -5,19 +5,23 @@
 #include "step/controlflow/RepeatStep.h"
 #include "step/controlflow/UntilStep.h"
 #include "step/controlflow/EmitStep.h"
+#include "step/controlflow/TimesStep.h"
 #include <vector>
 
 bool acquire_step(std::vector<TraversalStep*>& steps, size_t idx, RepeatStep* repeatStep) {
     if(idx < 0 || idx >= steps.size()) return false;
 
     auto uid = steps[idx]->uid;
-    if(uid == UNTIL_STEP || uid == EMIT_STEP) {
+    if(uid == UNTIL_STEP || uid == EMIT_STEP || uid == TIMES_STEP) {
         if(uid == UNTIL_STEP) {
             UntilStep* untilStep = static_cast<UntilStep*>(steps[idx]);
             repeatStep->setUntilTraversal(untilStep->getTraversal());
-        } else {
+        } else if(uid == EMIT_STEP) {
             EmitStep* emitStep = static_cast<EmitStep*>(steps[idx]);
             repeatStep->setEmitTraversal(emitStep->getTraversal());
+        } else {
+            TimesStep* timesStep = static_cast<TimesStep*>(steps[idx]);
+            repeatStep->setTimes(timesStep->get_times());
         }
         // delete the step
         steps.erase(steps.begin() + idx);

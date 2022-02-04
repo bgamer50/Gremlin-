@@ -3,6 +3,7 @@
 #include "step/TraversalStep.h"
 
 #define REPEAT_STEP 0x42
+#define LOOPS_TRAVERSAL_PROPERTY std::string("TRV_LOOPS")
 
 class RepeatStep: public TraversalStep {
     private:
@@ -25,6 +26,10 @@ class RepeatStep: public TraversalStep {
 
         void setUntilTraversal(GraphTraversal* untilTraversal) { this->untilTraversal = untilTraversal; }
         GraphTraversal* getUntilTraversal() { return this->untilTraversal; }
+
+        void setTimes(size_t times) {
+            this->untilTraversal = __->loops()->is(P::eq(times));
+        }
 
         virtual void apply(GraphTraversal* trv, TraverserSet& traversers);
 
@@ -57,6 +62,7 @@ void RepeatStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
         // Build and evaulate the until traversal
         if(this->untilTraversal != nullptr) {
             GraphTraversal currentUntilTraversal(src, untilTraversal);
+            currentUntilTraversal.setTraversalProperty(LOOPS_TRAVERSAL_PROPERTY, loops);
             currentUntilTraversal.setInitialTraversers(traversers);
             cont = currentUntilTraversal.hasNext();
         }
@@ -65,6 +71,7 @@ void RepeatStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
         if(this->emitTraversal != nullptr) {
             for(Traverser& trv : traversers) {
                 GraphTraversal currentEmitTraversal(src, emitTraversal);
+                currentEmitTraversal.setTraversalProperty(LOOPS_TRAVERSAL_PROPERTY, loops);
                 currentEmitTraversal.setInitialTraversers({trv});
                 if(currentEmitTraversal.hasNext()) emittedTraversers.push_back(trv);
             }
@@ -73,6 +80,7 @@ void RepeatStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
         // Build and evaulate the action traversal
         //std::cout << "action " << actionTraversal->getSteps()[0]->uid << std::endl;
         GraphTraversal currentActionTraversal(src, actionTraversal);
+        currentActionTraversal.setTraversalProperty(LOOPS_TRAVERSAL_PROPERTY, loops);
         currentActionTraversal.setInitialTraversers(traversers);
 
         currentActionTraversal.iterate();

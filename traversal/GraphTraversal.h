@@ -155,7 +155,7 @@ public:
 	GraphTraversal* limit(uint64_t the_limit);
 	//GraphTraversal limit(Scope scope, unsigned long theLimit);
 	//GraphTraversal* local(GraphTraversal* localTraversal);
-	//GraphTraversal* loops();
+	GraphTraversal* loops();
 	//GraphTraversal match(std::vector<GraphTraversal> matchTraversals);
 	//GraphTraversal* math(std::string equation);
 	//GraphTraversal* max();
@@ -249,6 +249,8 @@ public:
 	GraphTraversal* outE(std::vector<std::string> labels);
 	GraphTraversal* inE();
 	GraphTraversal* inE(std::vector<std::string> labels);
+
+	GraphTraversal* times(size_t times);
 
 	//GraphTraversal where(Predicate predicate);
 	/**
@@ -639,6 +641,16 @@ GraphTraversal* GraphTraversal::inject(std::vector<boost::any> injects) {
 #include "step/logic/MapStep.h"
 GraphTraversal* GraphTraversal::map(GraphTraversal* map_traversal) {
 	return this->appendStep(new MapStep(map_traversal));
+}
+
+#include "step/controlflow/TimesStep.h"
+GraphTraversal* GraphTraversal::times(size_t times) {
+	return this->appendStep(new TimesStep(times));
+}
+
+#include "step/controlflow/LoopsStep.h"
+GraphTraversal* GraphTraversal::loops() {
+	return this->appendStep(new LoopsStep());
 }
 
 std::string GraphTraversal::explain() {
