@@ -1,6 +1,9 @@
 #ifndef REPEAT_STEP_H
 #define REPEAT_STEP_H
+
 #include "step/TraversalStep.h"
+
+#include <optional>
 
 #define REPEAT_STEP 0x42
 #define LOOPS_TRAVERSAL_PROPERTY std::string("TRV_LOOPS")
@@ -16,6 +19,9 @@ class RepeatStep: public TraversalStep {
         // The action to be repeated.
         GraphTraversal* actionTraversal = nullptr;
 
+        // The # of times to run the loop
+        std::optional<size_t> times;
+
     public:
         RepeatStep(GraphTraversal* actionTraversal);
 
@@ -28,7 +34,7 @@ class RepeatStep: public TraversalStep {
         GraphTraversal* getUntilTraversal() { return this->untilTraversal; }
 
         void setTimes(size_t times) {
-            this->untilTraversal = __->loops()->is(P::eq(times));
+            this->times = times;
         }
 
         virtual void apply(GraphTraversal* trv, TraverserSet& traversers);
@@ -56,9 +62,11 @@ void RepeatStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
     TraverserSet emittedTraversers;
     GraphTraversalSource* src = trv->getTraversalSource();
     
-    bool cont;
+    bool cont = true;
     size_t loops = 0;
     do {
+        if(loops >= this->times) break;
+
         // Build and evaulate the until traversal
         if(this->untilTraversal != nullptr) {
             GraphTraversal currentUntilTraversal(src, untilTraversal);

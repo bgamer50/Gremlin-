@@ -24,7 +24,8 @@ bool acquire_step(std::vector<TraversalStep*>& steps, size_t idx, RepeatStep* re
             repeatStep->setTimes(timesStep->get_times());
         }
         // delete the step
-        steps.erase(steps.begin() + idx);
+        delete steps[idx];
+        steps[idx] = new NoOpStep();
         return true;
     }
 
