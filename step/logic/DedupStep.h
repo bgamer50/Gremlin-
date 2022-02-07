@@ -43,6 +43,7 @@ inline void DedupStep::apply(GraphTraversal* traversal, TraverserSet& traversers
     GraphTraversalSource* source = traversal->getTraversalSource();
     
     std::unordered_set<std::pair<GraphTraversalSource*, boost::any>, dc_global_hash, dc_global_equals> deduplicated_set;
+    deduplicated_set.reserve(traversers.size() / 10 + 10);
     for(auto it = traversers.begin(); it != traversers.end(); ++it) {
         if(!deduplicated_set.insert(std::make_pair(source, it->get())).second) {
             it = traversers.erase(it) - 1;

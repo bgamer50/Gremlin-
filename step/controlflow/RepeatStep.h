@@ -65,7 +65,7 @@ void RepeatStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
     bool cont = true;
     size_t loops = 0;
     do {
-        if(loops >= this->times) break;
+        if(this->times && loops >= this->times->value()) break;
 
         // Build and evaulate the until traversal
         if(this->untilTraversal != nullptr) {
