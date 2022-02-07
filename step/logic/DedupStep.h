@@ -16,18 +16,6 @@ class DedupStep: public TraversalStep, virtual public ByModulating {
     private:
         std::optional<std::string> dedup_by_key; // TODO make this actually do something
 
-        struct dc_global_hash {
-            size_t operator() (const std::pair<GraphTraversalSource*, boost::any>& p) const {
-                return p.first->test_hash(p.second);
-            }
-        };
-
-        struct dc_global_equals {
-            size_t operator() (const std::pair<GraphTraversalSource*, boost::any>& p, const std::pair<GraphTraversalSource*, boost::any>& q) const {
-                return p.first->test_equals(p.second, q.second);
-            }
-        };
-
     public:
         // This is a barrier step
         DedupStep()
@@ -41,14 +29,32 @@ class DedupStep: public TraversalStep, virtual public ByModulating {
 
 inline void DedupStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
     GraphTraversalSource* source = traversal->getTraversalSource();
+
+    auto hsh = [source](Traverser& t1){return source->test_hash(t1.get());};
+    auto eql = [source](Traverser& t1, Traverser&t2){return source->test_equals(t1.get(), t2.get());};
     
-    std::unordered_set<std::pair<GraphTraversalSource*, boost::any>, dc_global_hash, dc_global_equals> deduplicated_set;
-    deduplicated_set.reserve(traversers.size() / 10 + 10);
-    for(auto it = traversers.begin(); it != traversers.end(); ++it) {
-        if(!deduplicated_set.insert(std::make_pair(source, it->get())).second) {
-            it = traversers.erase(it) - 1;
+    // We use the tried and true pure bucket hashing method here, as (hopefully) nobody tries to dedup massive sets in a traversal
+    // If someone is stupid enough to attempt such a foolish operation, they will get the poor performance they deserve
+    // Otherwise this should be very fast
+    std::vector<std::vector<Traverser>> new_traversers;
+    new_traversers.resize(10 + traversers.size() / 10);
+
+    size_t total_size = 0;
+    for(Traverser& trv : traversers) {
+        size_t index = hsh(trv) % new_traversers.size();
+        bool found = false;
+        for(Traverser& trv2 : new_traversers[index]) if(eql(trv,trv2)) {found=true; break;};
+        if(!found) {
+            new_traversers[index].push_back(trv);
+            ++total_size;
         }
     }
+
+    traversers.clear();
+    traversers.resize(total_size);
+    for(std::vector<Traverser>& vec : new_traversers) 
+        for(Traverser& trv : vec)
+            traversers[--total_size] = trv;
 }
 
 inline std::string DedupStep::getInfo() {
