@@ -6,6 +6,7 @@
 #include "step/controlflow/UntilStep.h"
 #include "step/controlflow/EmitStep.h"
 #include "step/controlflow/TimesStep.h"
+#include "step/logic/NoOpStep.h"
 #include <vector>
 
 bool acquire_step(std::vector<TraversalStep*>& steps, size_t idx, RepeatStep* repeatStep) {
@@ -25,7 +26,7 @@ bool acquire_step(std::vector<TraversalStep*>& steps, size_t idx, RepeatStep* re
         }
         // delete the step
         delete steps[idx];
-        steps[idx] = new NoOpStep();
+        steps[idx] = static_cast<TraversalStep*>(new NoOpStep());
         return true;
     }
 
