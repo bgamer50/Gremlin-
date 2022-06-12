@@ -5,14 +5,17 @@
 
 #include <string>
 #include <vector>
+#include <boost/any.hpp>
+
+#include "step/modulate/FromToModulating.h"
 
 class GraphTraversalSource;
 class GraphTraversal;
 class Traverser;
 class TraversalStep;
-typedef std::vector<Traverser*> TraverserSet;
+typedef std::vector<Traverser> TraverserSet; // TODO remove this forward dec?
 
-class AddEdgeStartStep: public TraversalStep {
+class AddEdgeStartStep: public TraversalStep, virtual public FromToModulating {
 	private:
 		std::string label;
 		GraphTraversal* out_vertex_traversal; // filled in at runtime
@@ -29,11 +32,27 @@ class AddEdgeStartStep: public TraversalStep {
 
 		GraphTraversal* get_out_traversal();
 		GraphTraversal* get_in_traversal();
-		void set_out_traversal(GraphTraversal* new_traversal);
-		void set_in_traversal(GraphTraversal* new_traversal);
 		std::string get_label() { return this->label; }
 
 		virtual void apply(GraphTraversal* trv, TraverserSet& traversers);
+
+		virtual void modulate_from(boost::any arg) { 
+			if(arg.type() == typeid(Vertex*)) {
+				this->out_vertex_traversal = new GraphTraversal();
+				this->out_vertex_traversal->setInitialTraversers({Traverser(arg)});
+			}
+			else if(arg.type() == typeid(GraphTraversal*)) this->out_vertex_traversal = boost::any_cast<GraphTraversal*>(arg); 
+			else throw std::runtime_error("Invalid object passed in from() to AddEdgeStep");			
+		}
+		
+		virtual void modulate_to(boost::any arg) {
+			if(arg.type() == typeid(Vertex*)) {
+				this->in_vertex_traversal = new GraphTraversal();
+				this->in_vertex_traversal->setInitialTraversers({Traverser(arg)});
+			}
+			else if(arg.type() == typeid(GraphTraversal*)) this->in_vertex_traversal = boost::any_cast<GraphTraversal*>(arg);
+			else throw std::runtime_error("Invalid object passed in to() to AddEdgeStep");		
+		}
 };
 
 #include "traversal/GraphTraversal.h"
@@ -52,8 +71,6 @@ AddEdgeStartStep::AddEdgeStartStep(std::string label_arg)
 
 GraphTraversal* AddEdgeStartStep::get_out_traversal() { return this->out_vertex_traversal; }
 GraphTraversal* AddEdgeStartStep::get_in_traversal() { return this->in_vertex_traversal; }
-void AddEdgeStartStep::set_out_traversal(GraphTraversal* new_traversal) { this->out_vertex_traversal = new_traversal; }
-void AddEdgeStartStep::set_in_traversal(GraphTraversal* new_traversal) { this->in_vertex_traversal = new_traversal; }
 
 void AddEdgeStartStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
 	// Need to check if there is enough info to add the Edge, then add it
@@ -69,7 +86,7 @@ void AddEdgeStartStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
 	Vertex* to_vertex = boost::any_cast<Vertex*>(to_traversal.next());
 
 	Edge* new_edge = trv->getGraph()->add_edge(from_vertex, to_vertex, label);
-	traversers.push_back(new Traverser(new_edge));
+	traversers.push_back(Traverser(new_edge));
 }
 
 #endif

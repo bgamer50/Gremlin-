@@ -28,28 +28,37 @@ class PropertyStep: public TraversalStep {
         PropertyStepType get_type() { return ps_type; }
 
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers) {
-            std::vector<Traverser*> new_traversers;
+            TraverserSet new_traversers;
             bool get_value = this->ps_type == VALUE;
 
-            for(Traverser* trv : traversers) {
+            for(Traverser& trv : traversers) {
                 for(std::string key : keys) {
-                    boost::any x = trv->get();
-                    /*
-                    if(x.type() != typeid(Vertex*)) {
-                        throw std::runtime_error("Error: Traverser does not appear to contain a Vertex.");
+                    boost::any x = trv.get();
+                    if(x.type() == typeid(Vertex*)) {
+                        Vertex* v = boost::any_cast<Vertex*>(x);
+                        VertexProperty* p = static_cast<VertexProperty*>(v->property(key)); //TODO multiproperties?
+                        if(p != nullptr) {
+                            if(get_value) new_traversers.push_back(Traverser(p->value(), trv.get_side_effects()));
+                            else new_traversers.push_back(Traverser(boost::any(p), trv.get_side_effects()));
+                        }
                     }
-                    */
-
-                    Vertex* v = boost::any_cast<Vertex*>(x);
-                    VertexProperty<boost::any>* p = v->property(key); //TODO multiproperties?
-                    if(p == nullptr) new_traversers.push_back(new Traverser(boost::any()));
-                    else if(get_value && !p->value().empty()) new_traversers.push_back(new Traverser(p->value()));
-                    else if(!get_value) new_traversers.push_back(new Traverser(boost::any(p)));
+                    else if(x.type() == typeid(Edge*)) {
+                        Edge* e = boost::any_cast<Edge*>(x);
+                        Property* p = e->property(key);
+                    } else {
+                        throw std::runtime_error("Can only access properties on Vertices or Edges.");
+                    }
                 }
             }
 
             traversers.swap(new_traversers);
-            std::for_each(new_traversers.begin(), new_traversers.end(), [](Traverser* trav){delete trav;});
+        }
+
+        std::string getInfo() {
+            std::string s = "PropertyStep{";
+            s += (this->ps_type == VALUE ? "Value" : "Property");
+            s += "}";
+            return s;
         }
 };
 

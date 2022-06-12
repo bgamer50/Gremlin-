@@ -10,8 +10,6 @@
 #include "traversal/Traverser.h"
 #include "traversal/GraphTraversal.h"
 
-#include <boost/lockfree/stack.hpp>
-
 #define VERTEX_STEP 0x80
 
 class VertexStep : public TraversalStep {
@@ -41,6 +39,10 @@ class VertexStep : public TraversalStep {
 			return this->edge_labels;
 		}
 
+		GraphStepType get_type() {
+			return this->gsType;
+		}
+
 		virtual std::string getInfo() {
 			std::string info = "VertexStep(";
 			info += (direction == IN ? "IN" : direction == OUT ? "OUT" : "BOTH");
@@ -59,33 +61,37 @@ class VertexStep : public TraversalStep {
 		virtual void apply(GraphTraversal* traversal, TraverserSet& traversers) {
 			bool label_required = !this->edge_labels.empty();
 
-			std::vector<Traverser*> new_traversers;
+			TraverserSet new_traversers;
 			
-			//boost::lockfree::stack<Traverser*> new_traversers(8);
-			std::for_each(traversers.begin(), traversers.end(), [&, this](Traverser* trv) {
-				Vertex* v = boost::any_cast<Vertex*>(trv->get());
+			std::for_each(traversers.begin(), traversers.end(), [&, this](Traverser& trv) {
+				Vertex* v = boost::any_cast<Vertex*>(trv.get());
 				std::vector<Edge*> edges = v->edges(direction);
-				//#pragma omp for
+				
 				for(size_t k = 0; k < edges.size(); ++k) {
 					Edge* e = edges[k];
 					if(label_required && this->edge_labels.count(e->label()) == 0) continue;
 
-					switch(direction) {
-						case IN: {
-							Vertex* w = e->outV();
-							new_traversers.push_back(new Traverser(w));
-							break;
-						}
-						case OUT: {
-							Vertex* w = e->inV();
-							new_traversers.push_back(new Traverser(w));
-							break;
-						}
-						case BOTH: {
-							Vertex* u = e->outV();
-							Vertex* w = u == v ? e->inV() : u;
-							new_traversers.push_back(new Traverser(w));
-							break;
+					if(this->gsType == EDGE) {
+						new_traversers.push_back(Traverser(e, trv.get_side_effects()));
+					} 
+					else {
+						switch(direction) {
+							case IN: {
+								Vertex* w = e->outV();
+								new_traversers.push_back(Traverser(w, trv.get_side_effects()));
+								break;
+							}
+							case OUT: {
+								Vertex* w = e->inV();
+								new_traversers.push_back(Traverser(w, trv.get_side_effects()));
+								break;
+							}
+							case BOTH: {
+								Vertex* u = e->outV();
+								Vertex* w = u == v ? e->inV() : u;
+								new_traversers.push_back(Traverser(w, trv.get_side_effects()));
+								break;
+							}
 						}
 					}
 
@@ -94,9 +100,6 @@ class VertexStep : public TraversalStep {
 		
 
 			traversers.swap(new_traversers);
-			std::for_each(new_traversers.begin(), new_traversers.end(), [](Traverser* trav){delete trav;});
-			//traversers.clear();
-			//new_traversers.consume_all([&](Traverser* trv){ traversers.push_back(trv); }); 
 		}
 };
 

@@ -34,9 +34,9 @@ class AddVertexStep: public TraversalStep {
 
 		virtual void apply(GraphTraversal* traversal, TraverserSet& traversers) {
 			// For each traverser, a new Vertex should be created and replace the original traverser
-			std::for_each(traversers.begin(), traversers.end(), [&, this](Traverser* trv) {
+			std::for_each(traversers.begin(), traversers.end(), [&, this](Traverser& trv) {
 				Vertex* v = this->has_label ? traversal->getGraph()->add_vertex(this->label) : traversal->getGraph()->add_vertex();
-				trv->replace_data(v);
+				trv.replace_data(v);
 			});
 		}
 };

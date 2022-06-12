@@ -10,6 +10,9 @@
 #include <functional>
 #include <algorithm>
 #include <iostream>
+#include <typeindex>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "structure/Direction.h"
 #include "traversal/P.h"
@@ -26,8 +29,11 @@ class Traverser;
 class GraphTraversal {
 protected:
 	std::vector<TraversalStep*> steps;
+	std::vector<Traverser> traversers;
+	std::unordered_map<std::string, boost::any> traversal_properties;
 private:
 	GraphTraversalSource* source;
+	bool has_iterated = false;
 public:
 	/*
 		The "default" constructor.
@@ -61,6 +67,17 @@ public:
 		return this;
 	}
 
+	inline void setTraversalProperty(std::string property_name, boost::any property_value) { this->traversal_properties[property_name] = property_value; }
+	inline boost::any getTraversalProperty(std::string property_name) {
+		auto f = this->traversal_properties.find(property_name);
+		if(f == traversal_properties.end()) return boost::any();
+		return f->second;
+	}
+	inline void removeTraversalProperty(std::string property_name) {
+		auto f = this->traversal_properties.find(property_name);
+		if(f != traversal_properties.end()) this->traversal_properties.erase(f);
+	}
+
 	// Steps
 	GraphTraversal* addE(std::string label);
 
@@ -73,11 +90,12 @@ public:
 	//GraphTraversal<auto n> aggregate(std::string sideEffectLabel);
 	//GraphTraversal<auto n> _and();
 	//GraphTraversal<auto n> _and(std::vector<GraphTraversal<auto m>> traversals);
-	//GraphTraversal* as(std::string sideEffectLabel);
+	
+	GraphTraversal* as(std::string sideEffectLabel);
+	
 	//GraphTraversal* barrier();
-	//GraphTraversal* by(GraphTraversal* byTraversal);
-	//GraphTraversal* by(std::string label);
-	//GraphTraversal* cap(std::vector<std::string> sideEffectLabels);
+	GraphTraversal* by(boost::any arg);
+	GraphTraversal* cap(std::string sideEffectLabel);
 	//GraphTraversal<auto n> choose(GraphTraversal<A> ifTraversal, GraphTraversal<B> trueTraversal, GraphTraversal<C> falseTraversal);
 	//GraphTraversal<auto n> choose(GraphTraversal<A> withOptionTraversal);
 	
@@ -86,12 +104,12 @@ public:
 	//GraphTraversal constant(void* value, size_t size);
 	GraphTraversal* count();
 	//GraphTraversal* cyclicPath();
-	//GraphTraversal* dedup();
+	GraphTraversal* dedup();
 	//GraphTraversal* drop();
-	//GraphTraversal* emit();
+	GraphTraversal* emit();
 	//GraphTraversal emit(Predicate predicate);
-	//GraphTraversal* emit(GraphTraversal* emitTraversal);
-	//GraphTraversal* fold();
+	GraphTraversal* emit(GraphTraversal* emitTraversal);
+	GraphTraversal* fold();
 	//GraphTraversal* from(GraphTraversal* fromTraversal);
 
 	GraphTraversal* from(std::string sideEffectLabel);
@@ -107,18 +125,15 @@ public:
 	//GraphTraversal* V(void* objects, size_t sizeOfEach, int length);
 	//GraphTraversal group();
 	//GraphTraversal group(std::string sideEffectLabel);
-	//GraphTraversal groupCount();
+	GraphTraversal* groupCount();
 	//GraphTraversal groupCount(std::string sideEffectLabel);
 	//GraphTraversal has(std::string key, void* value, size_t size); // dangerous operation
 	//GraphTraversal has(std::string label, std::string key, void* value, size_t size); // dangerous operation
 
-	template<typename T>
-	GraphTraversal* has(std::string key, std::function<bool(boost::any)> pred);
+	GraphTraversal* has(std::string key, P pred);
 
-	template<typename T>
-	GraphTraversal* has(std::string key, T value);
+	GraphTraversal* has(std::string key, boost::any value);
 
-	template<typename T>
 	GraphTraversal* has(std::string key);
 
 	//GraphTraversal* has(std::string key, GraphTraversal* valueTraversal);
@@ -132,15 +147,15 @@ public:
 	GraphTraversal* id();
 
 	GraphTraversal* identity();
-	//GraphTraversal inject(void* object, size_t size);
-	//GraphTraversal* is(void* val, size_t size);
-	//GraphTraversal is(Predicate predicate);
+	GraphTraversal* inject(std::vector<boost::any> objects);
+	GraphTraversal* is(boost::any val);
+	GraphTraversal* is(P predicate);
 	//GraphTraversal key();
 	//GraphTraversal* label();
-	//GraphTraversal* limit(unsigned long theLimit);
+	GraphTraversal* limit(uint64_t the_limit);
 	//GraphTraversal limit(Scope scope, unsigned long theLimit);
 	//GraphTraversal* local(GraphTraversal* localTraversal);
-	//GraphTraversal* loops();
+	GraphTraversal* loops();
 	//GraphTraversal match(std::vector<GraphTraversal> matchTraversals);
 	//GraphTraversal* math(std::string equation);
 	//GraphTraversal* max();
@@ -148,7 +163,7 @@ public:
 	//GraphTraversal* mean();
 	//GraphTraversal mean(Scope scope);
 	
-	GraphTraversal* min(std::function<int(Traverser*, Traverser*)> c);
+	GraphTraversal* min(std::function<int(Traverser&, Traverser&)> c);
 
 	GraphTraversal* min();
 	//GraphTraversal min(Scope scope);
@@ -156,7 +171,7 @@ public:
 	//GraphTraversal option(GraphTraversal optionTraversal);
 	//GraphTraversal optional(GraphTraversal OptionalTraversal);
 	//GraphTraversal _or(std::vector<GraphTraversal> orTraversals);
-	//GraphTraversal* order();
+	GraphTraversal* order();
 	//GraphTraversal order(Scope scope);
 	// pagerank step not supported
 	//GraphTraversal* path();
@@ -169,21 +184,19 @@ public:
 	//GraphTraversal propertyMap(std::vector<std::string> labels);
 	//GraphTraversal propertyMap();
 	//GraphTraversal range(long low, long high);
-	//GraphTraversal repeat(GraphTraversal repeatTraversal);
+	GraphTraversal* repeat(GraphTraversal* repeatTraversal);
 	// sack step not supported
 	//GraphTraversal* sample(int sampleSize);
 	//GraphTraversal sample(Scope scope, int sampleSize);
 	// single-label select is special
-	GraphTraversal* select(std::string sideEffectLabel) {
-		//TODO write this
-	}
+	GraphTraversal* select(std::string sideEffectLabel);
 	//GraphTraversal select(std::vector<std::string> sideEffectLabels);
 	//GraphTraversal select(GraphTraversal selectTraversal);
 	//GraphTraversal* simplePath();
 	//GraphTraversal* skip(unsigned long toSkip);
 	//GraphTraversal skip(Scope scope, unsigned long toSkip);
 	//GraphTraversal* store(std::string sideEffectLabel);
-	//GraphTraversal subgraph(std::string sideEffectLabel);
+	GraphTraversal subgraph(std::string sideEffectLabel);
 	//GraphTraversal* sum();
 	//GraphTraversal sum(Scope scope);
 	//GraphTraversal tail();
@@ -205,19 +218,21 @@ public:
 	//GraphTraversal* toV(Direction direction);
 	//GraphTraversal tree(std::string sideEffectLabel);
 	//GraphTraversal tree();
-	//GraphTraversal unfold();
-	//GraphTraversal _union(std::vector<GraphTraversal> unionTraversals);
+	GraphTraversal* unfold();
+	GraphTraversal* _union(std::vector<GraphTraversal*> unionTraversals);
 	//GraphTraversal until(Predicate predicate);
-	//GraphTraversal until(GraphTraversal untilTraversal);
+	GraphTraversal* until(GraphTraversal* untilTraversal);
 	//GraphTraversal value();
 	//GraphTraversal valueMap();
-	//GraphTraversal valueMap(std::vector<std::string> labels);
+	GraphTraversal* valueMap(std::vector<std::string> labels);
 	//GraphTraversal valueMap(bool includeIdLabelKeyValue);
 	//GraphTraversal valueMap(bool includeIdLabelKeyValue, std::vector<std::string> labels);
 	//GraphTraversal values();
 	GraphTraversal* values(std::vector<std::string> labels);
 
 	GraphTraversal* values(std::string label);
+
+	GraphTraversal* map(GraphTraversal* map_traversal);
 
 	GraphTraversal* both();
 	GraphTraversal* both(std::vector<std::string> labels);
@@ -235,8 +250,14 @@ public:
 	GraphTraversal* inE();
 	GraphTraversal* inE(std::vector<std::string> labels);
 
+	GraphTraversal* times(size_t times);
+
 	//GraphTraversal where(Predicate predicate);
-	//GraphTraversal where(std::string label, Predicate predicate);
+	/**
+	 * Used for comparison of two objects stored as side effects.
+	 * TODO Current implementation is incorrect; used only as a temporary timesaver
+	 * **/
+	GraphTraversal* where(std::string label, P predicate);
 	//GraphTraversal where(GraphTraversal<auto n> whereTraversal);
 
 	// These may replace predicates...
@@ -249,14 +270,20 @@ public:
 	//GraphTraversal
 
 	void getInitialTraversal();
+	void setInitialTraversers(std::vector<Traverser> initial_traversers);
 
 	// The explain finalizer which works in anonymous GraphTraversals
 	std::string explain();
+	std::string explain(size_t indent);
 
 	// Finalizing steps
-	//boolean hasNext();
 
-	std::vector<boost::any> toVector() {
+	bool hasNext() {
+		if(!this->has_iterated) this->iterate();
+		return !this->traversers.empty();
+	}
+
+	std::vector<boost::any> toVector() {		
 		std::vector<boost::any> results;
 		this->forEachRemaining([&](boost::any& a){results.push_back(a);});
 		return results;
@@ -270,13 +297,16 @@ public:
 		return results;
 	}
 
-	boost::any next() { 
-		return this->toVector()[0];
-	}
+	// much more efficient & memory-safe for getting the first result than next()
+	boost::any first();
+
+	boost::any next();
 
 	void forEachRemaining(std::function<void(boost::any&)> func);
 
 	void iterate();
+
+	std::vector<Traverser> getTraversers();
 
 	//GraphTraversal toSet();
 };
@@ -317,7 +347,7 @@ GraphTraversal::GraphTraversal(GraphTraversalSource* src, GraphTraversal* trv) {
 }
 
 Graph* GraphTraversal::getGraph() {
-	return (*source).getGraph();
+	return source->getGraph();
 }
 
 
@@ -336,28 +366,25 @@ void GraphTraversal::getInitialTraversal() {
 	});
 }
 
-#include "step/property/AddPropertyStep.h"
-#include "step/vertex/VertexStep.h"
-#include "step/graph/GraphStep.h"
-#include "step/modulate/FromStep.h"
-#include "step/modulate/ToStep.h"
-#include "step/edge/AddEdgeStep.h"
-#include "step/vertex/AddVertexStep.h"
+/*
+
+*/
+void GraphTraversal::setInitialTraversers(TraverserSet initial_traversers) {
+	this->traversers.clear();
+	this->traversers.insert(this->traversers.begin(), initial_traversers.begin(), initial_traversers.end());
+}
+
 #include "step/edge/AddEdgeStartStep.h"
 #include "step/vertex/AddVertexStartStep.h"
-#include "step/logic/CoalesceStep.h"
-#include "step/IDStep.h"
-#include "step/property/PropertyStep.h"
 #include "step/logic/NoOpStep.h"
-#include "step/logic/IdentityStep.h"
-#include "step/property/HasStep.h"
-#include "step/math/CountStep.h"
-#include "step/math/MinStep.h"
 
+
+#include "step/edge/AddEdgeStep.h"
 GraphTraversal* GraphTraversal::addE(std::string label){
 	return this->appendStep(new AddEdgeStep(label));
 }
 
+#include "step/vertex/AddVertexStep.h"
 GraphTraversal* GraphTraversal::addV(std::string label) {
 	return this->appendStep(new AddVertexStep(label));
 }
@@ -366,14 +393,22 @@ GraphTraversal* GraphTraversal::addV() {
 	return this->appendStep(new AddVertexStep());
 }
 
+#include "step/controlflow/CoalesceStep.h"
 GraphTraversal* GraphTraversal::coalesce(std::vector<GraphTraversal*> traversals) {
 	return this->appendStep(new CoalesceStep(traversals));
 }
 
+#include "step/controlflow/UnionStep.h"
+GraphTraversal* GraphTraversal::_union(std::vector<GraphTraversal*> traversals) {
+	return this->appendStep(new UnionStep(traversals));
+}
+
+#include "step/property/AddPropertyStep.h"
 GraphTraversal* GraphTraversal::property(std::string property_key, boost::any value) {
 	return this->appendStep(new AddPropertyStep(property_key, value));
 }
 
+#include "step/graph/GraphStep.h"
 GraphTraversal* GraphTraversal::V() {
 	return this->appendStep(new GraphStep(VERTEX, {}));
 }
@@ -388,38 +423,41 @@ GraphTraversal* GraphTraversal::V(std::vector<Vertex*> vertices) {
 	return this->appendStep(new GraphStep(VERTEX, ids));
 }
 
+#include "step/modulate/FromStep.h"
 GraphTraversal* GraphTraversal::from(std::string sideEffectLabel) {
-	// Because from() uses void* (sigh) this awkward memory copy is necessary.
-	const char* base_string = sideEffectLabel.c_str();
-	size_t size = (1 + strlen(base_string));
-
-	char* sideEffectLabel_cpy = (char*)malloc(sizeof(char) * size);
-	strncpy(sideEffectLabel_cpy, base_string, size);
-
-	return this->appendStep(new FromStep(sideEffectLabel_cpy));
+	return this->appendStep(new FromStep(sideEffectLabel));
 }
 
 GraphTraversal* GraphTraversal::from(Vertex* fromVertex) {
 	return this->appendStep(new FromStep(fromVertex));
 }
 
-// MODULATOR for addE
+#include "step/modulate/ToStep.h"
 GraphTraversal* GraphTraversal::to(std::string sideEffectLabel) {
-	// Because to() uses void* (sigh) this awkward memory copy is necessary.
-	const char* base_string = sideEffectLabel.c_str();
-	size_t size = (1 + strlen(base_string));
-
-	char* sideEffectLabel_cpy = (char*)malloc(sizeof(char) * size);
-	strncpy(sideEffectLabel_cpy, base_string, size);
-
-	return this->appendStep(new ToStep(sideEffectLabel_cpy));
+	return this->appendStep(new ToStep(sideEffectLabel));
 }
 
-// MODULATOR for addE
 GraphTraversal* GraphTraversal::to(Vertex* toVertex) {
 	return this->appendStep(new ToStep(toVertex));
 }
 
+#include "step/modulate/ByStep.h"
+// Modulator for valuemap and others
+GraphTraversal* GraphTraversal::by(boost::any arg) {
+	return this->appendStep(new ByStep(arg));
+}
+
+#include "step/logic/UnfoldStep.h"
+GraphTraversal* GraphTraversal::unfold() {
+	return this->appendStep(new UnfoldStep());
+}
+
+#include "step/logic/FoldStep.h"
+GraphTraversal* GraphTraversal::fold() {
+	return this->appendStep(new FoldStep());
+}
+
+#include "step/vertex/VertexStep.h"
 GraphTraversal* GraphTraversal::both() {
 	return this->appendStep(new VertexStep(BOTH, {}, VERTEX));
 }
@@ -472,15 +510,32 @@ GraphTraversal* GraphTraversal::inE(std::vector<std::string> labels) {
 	return this->appendStep(new VertexStep(IN, labels, EDGE));
 }
 
+#include "step/graph/SubgraphStep.h"
+GraphTraversal GraphTraversal::subgraph(std::string sideEffectLabel) {
+	return this->appendStep(new SubgraphStep(sideEffectLabel));
+}
+
+#include "step/graph/IdStep.h"
 GraphTraversal* GraphTraversal::id() {
 	return this->appendStep(new IdStep());
 }
 
+#include "step/logic/IdentityStep.h"
 GraphTraversal* GraphTraversal::identity() {
 	return this->appendStep(new IdentityStep());
 }
 
-GraphTraversal* GraphTraversal::min(std::function<int(Traverser*, Traverser*)> c) {
+#include "step/filter/IsStep.h"
+GraphTraversal* GraphTraversal::is(boost::any val) {
+	return this->is(P::eq(val));
+}
+
+GraphTraversal* GraphTraversal::is(P predicate) {
+	return this->appendStep(new IsStep(predicate));
+}
+
+#include "step/math/MinStep.h"
+GraphTraversal* GraphTraversal::min(std::function<int(Traverser&, Traverser&)> c) {
 	return this->appendStep(new MinStep(c));
 }
 
@@ -488,25 +543,45 @@ GraphTraversal* GraphTraversal::min() {
 	return this->appendStep(new MinStep(nullptr));
 }
 
+#include "step/math/CountStep.h"
 GraphTraversal* GraphTraversal::count() {
 	return this->appendStep(new CountStep());
 }
 
-template<typename T>
-GraphTraversal* GraphTraversal::has(std::string key, std::function<bool(boost::any)> pred) {
+#include "step/math/GroupCountStep.h"
+GraphTraversal* GraphTraversal::groupCount() {
+	return this->appendStep(new GroupCountStep());
+}
+
+#include "step/property/HasStep.h"
+GraphTraversal* GraphTraversal::has(std::string key, P pred) {
 	return this->appendStep(new HasStep(key, pred));
 }
 
-template<typename T>
-GraphTraversal* GraphTraversal::has(std::string key, T value) {
-	return this->appendStep(new HasStep(key, value, P<T>::eq(value)));
+GraphTraversal* GraphTraversal::has(std::string key, boost::any value) {
+	return this->appendStep(new HasStep(key, P::eq(value)));
 }
 
-template<typename T>
 GraphTraversal* GraphTraversal::has(std::string key) {
-	return this->appendStep(new HasStep(key, nullptr));
+	return this->appendStep(new HasStep(key, P::neq(boost::any())));
 }
 
+#include "step/logic/DedupStep.h"
+GraphTraversal* GraphTraversal::dedup() {
+	return this->appendStep(new DedupStep());
+}
+
+#include "step/logic/OrderStep.h"
+GraphTraversal* GraphTraversal::order() {
+	return this->appendStep(new OrderStep());
+}
+
+#include "step/filter/WhereStep.h"
+GraphTraversal* GraphTraversal::where(std::string label, P predicate) {
+	return this->appendStep(new WhereStep(label, predicate));
+}
+
+#include "step/property/PropertyStep.h"
 GraphTraversal* GraphTraversal::values(std::vector<std::string> labels) {
 	return this->appendStep(new PropertyStep(VALUE, labels));
 }
@@ -515,11 +590,81 @@ GraphTraversal* GraphTraversal::values(std::string label) {
 	return this->appendStep(new PropertyStep(VALUE, {label}));
 }
 
+#include "step/property/ValueMapStep.h"
+GraphTraversal* GraphTraversal::valueMap(std::vector<std::string> labels) {
+	return this->appendStep(new ValueMapStep(labels));
+}
+
+#include "step/controlflow/RepeatStep.h"
+GraphTraversal* GraphTraversal::repeat(GraphTraversal* repeatTraversal) {
+	return this->appendStep(new RepeatStep(repeatTraversal));
+}
+
+#include "step/controlflow/EmitStep.h"
+GraphTraversal* GraphTraversal::emit(GraphTraversal* emitTraversal) {
+	return this->appendStep(new EmitStep(emitTraversal));
+}
+
+GraphTraversal* GraphTraversal::emit() {
+	return this->appendStep(new EmitStep(__->identity()));
+}
+
+#include "step/controlflow/UntilStep.h"
+GraphTraversal* GraphTraversal::until(GraphTraversal* untilTraversal) {
+	return this->appendStep(new UntilStep(untilTraversal));
+}
+
+#include "step/sideeffect/AsStep.h"
+GraphTraversal* GraphTraversal::as(std::string sideEffectLabel) {
+	return this->appendStep(new AsStep(sideEffectLabel));
+}
+
+#include "step/sideeffect/SelectStep.h"
+GraphTraversal* GraphTraversal::select(std::string sideEffectLabel) {
+	return this->appendStep(new SelectStep(sideEffectLabel));
+}
+
+GraphTraversal* GraphTraversal::cap(std::string sideEffectLabel) {
+	return this->appendStep(new SelectStep(sideEffectLabel));
+}
+
+#include "step/filter/LimitStep.h"
+GraphTraversal* GraphTraversal::limit(uint64_t the_limit) {
+	return this->appendStep(new LimitStep(the_limit));
+}
+
+#include "step/controlflow/InjectStep.h"
+GraphTraversal* GraphTraversal::inject(std::vector<boost::any> injects) {
+	return this->appendStep(new InjectStep(injects));
+}
+
+#include "step/logic/MapStep.h"
+GraphTraversal* GraphTraversal::map(GraphTraversal* map_traversal) {
+	return this->appendStep(new MapStep(map_traversal));
+}
+
+#include "step/controlflow/TimesStep.h"
+GraphTraversal* GraphTraversal::times(size_t times) {
+	return this->appendStep(new TimesStep(times));
+}
+
+#include "step/controlflow/LoopsStep.h"
+GraphTraversal* GraphTraversal::loops() {
+	return this->appendStep(new LoopsStep());
+}
+
 std::string GraphTraversal::explain() {
-	this->getInitialTraversal();
+	return this->explain(0);
+}
+
+std::string GraphTraversal::explain(size_t indent) {
+	std::string ind = "";
+	for(size_t k = 0; k < indent; ++k) ind += "  ";
+
+	if(this->source != nullptr) this->getInitialTraversal();
 
 	std::string explanation = "GraphTraversal {\n";
-	for(int k = 0; k < this->steps.size(); k++) explanation += this->steps[k]->getInfo() + "\n";
+	for(int k = 0; k < this->steps.size(); k++) explanation += ind + this->steps[k]->getInfo() + "\n";
 
 	return explanation + "}";
 }
@@ -527,72 +672,52 @@ std::string GraphTraversal::explain() {
 #include "traversal/Traverser.h"
 #include <omp.h>
 
-/*
-void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
-	this->getInitialTraversal();
-	
-	TraverserSet traversers;
-	std::for_each(this->steps.begin(), this->steps.end(), [&](TraversalStep* step){
-		step->apply(this, traversers);
-	});
+boost::any GraphTraversal::first() {
+	this->iterate();
+	if(this->traversers.empty()) throw std::runtime_error("Traversal produced an empty set of final traversers!");
 
-	std::for_each(traversers.begin(), traversers.end(), [&](Traverser* trv){
-		boost::any obj = trv->get();
-		func(obj);
-	});
-}
-*/
-
-
-void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
-	this->getInitialTraversal();
-	
-	TraverserSet traversers;
-	size_t current_step = 0;
-	size_t num_steps = steps.size();
-	
-	while(current_step < num_steps) {
-		steps[current_step++]->apply(this, traversers);
-		TraverserSet new_traversers;
-
-		size_t step = current_step;
-		size_t k = 0;
-		size_t sz = traversers.size();
-		size_t thread;
-		#pragma omp for private(step, k, thread)
-		for(size_t k = 0; k < sz; ++k) {
-			thread = omp_get_thread_num();
-			TraverserSet local_traversers(traversers.begin() + k, traversers.begin() + k + 1);
-			while(step < num_steps && !steps[step]->is_barrier) {
-				steps[step]->apply(this, local_traversers);
-				step++;
-				if(thread == 0) current_step = step;
-			}
-
-			#pragma omp critical 
-			{
-				new_traversers.insert(new_traversers.end(), local_traversers.begin(), local_traversers.end());
-			}
-		}
-
-		traversers.swap(new_traversers);
-		//TODO delete
-	}
-
-	std::for_each(traversers.begin(), traversers.end(), [&](Traverser* trv){
-		boost::any obj = trv->get();
-		func(obj);
-	});
+	boost::any next_result = this->traversers.front().get();
+	traversers.clear();
+	return next_result;
 }
 
+boost::any GraphTraversal::next() { 
+	if(!this->has_iterated) this->iterate();
+	if(this->traversers.empty()) throw std::runtime_error("No traversers available when calling next()");
+
+	boost::any next_result = this->traversers.front().get();
+	traversers.erase(traversers.begin());
+
+	return next_result;
+}
+
+void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
+	if(!this->has_iterated) this->iterate();
+
+	std::for_each(this->traversers.begin(), this->traversers.end(), [&](Traverser& trv){
+		boost::any obj = trv.get();
+		func(obj);
+	});
+
+	traversers.clear();
+}
 
 void GraphTraversal::iterate() {
+	if(this->has_iterated) throw std::runtime_error("Traversal has already iterated!");
+	
 	this->getInitialTraversal();
-
-	TraverserSet traversers;
+	
 	std::for_each(this->steps.begin(), this->steps.end(), [&](TraversalStep* step){
-		step->apply(this, traversers);
+		//std::cout << "step: " << step->uid << std::endl;
+		//std::cout << step->getInfo() << std::endl;
+		step->apply(this, this->traversers);
 	});
+
+	this->has_iterated = true;
+}
+
+TraverserSet GraphTraversal::getTraversers() {
+	return this->traversers;
 }
 
 #endif

@@ -12,42 +12,21 @@
 
 enum Cardinality {SINGLE, LIST, SET};
 
-template<typename T>
-class VertexProperty {
+class VertexProperty: public Property {
 	private:
-		std::string my_key;
-		std::vector<T>* my_values;
+		// kv pairs
+		std::unordered_map<std::string, Property> my_values;
 	public:
-		VertexProperty(Cardinality card, std::string new_key, std::vector<T> new_values) {
-			this->my_key = new_key;
+		VertexProperty(std::string new_key, boost::any new_value)
+		: Property(new_key, new_value) {}
 
-			// sets are weird in general, and the default comparator won't work in this method
-			if(card == SET) {
-				throw std::runtime_error("Set cardinality not yet supported!");
-			}
-			else if(card == LIST) {
-				my_values = new std::vector<T>;
-				for(T t : new_values) my_values->push_back(T(t));
-			}
-			else {
-				if(new_values.size() > 1) throw std::runtime_error("Specified single Cardinality but provided a vector of size > 1!");
-				my_values = new std::vector<T>;
-				my_values->push_back(T(new_values[0]));
-			}
+		VertexProperty(std::string new_key, boost::any new_value, std::unordered_map<std::string, Property>& new_values)
+		: Property(new_key, new_value) {
+			my_values = new_values;
 		}
 
-		std::string key() {
-			return my_key;
-		}
-
-		std::vector<T> values() {
-			return *my_values;
-		}
-
-		T value() {
-			if(my_values->empty()) throw std::runtime_error("No values present for the given property key.");
-			T z = my_values->at(0);
-			return z;
+		std::unordered_map<std::string, Property> values() {
+			return my_values;
 		}
 };
 

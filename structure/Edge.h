@@ -3,8 +3,11 @@
 
 #include <stdlib.h>
 #include <string>
+#include <utility>
+
 #include "structure/Element.h"
 #include "structure/Graph.h"
+#include "structure/VertexProperty.h"
 
 class Vertex;
 
@@ -46,21 +49,39 @@ public:
 	/*
 		Return the pair of Vertices related
 		to this edge as an (outV, inV) pair.
+
+		Default Implementation: Call outV()
+		and inV(), and return them as a Pair.
 	*/
-	virtual Vertex** bothV();
+	virtual std::pair<Vertex*, Vertex*> bothV();
+
+	/*
+		Return the property
+		with the given property key.  If
+		no such property exists, returns
+		an empty Property object.
+	*/
+	virtual Property* property(std::string key) = 0;
+
+	/*
+		Return the property
+		with the given property value.  If
+		no such property exists, returns
+		an empty Property object.
+	*/
+	virtual Property* property(std::string key, boost::any& value) = 0;
+
+	/*
+		Return a vector of
+		properties on this Element.
+	*/
+	virtual std::vector<Property*> properties(std::vector<std::string> keys) = 0;
 };
 
 #include "structure/Vertex.h"
 
-/*
-	Return the pair of Vertices related
-	to this edge as an (outV, inV) pair.
-*/
-Vertex** Edge::bothV() {
-	Vertex** vertices = (Vertex**)malloc(sizeof(Vertex*) * 2);
-	vertices[0] = outV();
-	vertices[1] = inV();
-	return vertices;
-}
+ std::pair<Vertex*, Vertex*> Edge::bothV() {
+	return std::make_pair(outV(), inV());
+ }
 
 #endif

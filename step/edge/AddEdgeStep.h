@@ -3,13 +3,13 @@
 
 #include "traversal/GraphTraversal.h"
 #include "step/TraversalStep.h"
-#include "step/InjectStep.h"
+#include "step/modulate/FromToModulating.h"
 #include <string>
 #include <vector>
 
 #define ADD_EDGE_STEP 0x73
 
-class AddEdgeStep: public TraversalStep {
+class AddEdgeStep: public TraversalStep, virtual public FromToModulating {
 	private:
 		std::string label;
 		GraphTraversal* out_vertex_traversal; // filled in at runtime
@@ -30,13 +30,11 @@ class AddEdgeStep: public TraversalStep {
 
 		GraphTraversal* get_out_traversal() { return this->out_vertex_traversal; }
 		GraphTraversal* get_in_traversal() { return this->in_vertex_traversal; }
-		void set_out_traversal(GraphTraversal* new_traversal) { this->out_vertex_traversal = new_traversal; }
-		void set_in_traversal(GraphTraversal* new_traversal) { this->in_vertex_traversal = new_traversal; }
 		std::string get_label() { return this->label; }
 
 		virtual void apply(GraphTraversal* traversal, TraverserSet& traversers) {
 			// For each traverser
-			std::for_each(traversers.begin(), traversers.end(), [&, this](Traverser* trv) {
+			std::for_each(traversers.begin(), traversers.end(), [&, this](Traverser& trv) {
 				// Need to check if there is enough info to add the Edge, then add it if we can.
 				
 				GraphTraversalSource* my_traversal_source = traversal->getTraversalSource();
@@ -46,13 +44,13 @@ class AddEdgeStep: public TraversalStep {
 				Vertex* to_vertex;
 				bool used_current_traverser = false;
 				if(this->out_vertex_traversal == nullptr) {
-					from_vertex = boost::any_cast<Vertex*>(trv->get());
+					from_vertex = boost::any_cast<Vertex*>(trv.get());
 					used_current_traverser = true;
 				} else { 
 					GraphTraversal from_traversal(my_traversal_source, this->out_vertex_traversal);
-					std::vector<boost::any> inj; inj.push_back(trv->get());
-					InjectStep inject_step(inj);
-					from_traversal.insertStep(0, &inject_step);
+					from_traversal.setInitialTraversers({trv});
+					//std::cout << "about to call from_traversal.next()" << std::endl;
+					//std::cout << from_traversal.explain() << std::endl;
 					from_vertex = boost::any_cast<Vertex*>(from_traversal.next());
 				}
 
@@ -60,19 +58,34 @@ class AddEdgeStep: public TraversalStep {
 					if(used_current_traverser) {
 						throw std::runtime_error("No from/to step was provided.");
 					}
-					to_vertex = boost::any_cast<Vertex*>(trv->get());
+					to_vertex = boost::any_cast<Vertex*>(trv.get());
 				} else { 
 					GraphTraversal to_traversal(my_traversal_source, this->in_vertex_traversal);
-					std::vector<boost::any> inj; inj.push_back(trv->get());
-					InjectStep inject_step(inj);
-					to_traversal.insertStep(0, &inject_step);
+					to_traversal.setInitialTraversers({trv});
 					to_vertex = boost::any_cast<Vertex*>(to_traversal.next()); 
 				}
 
 				Graph* my_graph = my_traversal_source->getGraph();
 				Edge* new_edge = my_graph->add_edge(from_vertex, to_vertex, label);
-				trv->replace_data(new_edge);
+				trv.replace_data(new_edge);
 			});
+		}
+
+		virtual void modulate_from(boost::any arg) { 
+			if(arg.type() == typeid(Vertex*)) {
+				this->out_vertex_traversal = new GraphTraversal();
+				this->out_vertex_traversal->setInitialTraversers({Traverser(arg)});
+			}
+			else if(arg.type() == typeid(GraphTraversal*)) this->out_vertex_traversal = boost::any_cast<GraphTraversal*>(arg); 
+			else throw std::runtime_error("Invalid object passed in from() to AddEdgeStep");			
+		}
+		virtual void modulate_to(boost::any arg) {
+			if(arg.type() == typeid(Vertex*)) {
+				this->in_vertex_traversal = new GraphTraversal();
+				this->in_vertex_traversal->setInitialTraversers({Traverser(arg)});
+			}
+			else if(arg.type() == typeid(GraphTraversal*)) this->in_vertex_traversal = boost::any_cast<GraphTraversal*>(arg);
+			else throw std::runtime_error("Invalid object passed in to() to AddEdgeStep");		
 		}
 };
 

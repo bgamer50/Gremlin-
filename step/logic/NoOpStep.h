@@ -20,7 +20,7 @@ class NoOpStep: public TraversalStep {
 			return "NoOpStep()";
 		}
 
-		virtual void apply(GraphTraversal* traversal, TraverserSet traversers){}
+		virtual void apply(GraphTraversal* traversal, TraverserSet& traversers){}
 };
 
 #endif

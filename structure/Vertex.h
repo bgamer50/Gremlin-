@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <boost/any.hpp>
+#include "structure/Property.h"
 #include "structure/VertexProperty.h"
 #include "structure/Element.h"
 #include "structure/Direction.h"
@@ -30,9 +31,7 @@ public:
 	virtual boost::any id() = 0;
 
 	/*
-		Return a pointer to the Graph's label
-		for this Vertex.  If this Vertex does
-		not have a label, return NULL.
+		Return the label of this Vertex.
 	*/
 	virtual std::string label() = 0;
 
@@ -45,19 +44,35 @@ public:
 		Get the property corresponding to the given
 		key.
 	*/
-	virtual VertexProperty<boost::any>* property(std::string key) = 0;
+	virtual Property* property(std::string key) = 0;
 
 	/*
 		Set the property corresponding to the given
 		key assuming the given cardinality.
 	*/
-	virtual VertexProperty<boost::any>* property(Cardinality cardinality, std::string key, boost::any& value) = 0;
+	virtual Property* property(Cardinality cardinality, std::string key, boost::any& value) = 0;
 
 	/*
-		Set the property corresponding to the given
-		key.
+		Return the property
+		with the given property value.  If
+		no such property exists, returns
+		an empty Property object.
 	*/
-	virtual VertexProperty<boost::any>* property(std::string key, boost::any& value) = 0;
+	virtual Property* property(std::string key, boost::any& value) {
+		return this->property(SINGLE, key, value);
+	}
+
+	/*
+		Return a vector of properties 
+		on this Element.
+		Note: should not have a default implementation as backends may or not support
+		multiproperties and need to handle these appropriately.
+	*/
+	virtual std::vector<Property*> properties(std::vector<std::string> keys) = 0;
+
+	virtual std::vector<Property*> properties() {
+		return this->properties({});
+	}
 };
 
 #include "structure/Graph.h"

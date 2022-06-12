@@ -16,7 +16,7 @@ class CountStep : public TraversalStep {
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers) {
             size_t size = traversers.size();
 			traversers.clear();
-			traversers.push_back(new Traverser(size));
+			traversers.push_back(Traverser(size));
         }
 };
 

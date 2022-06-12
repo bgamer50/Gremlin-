@@ -10,7 +10,7 @@ class Vertex;
 
 class ToStep : public TraversalStep {
 	private:
-		GraphTraversal* to_traversal;
+		boost::any arg;
 	public:
 		ToStep(std::string side_effect_label);
 
@@ -18,12 +18,10 @@ class ToStep : public TraversalStep {
 
 		ToStep(GraphTraversal* to_vertex_traversal)
 		: TraversalStep(MODULATOR, TO_STEP) {
-			to_traversal = to_vertex_traversal;
+			arg = to_vertex_traversal;
 		}
 
-		GraphTraversal* getTraversal() {
-			return to_traversal;
-		}
+		boost::any get() { return arg; }
 
 		virtual std::string getInfo();
 };
@@ -32,16 +30,16 @@ class ToStep : public TraversalStep {
 
 ToStep::ToStep(std::string side_effect_label)
 : TraversalStep(MODULATOR, TO_STEP) {
-	to_traversal = (GraphTraversal*)__->select(side_effect_label);
+	arg = (GraphTraversal*)__->select(side_effect_label);
 }
 
 ToStep::ToStep(Vertex* to_vertex)
 : TraversalStep(MODULATOR, TO_STEP) {
-	to_traversal = __->V(to_vertex);
+	arg = __->V(to_vertex);
 }
 
 std::string ToStep::getInfo() {
-	return "ToStep {\n" + this->to_traversal->explain() + "\n}";
+	return "ToStep {?}";
 }
 
 #endif

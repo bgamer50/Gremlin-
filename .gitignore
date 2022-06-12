@@ -3,5 +3,6 @@
 *.o
 *.exe
 *.stackdump
+*.stats
 .vscode/*
 bin/*
