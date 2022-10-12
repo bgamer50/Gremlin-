@@ -30,7 +30,7 @@ class MinStep : public TraversalStep {
         void apply_local(GraphTraversal* traversal, TraverserSet& traversers) {
             tbb::concurrent_unordered_map<scope_group_t, Traverser> min_values;
             //std::unordered_map<scope_group_t, Traverser> min_values;
-            std::for_each(std::execution::par_unseq, traversers.begin(), traversers.end(), [this, &min_values](Traverser& t){
+            std::for_each(std::execution::seq, traversers.begin(), traversers.end(), [this, &min_values](Traverser& t){
                 scope_group_t group_id = boost::any_cast<scope_group_t>(t.get_side_effects()[*this->scope_context->side_effect_key]);
                 if(min_values.find(group_id) == min_values.end()) min_values[group_id] = t;
                 else {
