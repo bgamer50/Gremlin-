@@ -1,3 +1,20 @@
+Version 0.6.1 (October 11, 2022)
+
+Gremlin++ is the core of a C++ interpreter for the Gremlin language.
+It is licensed under the Apache license.  Version 0.6.1 makes some
+semantic changes to accelerate traversals, most importantly the
+reconceptualization of *scopes*.
+
+Gremlin++ is a platform-independent header library.  To use Gremlin++
+in your project, simply set it as an include directory.
+
+Gremlin++ mostly follows the semantics of Gremlin, but with some
+key differences (some steps are always barriers, scopes have a
+different meaning, etc.)  These differences will be documented
+in an upcoming paper.
+
+--------------------------------------------------------------
+
 Version 0.6.0 (June 11, 2022)
 
 Gremlin++ is the core of a C++ interpreter for the Gremlin language.
