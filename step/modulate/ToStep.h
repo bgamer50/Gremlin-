@@ -23,6 +23,7 @@ class ToStep : public TraversalStep {
 
 		boost::any get() { return arg; }
 
+		using TraversalStep::getInfo;
 		virtual std::string getInfo();
 };
 

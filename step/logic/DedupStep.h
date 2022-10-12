@@ -22,6 +22,8 @@ class DedupStep: public TraversalStep, virtual public ByModulating {
         : TraversalStep(true, FILTER, DEDUP_STEP) {}
 
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+
+        using TraversalStep::getInfo;
         virtual std::string getInfo();
 
         virtual void modulate_by(boost::any arg) { this->dedup_by_key = boost::any_cast<std::string>(arg); }

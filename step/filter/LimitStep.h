@@ -17,7 +17,9 @@ class LimitStep: public TraversalStep {
         }
 
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+        using TraversalStep::getInfo;
         virtual std::string getInfo() { return "LimitStep(" + std::to_string(limit) + ")"; }
+        
         uint64_t get_limit() { return this->limit; }
 };
 

@@ -16,6 +16,7 @@ class NoOpStep: public TraversalStep {
 		NoOpStep()
 		: TraversalStep(MAP, NO_OP_STEP) {}
 
+		using TraversalStep::getInfo;
 		virtual std::string getInfo() {
 			return "NoOpStep()";
 		}

@@ -21,6 +21,7 @@ class GraphStep : public TraversalStep {
 			for(boost::any id_ctr : eids) this->element_ids.push_back(id_ctr);
 		}
 
+		using TraversalStep::getInfo;
 		virtual std::string	getInfo() {
 			std::string info = "GraphStep(";
 			info += this->gs_type == VERTEX ? "VERTEX" : "EDGE";

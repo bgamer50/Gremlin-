@@ -19,6 +19,7 @@ class MapStep: public TraversalStep {
             this->map_traversal = map_traversal;
         }
 
+        using TraversalStep::getInfo;
         virtual std::string getInfo() {
             return "MapStep{\n" + this->map_traversal->explain() + "\n}";
         }

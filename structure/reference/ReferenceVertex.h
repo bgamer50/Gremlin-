@@ -32,9 +32,13 @@ class ReferenceVertex: public Vertex {
 
     	virtual std::vector<Edge*> edges(Direction dir) { throw std::runtime_error(std::string(__func__) + " "  + STR_NOT_SUPPORTED); }
 
-    	virtual Property* property(std::string key) { throw std::runtime_error(std::string(__func__) + " "  + STR_NOT_SUPPORTED); }
+        using Vertex::property;
+    	
+        virtual Property* property(std::string key) { throw std::runtime_error(std::string(__func__) + " "  + STR_NOT_SUPPORTED); }
 
     	virtual Property* property(Cardinality cardinality, std::string key, boost::any& value) { throw std::runtime_error(std::string(__func__) + " "  + STR_NOT_SUPPORTED); }
+
+        using Vertex::properties;
 
         virtual std::vector<Property*> properties(std::vector<std::string> keys) { throw std::runtime_error(std::string(__func__) + " "  + STR_NOT_SUPPORTED); } 
 };

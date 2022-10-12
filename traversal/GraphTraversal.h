@@ -122,6 +122,8 @@ public:
 
 	GraphTraversal* V(std::vector<Vertex*> vertices);
 
+	GraphTraversal* V(boost::any v_id);
+
 	//GraphTraversal* V(void* objects, size_t sizeOfEach, int length);
 	//GraphTraversal group();
 	//GraphTraversal group(std::string sideEffectLabel);
@@ -421,6 +423,10 @@ GraphTraversal* GraphTraversal::V(std::vector<Vertex*> vertices) {
 	std::vector<boost::any> ids;
 	for(Vertex* v : vertices) ids.push_back(v->id());
 	return this->appendStep(new GraphStep(VERTEX, ids));
+}
+
+GraphTraversal* GraphTraversal::V(boost::any v_id) {
+	return this->appendStep(new GraphStep(VERTEX, {boost::any(v_id)}));
 }
 
 #include "step/modulate/FromStep.h"

@@ -10,7 +10,7 @@
 #include <vector>
 
 bool acquire_step(std::vector<TraversalStep*>& steps, size_t idx, RepeatStep* repeatStep) {
-    if(idx < 0 || idx >= steps.size()) return false;
+    if(idx >= steps.size()) return false;
 
     auto uid = steps[idx]->uid;
     if(uid == UNTIL_STEP || uid == EMIT_STEP || uid == TIMES_STEP) {

@@ -21,6 +21,8 @@ class OrderStep: public TraversalStep, virtual public ByModulating {
         : TraversalStep(true, MAP, ORDER_STEP) {}
 
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+
+        using TraversalStep::getInfo;
         virtual std::string getInfo();
 
         virtual void modulate_by(boost::any arg) { this->order_traversal = boost::any_cast<GraphTraversal*>(arg); }

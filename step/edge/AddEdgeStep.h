@@ -22,6 +22,7 @@ class AddEdgeStep: public TraversalStep, virtual public FromToModulating {
 			in_vertex_traversal = NULL;
 		}
 
+		using TraversalStep::getInfo;
 		virtual std::string getInfo() {
 			std::string info = "AddEdgeStep(";
 			info += label + ")";

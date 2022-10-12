@@ -48,7 +48,8 @@ public:
 	size_t test_hash(boost::any v);
 
 	GraphTraversal* V();
-	GraphTraversal* V(Vertex* v) ;
+	GraphTraversal* V(Vertex* v);
+	GraphTraversal* V(boost::any v_id);
 	GraphTraversal* E();
 	GraphTraversal* addV();
 	GraphTraversal* addV(std::string label);
@@ -210,6 +211,12 @@ GraphTraversal* GraphTraversalSource::V() {
 GraphTraversal* GraphTraversalSource::V(Vertex* v) {
 	GraphTraversal* trv = new GraphTraversal(this);
 	trv->appendStep(new GraphStep(VERTEX, {v->id()}));
+	return trv;
+}
+
+GraphTraversal* GraphTraversalSource::V(boost::any v_id) {
+	GraphTraversal* trv = new GraphTraversal(this);
+	trv->appendStep(new GraphStep(VERTEX, {v_id}));
 	return trv;
 }
 

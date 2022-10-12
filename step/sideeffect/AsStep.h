@@ -18,6 +18,7 @@ class AsStep: public TraversalStep {
 
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
 
+        using TraversalStep::getInfo;
         virtual std::string getInfo() { return "AsStep{" + sideEffectLabel + "}"; }
 };
 

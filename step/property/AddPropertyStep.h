@@ -2,9 +2,16 @@
 #define ADD_PROPERTY_STEP_H
 
 #define ADD_PROPERTY_STEP 0x75
+#define ADD_PROPERTY_STEP_SIDE_EFFECT_KEY "__AddPropertyStep__originating_traverser__"
+
 #include "step/TraversalStep.h"
 #include "step/controlflow/InjectStep.h"
+#include "step/math/MinStep.h"
+
 #include "structure/Vertex.h"
+
+#include "traversal/Scope.h"
+
 #include <boost/any.hpp>
 
 // Edge properties currently not supported.
@@ -44,19 +51,29 @@ class AddPropertyStep : public TraversalStep {
 		virtual void apply(GraphTraversal* current_traversal, TraverserSet& traversers) {
 			if(this->value.type() == typeid(GraphTraversal*)) {
 				GraphTraversal* ap_anonymous_trv = boost::any_cast<GraphTraversal*>(value);
+				auto g = current_traversal->getTraversalSource();
+				auto& eid_type = boost::any_cast<Vertex*>(traversers.front().get())->id().type();
+				
+				for(TraversalStep* step : ap_anonymous_trv->getSteps()) if(step->uid == MIN_STEP) {
+					MinStep* min_step = static_cast<MinStep*>(step);
+					min_step->set_scope_context(ScopeContext{Scope::local, ADD_PROPERTY_STEP_SIDE_EFFECT_KEY});
+				}
 				
 				for(Traverser& trv : traversers) {
-					//Element* e = get_element(trv->get());
-					Vertex* e = boost::any_cast<Vertex*>(trv.get());
-					GraphTraversal new_trv(current_traversal->getTraversalSource(), ap_anonymous_trv);
-					
-					// Execute traversal
-					new_trv.setInitialTraversers({Traverser(trv)});
-					boost::any prop_value = new_trv.first();
+					boost::any v_id = boost::any_cast<Vertex*>(trv.get())->id();
+					trv.get_side_effects()[ADD_PROPERTY_STEP_SIDE_EFFECT_KEY] = group_id_from_any(v_id);
+				}
 
-					// Store the property; TODO deal w/ edges
-					e->property(this->cardinality, this->key, prop_value);
-					//std::cout << "property stored!\n";
+				TraverserSet temp_traversers(traversers.begin(), traversers.end());
+				GraphTraversal new_trv(current_traversal->getTraversalSource(), ap_anonymous_trv);
+				new_trv.setInitialTraversers(temp_traversers);
+				new_trv.iterate();
+
+				for(Traverser& trv : new_trv.getTraversers()) {
+					scope_group_t g_id = boost::any_cast<scope_group_t>(trv.get_side_effects()[ADD_PROPERTY_STEP_SIDE_EFFECT_KEY]);
+					boost::any prop_value = trv.get();
+					Vertex* v = boost::any_cast<Vertex*>(g->V(any_from_group_id(g_id, eid_type))->next());
+					v->property(this->cardinality, this->key, prop_value);
 				}
 			} 
 			else {

@@ -13,6 +13,7 @@ class IdentityStep: public TraversalStep {
 
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers){}
 
+        using TraversalStep::getInfo;
         virtual std::string getInfo() { return "IdentityStep{}"; }
 };
 

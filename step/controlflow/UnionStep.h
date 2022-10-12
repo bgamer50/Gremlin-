@@ -39,10 +39,10 @@ void UnionStep::apply(GraphTraversal* parent_traversal, TraverserSet& traversers
                 GraphTraversal executing_traversal(parent_traversal->getTraversalSource(), current_union_traversal);
                 TraverserSet temp_traversers(traversers.begin(), traversers.end());
                 executing_traversal.setInitialTraversers(temp_traversers);
+                executing_traversal.iterate();
                 
-                executing_traversal.forEachRemaining([&](boost::any& obj){
-                    new_traversers.push_back(Traverser(obj));
-                });
+                auto output_traversers = executing_traversal.getTraversers();
+                new_traversers.insert(new_traversers.end(), output_traversers.begin(), output_traversers.end());
             }
 
             traversers.swap(new_traversers);

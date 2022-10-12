@@ -43,6 +43,7 @@ class VertexStep : public TraversalStep {
 			return this->gsType;
 		}
 
+		using TraversalStep::getInfo;
 		virtual std::string getInfo() {
 			std::string info = "VertexStep(";
 			info += (direction == IN ? "IN" : direction == OUT ? "OUT" : "BOTH");

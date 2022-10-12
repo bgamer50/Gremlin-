@@ -39,6 +39,7 @@ class RepeatStep: public TraversalStep {
 
         virtual void apply(GraphTraversal* trv, TraverserSet& traversers);
 
+        using TraversalStep::getInfo;
         virtual std::string getInfo() { 
             std::string info = "RepeatStep{\n" + actionTraversal->explain(1) ;
             //if(this->emitTraversal != nullptr) info += ",\nemit = " + emitTraversal->explain();

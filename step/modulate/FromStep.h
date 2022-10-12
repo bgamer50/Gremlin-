@@ -19,6 +19,7 @@ class FromStep : public TraversalStep {
 
 		FromStep(GraphTraversal* from_vertex_traversal);
 
+		using TraversalStep::getInfo;
 		virtual std::string getInfo();
 
 		boost::any get() { return arg; }

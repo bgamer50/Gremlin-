@@ -16,6 +16,7 @@ class ByStep : public TraversalStep {
 		ByStep(boost::any arg);
 		boost::any get() { return arg; }
 
+		using TraversalStep::getInfo;
 		virtual std::string getInfo();
 };
 

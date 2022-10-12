@@ -25,6 +25,7 @@ class AddVertexStep: public TraversalStep {
 			has_label = false;
 		}
 
+		using TraversalStep::getInfo;
 		virtual std::string getInfo() {
 			std::string info = "AddVertexStep(";
 			info += has_label ? label : "";

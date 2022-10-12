@@ -33,6 +33,7 @@ class HasStep : public TraversalStep {
 			this->property_key_or_label = property_key_or_label;
 		}
 
+		using TraversalStep::getInfo;
 		virtual std::string	getInfo() {
 			return std::string("HasStep(") + property_key_or_label + " " + predicate.getInfo() + ")";
 		}

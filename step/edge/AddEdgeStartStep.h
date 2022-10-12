@@ -23,6 +23,7 @@ class AddEdgeStartStep: public TraversalStep, virtual public FromToModulating {
 	public:
 		AddEdgeStartStep(std::string label_arg);
 		
+		using TraversalStep::getInfo;
 		virtual std::string getInfo() {
 			std::string info = "AddEdgeStartStep(";
 			info += label + ")";

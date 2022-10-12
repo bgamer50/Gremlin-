@@ -23,6 +23,7 @@ class ValueMapStep: public TraversalStep, virtual public ByModulating {
         
         void modulate_by(boost::any arg) { this->by_traversal = boost::any_cast<GraphTraversal*>(arg); }
 
+        using TraversalStep::getInfo;
         std::string getInfo() {
             std::string s = "ValueMapStep{";
             for(std::string key : this->keys) s += key + ",";
