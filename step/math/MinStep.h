@@ -1,21 +1,18 @@
-#ifndef MIN_STEP_H
-#define MIN_STEP_H
+#pragma once
 
 #define MIN_STEP 0x60
 
 #include "step/TraversalStep.h"
 #include "traversal/Traverser.h"
 #include "traversal/Scope.h"
+#include "traversal/Comparison.h"
 
 #include <functional>
-#include <execution>
-
-#include <tbb/concurrent_unordered_map.h>
 
 class MinStep : public TraversalStep {
     private:
-        std::function<int(Traverser&, Traverser&)> compare;
         std::optional<ScopeContext> scope_context;
+        gremlinxx::comparison::C comparison_type;
 
         void apply_global(GraphTraversal* traversal, TraverserSet& traversers) {
             Traverser min_value = traversers.front();
@@ -28,9 +25,8 @@ class MinStep : public TraversalStep {
         }
 
         void apply_local(GraphTraversal* traversal, TraverserSet& traversers) {
-            tbb::concurrent_unordered_map<scope_group_t, Traverser> min_values;
-            //std::unordered_map<scope_group_t, Traverser> min_values;
-            std::for_each(std::execution::seq, traversers.begin(), traversers.end(), [this, &min_values](Traverser& t){
+            std::unordered_map<scope_group_t, Traverser> min_values;
+            std::for_each(traversers.begin(), traversers.end(), [this, &min_values](Traverser& t){
                 scope_group_t group_id = boost::any_cast<scope_group_t>(t.get_side_effects()[*this->scope_context->side_effect_key]);
                 if(min_values.find(group_id) == min_values.end()) min_values[group_id] = t;
                 else {
@@ -44,16 +40,17 @@ class MinStep : public TraversalStep {
         }
 
     public:
-        MinStep(std::function<int(Traverser&, Traverser&)> c)
+        MinStep(gremlinxx::comparison::C comparison_type)
         : TraversalStep(true, MAP, MIN_STEP) {
-            compare = c;
+            this->comparison_type = comparison_type;
         }
 
         void set_scope_context(ScopeContext sc) { this->scope_context = sc; }
+        
+        gremlinxx::comparison::C get_comparison_type() { return this->comparison_type; }
 
         Traverser min(Traverser& t1, Traverser& t2) {
-            int cmp = compare(t1, t2);
-            return cmp < 0 ? t1 : t2;
+            return C_LESS(this->comparison_type, t1.get(), t2.get()) ? t1 : t2;
         }
 
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers) {
@@ -63,5 +60,3 @@ class MinStep : public TraversalStep {
             }
         }
 };
-
-#endif

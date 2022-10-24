@@ -165,9 +165,9 @@ public:
 	//GraphTraversal* mean();
 	//GraphTraversal mean(Scope scope);
 	
-	GraphTraversal* min(std::function<int(Traverser&, Traverser&)> c);
-
+	template<typename T>
 	GraphTraversal* min();
+
 	//GraphTraversal min(Scope scope);
 	//GraphTraversal _not(GraphTraversal notTraversal);
 	//GraphTraversal option(GraphTraversal optionTraversal);
@@ -541,12 +541,10 @@ GraphTraversal* GraphTraversal::is(P predicate) {
 }
 
 #include "step/math/MinStep.h"
-GraphTraversal* GraphTraversal::min(std::function<int(Traverser&, Traverser&)> c) {
-	return this->appendStep(new MinStep(c));
-}
-
+template<typename T>
 GraphTraversal* GraphTraversal::min() {
-	return this->appendStep(new MinStep(nullptr));
+	auto comparison_type = gremlinxx::comparison::C_TYPEID<T>();
+	return this->appendStep(new MinStep(comparison_type));
 }
 
 #include "step/math/CountStep.h"
