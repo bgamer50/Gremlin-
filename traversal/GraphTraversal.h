@@ -198,7 +198,7 @@ public:
 	//GraphTraversal* skip(unsigned long toSkip);
 	//GraphTraversal skip(Scope scope, unsigned long toSkip);
 	//GraphTraversal* store(std::string sideEffectLabel);
-	GraphTraversal subgraph(std::string sideEffectLabel);
+	GraphTraversal* subgraph(std::string sideEffectLabel);
 	//GraphTraversal* sum();
 	//GraphTraversal sum(Scope scope);
 	//GraphTraversal tail();
@@ -313,9 +313,7 @@ public:
 	//GraphTraversal toSet();
 };
 
-#ifndef __
-#define __ (new GraphTraversal())
-#endif
+#include "traversal/SyntaxHelper.h"
 
 #include "structure/Graph.h"
 #include "structure/Vertex.h"
@@ -517,7 +515,7 @@ GraphTraversal* GraphTraversal::inE(std::vector<std::string> labels) {
 }
 
 #include "step/graph/SubgraphStep.h"
-GraphTraversal GraphTraversal::subgraph(std::string sideEffectLabel) {
+GraphTraversal* GraphTraversal::subgraph(std::string sideEffectLabel) {
 	return this->appendStep(new SubgraphStep(sideEffectLabel));
 }
 
@@ -610,7 +608,7 @@ GraphTraversal* GraphTraversal::emit(GraphTraversal* emitTraversal) {
 }
 
 GraphTraversal* GraphTraversal::emit() {
-	return this->appendStep(new EmitStep(__->identity()));
+	return this->appendStep(new EmitStep(identity()));
 }
 
 #include "step/controlflow/UntilStep.h"
@@ -712,8 +710,8 @@ void GraphTraversal::iterate() {
 	this->getInitialTraversal();
 	
 	std::for_each(this->steps.begin(), this->steps.end(), [&](TraversalStep* step){
-		//std::cout << "step: " << step->uid << std::endl;
-		//std::cout << step->getInfo() << std::endl;
+		std::cout << "step: " << step->uid << std::endl;
+		std::cout << step->getInfo() << std::endl;
 		step->apply(this, this->traversers);
 	});
 

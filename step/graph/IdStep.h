@@ -19,6 +19,12 @@ class IdStep : public TraversalStep {
                 else throw std::runtime_error("Error: Traverser does not appear to contain an element.");
             });
         }
+
+
+        using TraversalStep::getInfo;
+        virtual std::string getInfo() {
+            return "IdStep()";
+        }
 };
 
 #endif

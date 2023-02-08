@@ -9,12 +9,17 @@
 #include <boost/any.hpp>
 #include <boost/core/typeinfo.hpp>
 #include <sstream>
+#include <string>
+#include <vector>
+
+class Vertex;
 
 namespace gremlinxx {
     namespace comparison {
 
         enum C {UINT64=0, UINT32=1, INT64=2, INT32=3, FLOAT64=4, FLOAT32=5, UINT8=6, INT8=7, STRING=8, VERTEX=9};
         std::vector<std::string> C_to_string = {"UINT64", "UINT32", "INT64", "INT32", "FLOAT64", "FLOAT32", "UINT8", "INT8", "STRING", "VERTEX"};
+        std::vector<size_t> C_size = {sizeof(uint64_t), sizeof(uint32_t), sizeof(int64_t), sizeof(int32_t), sizeof(double), sizeof(float), sizeof(uint8_t), sizeof(int8_t), sizeof(uint64_t), sizeof(Vertex*)};
 
         // Conversion from type to C type id
         template<class T>
@@ -113,6 +118,35 @@ namespace gremlinxx {
             }
 
             throw std::runtime_error("Illegal type provided");
+        }
+
+        C from_any(boost::any& a) {
+            const std::type_info& t = a.type();
+			if(t == typeid(uint64_t)) {
+                return C::UINT64;
+            } else if(t == typeid(uint32_t)) {
+                return C::UINT32;
+            } else if(t == typeid(uint8_t)) {
+                return C::UINT8;
+            } else if(t == typeid(int64_t)) {
+                return C::INT64;
+            } else if(t == typeid(int32_t)) {
+                return C::INT32;
+            } else if(t == typeid(int8_t)) {
+                return C::INT8;
+            } else if(t == typeid(double)) {
+                return C::FLOAT64;
+            } else if(t == typeid(float)) {
+                return C::FLOAT32;
+            } else if(t == typeid(std::string)) {
+                return C::STRING;
+            } else if(t == typeid(Vertex*)) {
+                return C::VERTEX;
+            }
+
+            std::stringstream sx;
+            sx << "Illegal type " << boost::core::demangled_name(t) << " provided to from_any";
+            throw std::runtime_error(sx.str());
         }
     }
 }

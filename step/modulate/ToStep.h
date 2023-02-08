@@ -31,12 +31,12 @@ class ToStep : public TraversalStep {
 
 ToStep::ToStep(std::string side_effect_label)
 : TraversalStep(MODULATOR, TO_STEP) {
-	arg = (GraphTraversal*)__->select(side_effect_label);
+	arg = (GraphTraversal*)select(side_effect_label);
 }
 
 ToStep::ToStep(Vertex* to_vertex)
 : TraversalStep(MODULATOR, TO_STEP) {
-	arg = __->V(to_vertex);
+	arg = V(to_vertex);
 }
 
 std::string ToStep::getInfo() {
