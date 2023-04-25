@@ -1,5 +1,4 @@
-#ifndef VERTEX_PROPERTY_H
-#define VERTEX_PROPERTY_H
+#pragma once
 
 #include <set>
 #include <exception>
@@ -8,7 +7,7 @@
 #include <algorithm>
 #include <functional>
 #include <boost/any.hpp>
-#include "structure/Property.h"
+#include "Property.h"
 
 enum Cardinality {SINGLE, LIST, SET};
 
@@ -25,9 +24,7 @@ class VertexProperty: public Property {
 			my_values = new_values;
 		}
 
-		std::unordered_map<std::string, Property> values() {
+		virtual std::unordered_map<std::string, Property> values() {
 			return my_values;
 		}
 };
-
-#endif

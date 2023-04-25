@@ -1,5 +1,4 @@
-#ifndef BY_MODULATING_H
-#define BY_MODULATING_H
+#pragma once
 
 #include <boost/any.hpp>
 
@@ -8,4 +7,3 @@ class ByModulating {
         virtual void modulate_by(boost::any arg) = 0;
 };
 
-#endif

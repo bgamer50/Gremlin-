@@ -1,5 +1,5 @@
-#ifndef GRAPH_STEP_H
-#define GRAPH_STEP_H
+#pragma once
+
 #include <string>
 #include <vector>
 #include <boost/any.hpp>
@@ -15,27 +15,15 @@ class GraphStep : public TraversalStep {
 		GraphStepType gs_type;
 		std::vector<boost::any> element_ids;
 	public:
-		GraphStep(GraphStepType gsType_arg, std::vector<boost::any> eids)
-		: TraversalStep(MAP, GRAPH_STEP) {
-			this->gs_type = gsType_arg;
-			for(boost::any id_ctr : eids) this->element_ids.push_back(id_ctr);
-		}
+		GraphStep(GraphStepType gsType_arg, std::vector<boost::any> eids);
 
 		using TraversalStep::getInfo;
-		virtual std::string	getInfo() {
-			std::string info = "GraphStep(";
-			info += this->gs_type == VERTEX ? "VERTEX" : "EDGE";
-			info = info + ", " + (element_ids.size() > 0 ? "{...}" : "{}");
-			return info + ")";
-		}
+		virtual std::string	getInfo();
 
-		GraphStepType getType() { return this->gs_type; }
+		inline GraphStepType getType() { return this->gs_type; }
 
-		std::vector<boost::any>& get_element_ids() { return this->element_ids; }
+		inline std::vector<boost::any>& get_element_ids() { return this->element_ids; }
 
-		virtual void apply(GraphTraversal* trv, TraverserSet& traversers) {
-			throw std::runtime_error("Unsupported operation!");
-		}
+		virtual void apply(GraphTraversal* trv, TraverserSet& traversers);
 };
 
-#endif

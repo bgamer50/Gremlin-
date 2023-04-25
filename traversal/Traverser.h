@@ -1,5 +1,4 @@
-#ifndef TRAVERSER_H
-#define TRAVERSER_H
+#pragma once
 
 #include <list>
 #include <map>
@@ -14,34 +13,21 @@ class Traverser {
 		std::map<std::string, boost::any> side_effects;
 
 	public:
-		Traverser(boost::any t) {
-			my_data = boost::any(t);
-		}
+		Traverser(boost::any t);
 
-		Traverser(boost::any t, std::map<std::string, boost::any>& new_side_effects) {
-			my_data = boost::any(t);
-			this->side_effects = new_side_effects;
-		}
+		Traverser(boost::any t, std::map<std::string, boost::any>& new_side_effects);
 
-		Traverser() : Traverser(boost::any()){}
+		Traverser();
 
-		virtual boost::any get() {
-			return my_data;
-		}
+		virtual boost::any get();
 
-		virtual Traverser replace_data(boost::any t) {
-			my_data = t;
-			return *this;
-		}
+		virtual Traverser replace_data(boost::any t);
 
 		/**
 		 * Returns a reference to this traverser's side effect map.
 		 * **/
-		virtual std::map<std::string, boost::any>& get_side_effects() {
-			return this->side_effects;
-		}
+		virtual std::map<std::string, boost::any>& get_side_effects();
 };
 
 typedef std::vector<Traverser> TraverserSet;
 
-#endif

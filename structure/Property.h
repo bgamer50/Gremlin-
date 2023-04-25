@@ -1,7 +1,7 @@
-#ifndef PROPERTY_H
-#define PROPERTY_H
+#pragma once
 
 #include <string>
+#include <boost/any.hpp>
 
 class Property {
 	private:
@@ -14,13 +14,11 @@ class Property {
 			this->my_value = new_value;
 		}
 
-		std::string key() {
+		virtual std::string key() {
 			return this->my_key;
 		}
 
-		boost::any value() {
+		virtual boost::any value() {
 			return this->my_value;
 		}
 };
-
-#endif

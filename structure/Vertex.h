@@ -1,5 +1,4 @@
-#ifndef VERTEX_H
-#define VERTEX_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -10,6 +9,7 @@
 #include "structure/Direction.h"
 
 class Graph;
+class Edge;
 
 class Vertex : public Element {
 public:
@@ -77,4 +77,3 @@ public:
 
 #include "structure/Graph.h"
 
-#endif

@@ -1,5 +1,4 @@
-#ifndef NO_OP_STEP_H
-#define NO_OP_STEP_H
+#pragma once
 
 #define NO_OP_STEP 0x00
 
@@ -13,15 +12,11 @@
 // step.
 class NoOpStep: public TraversalStep {
 	public:
-		NoOpStep()
-		: TraversalStep(MAP, NO_OP_STEP) {}
+		NoOpStep();
 
 		using TraversalStep::getInfo;
-		virtual std::string getInfo() {
-			return "NoOpStep()";
-		}
+		virtual std::string getInfo();
 
-		virtual void apply(GraphTraversal* traversal, TraverserSet& traversers){}
+		virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
 };
 
-#endif

@@ -1,10 +1,10 @@
-#ifndef GRAPH_H
-#define GRAPH_H
+#pragma once
 
 #include <vector>
 
-class Edge;
-class Vertex;
+#include "structure/Edge.h"
+#include "structure/Vertex.h"
+
 class GraphTraversalSource;
 
 class Graph {
@@ -27,8 +27,4 @@ public:
 	virtual Edge* add_edge(Vertex* from_vertex, Vertex* to_vertex, std::string label) = 0;
 };
 
-#include "structure/Edge.h"
-#include "structure/Vertex.h"
 #include "traversal/GraphTraversalSource.h"
-
-#endif

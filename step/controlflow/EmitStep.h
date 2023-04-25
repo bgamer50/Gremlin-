@@ -1,5 +1,4 @@
-#ifndef EMIT_STEP_H
-#define EMIT_STEP_H
+#pragma once
 
 #define EMIT_STEP 0x44
 
@@ -10,12 +9,7 @@ class EmitStep: public TraversalStep {
         GraphTraversal* traversal;
 
     public:
-        EmitStep(GraphTraversal* traversal)
-        : TraversalStep(MODULATOR, EMIT_STEP) {
-            this->traversal = traversal;            
-        }
+        EmitStep(GraphTraversal* traversal);
 
-        GraphTraversal* getTraversal() { return this->traversal; }
+        inline GraphTraversal* getTraversal() { return this->traversal; }
 };
-
-#endif

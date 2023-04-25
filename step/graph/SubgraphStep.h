@@ -1,9 +1,9 @@
-#ifndef SUBGRAPH_STEP_H
-#define SUBGRAPH_STEP_H
+#pragma once
 
 #define SUBGRAPH_STEP 0x82
 
 #include "step/TraversalStep.h"
+#include "traversal/Traverser.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -16,23 +16,10 @@ class SubgraphStep: public TraversalStep {
         std::string subgraph_name;
 
     public:
-        SubgraphStep(std::string name) : TraversalStep(SIDE_EFFECT, SUBGRAPH_STEP) {
-            this->subgraph_name = name;
-        }
-
-        void apply(GraphTraversal* traversal, TraverserSet& traversers) {
-            boost::any subgraph_property = traversal->getTraversalProperty(SUBGRAPH_PREFIX + subgraph_name);
-            if(subgraph_property.empty()) subgraph_property = std::unordered_set<Edge*>();
-            
-            std::unordered_set<Edge*> subgraph_edges = boost::any_cast<std::unordered_set<Edge*>>(subgraph_property);
-            for(Traverser& trv : traversers) {
-                subgraph_edges.insert(boost::any_cast<Edge*>(trv.get()));
-            }
-
-            traversal->setTraversalProperty(SUBGRAPH_PREFIX + subgraph_name, subgraph_edges);
-        }
+        SubgraphStep(std::string name);
 
         inline std::string get_subgraph_name() { return this->subgraph_name; }
+
+        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
 };
 
-#endif

@@ -1,5 +1,4 @@
-#ifndef FOLD_STEP_H
-#define FOLD_STEP_H
+#pragma once
 
 #define FOLD_STEP 0x3f
 #include "step/TraversalStep.h"
@@ -11,21 +10,11 @@
 
 class FoldStep: public TraversalStep {
     public:
-        FoldStep()
-        : TraversalStep(MAP, FOLD_STEP) {}
+        FoldStep();
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers){
-            TraverserSet new_traversers;
+        using TraversalStep::getInfo;
+        virtual std::string getInfo();
 
-            size_t sz = traversers.size();
-            std::vector<boost::any> vec(sz);
-            for(size_t k = 0; k < sz; ++k) {
-                vec[k] = traversers[k].get();
-            }
-
-            traversers.clear();
-            traversers.push_back(Traverser(vec));
-        }
+        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
 };
 
-#endif

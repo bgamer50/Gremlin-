@@ -21,35 +21,35 @@ class P {
 			this->operand = operand;
 		}
 
-		std::string getInfo() {
+		inline std::string getInfo() {
 			return std::string("P<?>");
 		}
 
-		static P eq(boost::any t) {
+		inline static P eq(boost::any t) {
 			return P(EQ, t);
 		}
 
-		static P neq(boost::any t) {
+		inline static P neq(boost::any t) {
 			return P(NEQ, t);
 		}
 
-		static P gt(boost::any t) {
+		inline static P gt(boost::any t) {
 			return P(GT, t);
 		}
 
-		static P gte(boost::any t) {
+		inline static P gte(boost::any t) {
 			return P(GTE, t);
 		}
 
-		static P lt(boost::any t) {
+		inline static P lt(boost::any t) {
 			return P(LT, t);
 		}
 
-		static P lte(boost::any t) {
+		inline static P lte(boost::any t) {
 			return P(LTE, t);
 		}
 
-		static P between(boost::any t, boost::any u) {
+		inline static P between(boost::any t, boost::any u) {
 			return P(BETWEEN, std::make_pair(t,u));
 		}
 };

@@ -1,14 +1,15 @@
-#ifndef GREMLIN_UTILS_H
-#define GREMLIN_UTILS_H
+#pragma once
 
 #include <boost/any.hpp>
 #include <string>
 #include <unordered_map>
+#include <vector>
+#include <iostream>
 
 typedef std::unordered_map<std::string, boost::any> valuemap_t;
 typedef std::vector<boost::any> anyvec_t;
 
-std::string string_any(boost::any a) {
+inline std::string string_any(boost::any a) {
     auto& id = a.type();
     if(id == typeid(int)) return std::to_string(boost::any_cast<int>(a));
     else if (id == typeid(long)) return std::to_string(boost::any_cast<long>(a));
@@ -23,11 +24,11 @@ std::string string_any(boost::any a) {
     else return std::string("?");
 }
 
-void print_any(boost::any a) {
+inline void print_any(boost::any a) {
     std::cout << string_any(a) << std::endl;
 }
 
-void print_valuemap(boost::any vm) {
+inline void print_valuemap(boost::any vm) {
     std::cout << "{";
     for(auto p : boost::any_cast<valuemap_t>(vm)) {
         std::cout << p.first << ": ";
@@ -46,5 +47,3 @@ void print_valuemap(boost::any vm) {
     }
     std::cout << "}" << std::endl;
 }
-
-#endif

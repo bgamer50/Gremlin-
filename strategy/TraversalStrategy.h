@@ -1,5 +1,4 @@
-#ifndef TRAVERSAL_STRATEGY_H
-#define TRAVERSAL_STRATEGY_H
+#pragma once
 
 #include <functional>
 #include <vector>
@@ -11,4 +10,3 @@
 */
 typedef std::function<void(std::vector<TraversalStep*>&)> TraversalStrategy;
 
-#endif

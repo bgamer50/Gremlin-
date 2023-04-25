@@ -1,5 +1,4 @@
-#ifndef EDGE_H
-#define EDGE_H
+#pragma once
 
 #include <stdlib.h>
 #include <string>
@@ -77,11 +76,3 @@ public:
 	*/
 	virtual std::vector<Property*> properties(std::vector<std::string> keys) = 0;
 };
-
-#include "structure/Vertex.h"
-
- std::pair<Vertex*, Vertex*> Edge::bothV() {
-	return std::make_pair(outV(), inV());
- }
-
-#endif

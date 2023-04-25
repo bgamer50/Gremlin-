@@ -1,5 +1,4 @@
-#ifndef SELECT_STEP_H
-#define SELECT_STEP_H
+#pragma once
 
 #define SELECT_STEP 0x32
 
@@ -8,16 +7,14 @@
 #include <utility>
 
 #include "step/TraversalStep.h"
+#include "traversal/Traverser.h"
 
 class SelectStep: public TraversalStep {
     private:
         std::string sideEffectLabel;
 
     public:
-        SelectStep(std::string sideEffectLabel)
-        : TraversalStep(SIDE_EFFECT, SELECT_STEP) {
-            this->sideEffectLabel = sideEffectLabel;
-        }
+        SelectStep(std::string se_label);
 
         virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
 
@@ -27,21 +24,3 @@ class SelectStep: public TraversalStep {
         inline std::string get_side_effect_label() { return this->sideEffectLabel; }
 };
 
-inline void SelectStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    //std::cout << traversers.size() << " traversers." << std::endl;
-    //std::for_each(traversers[0].get_side_effects().begin(), traversers[0].get_side_effects().end(), [](std::pair<std::string, boost::any> r){std::cout << r.first << "\t" << (r.second.type() == typeid(Vertex*)) << std::endl;});
-    for(Traverser& trv : traversers) {
-        auto p = trv.get_side_effects().find(this->sideEffectLabel);
-        if(p == trv.get_side_effects().end()) {
-            throw std::runtime_error("Side effect " + this->sideEffectLabel + " does not exist!");
-        }
-
-        trv.replace_data(p->second);
-    }
-}
-
-inline std::string SelectStep::getInfo() {
-    return "SelectStep(" + this->sideEffectLabel + ")";
-}
-
-#endif

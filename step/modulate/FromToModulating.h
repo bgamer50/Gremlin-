@@ -1,5 +1,4 @@
-#ifndef FROM_TO_MODULATING_H
-#define FROM_TO_MODULATING_H
+#pragma once
 
 class FromToModulating {
     public:
@@ -7,4 +6,3 @@ class FromToModulating {
         virtual void modulate_to(boost::any arg) = 0;
 };
 
-#endif
