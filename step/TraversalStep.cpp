@@ -22,6 +22,6 @@ std::string TraversalStep::getInfo(size_t indent) {
 	return s + getInfo();
 }
 
-void TraversalStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
+void TraversalStep::apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet* traversers) {
 	throw std::runtime_error("Non-executable traversal step! (" + std::to_string(uid) + ")");
 };

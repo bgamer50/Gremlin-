@@ -13,5 +13,5 @@ class LoopsStep: public TraversalStep {
     public:
         LoopsStep();
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+        virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet* traversers);
 };

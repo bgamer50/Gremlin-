@@ -4,6 +4,7 @@
 LoopsStep::LoopsStep()
 : TraversalStep(MAP, LOOPS_STEP) {}
 
-void LoopsStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    for(Traverser& trv : traversers) trv.replace_data(traversal->getTraversalProperty(LOOPS_TRAVERSAL_PROPERTY));
+void LoopsStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet* traversers) {
+    std::vector<boost::any> l(traversers->size(), traversal->getTraversalProperty(LOOPS_TRAVERSAL_PROPERTY));
+    traversers->advance(l);
 }

@@ -4,6 +4,7 @@
 
 #include "structure/Edge.h"
 #include "structure/Vertex.h"
+#include "maelstrom/storage/datatype.h"
 
 class GraphTraversalSource;
 
@@ -25,6 +26,8 @@ public:
 	virtual Vertex* add_vertex(std::string label) = 0;
 	virtual Vertex* add_vertex() = 0;
 	virtual Edge* add_edge(Vertex* from_vertex, Vertex* to_vertex, std::string label) = 0;
+
+	virtual maelstrom::dtype_t get_vertex_dtype() = 0;
 };
 
 #include "traversal/GraphTraversalSource.h"

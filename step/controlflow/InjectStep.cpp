@@ -10,8 +10,6 @@ InjectStep::InjectStep(boost::any& b) : TraversalStep(SIDE_EFFECT, INJECT_STEP) 
     objects.push_back(b);
 }
 
-void InjectStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
-    std::for_each(objects.begin(), objects.end(), [&](boost::any obj){
-        traversers.push_back(Traverser(obj));
-    });
+void InjectStep::apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet* traversers) {
+    traversers->advance(objects);
 }

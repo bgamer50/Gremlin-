@@ -17,8 +17,8 @@ std::string RepeatStep::getInfo() {
 
 // TODO for now "until" is checked only at the end, but per TinkerPop3 standard it can be either pre- or post-loop.
 // TODO emit is also pre- or post-loop; right now it is pre-loop.
-void RepeatStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
-    TraverserSet emittedTraversers;
+void RepeatStep::apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet* traversers) {
+    gremlinxx::traversal::TraverserSet* emittedTraversers;
     GraphTraversalSource* src = trv->getTraversalSource();
     
     bool cont = true;

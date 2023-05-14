@@ -139,6 +139,12 @@ Graph* GraphTraversalSource::getGraph() {
 		return graph;
 }
 
+#include "traversal/BasicTraverserSet.h"
+
+gremlinxx::traversal::TraverserSet* getNewTraverserSet() {
+	return new gremlinxx::traversal::BasicTraverserSet();
+}
+
 #include "step/graph/GraphStep.h"
 #include "step/vertex/AddVertexStartStep.h"
 #include "step/edge/AddEdgeStartStep.h"

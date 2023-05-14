@@ -14,5 +14,5 @@ class CoalesceStep: public TraversalStep {
     public:
         CoalesceStep(std::vector<GraphTraversal*>& traversals);
         std::vector<GraphTraversal*>& get_traversals();
-        virtual void apply(GraphTraversal* parent_traversal, TraverserSet& traversers);
+        virtual void apply(GraphTraversal* parent_traversal, gremlinxx::traversal::TraverserSet* traversers);
 };

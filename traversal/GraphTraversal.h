@@ -18,6 +18,7 @@
 #include "structure/Direction.h"
 #include "traversal/Scope.h"
 #include "traversal/Traverser.h"
+#include "traversal/TraverserSet.h"
 
 class Edge;
 class Vertex;
@@ -28,7 +29,7 @@ class GraphTraversalSource;
 class GraphTraversal {
 protected:
 	std::vector<TraversalStep*> steps;
-	std::vector<Traverser> traversers;
+	gremlinxx::traversal::TraverserSet* traversers;
 	std::unordered_map<std::string, boost::any> traversal_properties;
 private:
 	GraphTraversalSource* source;
@@ -275,7 +276,7 @@ public:
 	//GraphTraversal
 
 	void getInitialTraversal();
-	void setInitialTraversers(std::vector<Traverser> initial_traversers);
+	void setInitialTraversers(gremlinxx::traversal::TraverserSet* initial_traversers);
 
 	// The explain finalizer which works in anonymous GraphTraversals
 	std::string explain();
@@ -299,6 +300,8 @@ public:
 	void iterate();
 
 	std::vector<Traverser> getTraversers();
+
+	gremlinxx::traversal::TraverserSet* getTraverserSet();
 
 	//GraphTraversal toSet();
 };

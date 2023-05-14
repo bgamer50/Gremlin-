@@ -50,7 +50,12 @@ void AddPropertyStep::apply(GraphTraversal* current_traversal, TraverserSet& tra
 		new_trv.setInitialTraversers(temp_traversers);
 		new_trv.iterate();
 
-		for(Traverser& trv : new_trv.getTraversers()) {
+		auto retrieved_traversers = new_trv.getTraversers();
+		if(retrieved_traversers.size() < traversers.size()) {
+			throw std::runtime_error("One of more traversers did not produce a valid property value!");
+		}
+
+		for(Traverser& trv : retrieved_traversers) {
 			scope_group_t g_id = boost::any_cast<scope_group_t>(trv.get_side_effects()[ADD_PROPERTY_STEP_SIDE_EFFECT_KEY]);
 			boost::any prop_value = trv.get();
 			Vertex* v = boost::any_cast<Vertex*>(g->V(any_from_group_id(g_id, eid_type))->next());

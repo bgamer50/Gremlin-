@@ -95,4 +95,5 @@ target_include_directories(
     gremlinxx
     PUBLIC
         "/mnt/gremlin++" # gremlinxx path
+        "/mnt/maelstrom" # maelstrom path
 )

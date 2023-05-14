@@ -19,17 +19,20 @@ GraphTraversal::GraphTraversal() {
 */
 GraphTraversal::GraphTraversal(GraphTraversalSource* src) : GraphTraversal() {
 	source = src;
+	this->traversers = src->getNewTraverserSet();
 }
 
 #include "step/TraversalStep.h"
 GraphTraversal::GraphTraversal(GraphTraversal* trv) : GraphTraversal() {
 	this->steps = trv->getSteps();
 	this->source = trv->getTraversalSource();
+	this->traversers = this->source->getNewTraverserSet();
 }
 
 GraphTraversal::GraphTraversal(GraphTraversalSource* src, GraphTraversal* trv) {
 	this->steps = trv->getSteps();
 	this->source = src;
+	this->traversers = src->getNewTraverserSet();
 }
 
 Graph* GraphTraversal::getGraph() {
@@ -37,8 +40,8 @@ Graph* GraphTraversal::getGraph() {
 }
 
 bool GraphTraversal::hasNext() {
-		if(!this->has_iterated) this->iterate();
-		return !this->traversers.empty();
+	if(!this->has_iterated) this->iterate();
+	return !this->traversers->empty();
 }
 
 std::vector<boost::any> GraphTraversal::toVector() {		
@@ -73,9 +76,9 @@ void GraphTraversal::getInitialTraversal() {
 /*
 
 */
-void GraphTraversal::setInitialTraversers(TraverserSet initial_traversers) {
-	this->traversers.clear();
-	this->traversers.insert(this->traversers.begin(), initial_traversers.begin(), initial_traversers.end());
+void GraphTraversal::setInitialTraversers(gremlinxx::traversal::TraverserSet* initial_traversers) {
+	this->traversers->clear();
+	this->traversers->addTraversers(initial_traversers);
 }
 
 #include "step/edge/AddEdgeStartStep.h"
@@ -395,19 +398,19 @@ std::string GraphTraversal::explain(size_t indent) {
 
 boost::any GraphTraversal::first() {
 	this->iterate();
-	if(this->traversers.empty()) throw std::runtime_error("Traversal produced an empty set of final traversers!");
+	if(this->traversers->empty()) throw std::runtime_error("Traversal produced an empty set of final traversers!");
 
-	boost::any next_result = this->traversers.front().get();
-	traversers.clear();
+	boost::any next_result = this->traversers->getData(0);
+	traversers->clear();
 	return next_result;
 }
 
 boost::any GraphTraversal::next() { 
 	if(!this->has_iterated) this->iterate();
-	if(this->traversers.empty()) throw std::runtime_error("No traversers available when calling next()");
+	if(this->traversers->empty()) throw std::runtime_error("No traversers available when calling next()");
 
-	boost::any next_result = this->traversers.front().get();
-	traversers.erase(traversers.begin());
+	boost::any next_result = this->traversers->getData(0);
+	traversers->erase(0);
 
 	return next_result;
 }
@@ -415,12 +418,12 @@ boost::any GraphTraversal::next() {
 void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
 	if(!this->has_iterated) this->iterate();
 
-	std::for_each(this->traversers.begin(), this->traversers.end(), [&](Traverser& trv){
-		boost::any obj = trv.get();
-		func(obj);
+	this->traversers->apply([func](boost::any& data_i, std::unordered_map<std::string, boost::any>& se_i, std::vector<boost::any>& path_i) {
+		func(data_i);
+		return boost::any();
 	});
 
-	traversers.clear();
+	traversers->clear();
 }
 
 void GraphTraversal::iterate() {
@@ -437,7 +440,11 @@ void GraphTraversal::iterate() {
 	this->has_iterated = true;
 }
 
-TraverserSet GraphTraversal::getTraversers() {
+std::vector<Traverser> GraphTraversal::getTraversers() {
+	return this->traversers->getTraversers();
+}
+
+gremlinxx::traversal::TraverserSet* GraphTraversal::getTraverserSet() {
 	return this->traversers;
 }
 

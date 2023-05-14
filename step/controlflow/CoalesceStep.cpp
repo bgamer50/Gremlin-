@@ -14,26 +14,26 @@ std::vector<GraphTraversal*>& CoalesceStep::get_traversals() {
     return this->traversals;
 }
 
-void CoalesceStep::apply(GraphTraversal* parent_traversal, TraverserSet& traversers) {
-    size_t num_traversers = traversers.size();
-    TraverserSet new_traversers;
+void CoalesceStep::apply(GraphTraversal* parent_traversal, gremlinxx::traversal::TraverserSet* traversers) {
+    traversers->getTraversers();
 
     for(auto it = this->traversals.begin(); it != this->traversals.end(); ++it) {
         GraphTraversal* current_coalesce_traversal = *it;
-        
-        std::vector<boost::any> objects(num_traversers);
-        for(size_t k = 0; k < num_traversers; ++k) objects[k] = traversers[k].get();
-
         GraphTraversal executing_traversal(parent_traversal->getTraversalSource(), current_coalesce_traversal);
-        InjectStep inject_step(objects);
-        executing_traversal.insertStep(0, &inject_step);
         
-        executing_traversal.forEachRemaining([&](boost::any& obj){
-            new_traversers.push_back(Traverser(obj));
-        });
+        executing_traversal.setInitialTraversers(traversers);
+        executing_traversal.iterate();
+        
+        auto new_traverser_set = executing_traversal.getTraverserSet();
 
-        if(new_traversers.size() > 0) break;
+        if(new_traverser_set->size() > 0) {
+            traversers->clear();
+            traversers->addTraversers(new_traverser_set);
+            new_traverser_set->clear();
+            return;
+        }
     }
 
-    traversers.swap(new_traversers);
+    // If all coalesce traversals return nothing, the traverser set should be empty.
+    traversers->clear();
 }

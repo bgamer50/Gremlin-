@@ -7,6 +7,8 @@
 #include <typeindex>
 #include <boost/any.hpp>
 
+#include "traversal/TraverserSet.h"
+
 class Graph;
 class Vertex;
 class Edge;
@@ -30,6 +32,11 @@ public:
 	GraphTraversalSource(Graph* gr);
 	
 	Graph* getGraph();
+
+	/*
+		Constructs and returns a new traverser set object.
+	*/
+	gremlinxx::traversal::TraverserSet* getNewTraverserSet();
 
 	GraphTraversalSource* withStrategy(TraversalStrategy strategy);
 	//GraphTraversalSource* withoutStrategy(TraversalStrategy strategy); TODO

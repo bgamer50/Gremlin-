@@ -1,4 +1,5 @@
 #include "step/math/MinStep.h"
+#include <iostream>
 
 MinStep::MinStep(gremlinxx::comparison::C cmp_type)
 : TraversalStep(true, MAP, MIN_STEP) {
@@ -17,8 +18,10 @@ void MinStep::apply_global(GraphTraversal* traversal, TraverserSet& traversers) 
 
 void MinStep::apply_local(GraphTraversal* traversal, TraverserSet& traversers) {
     std::unordered_map<scope_group_t, Traverser> min_values;
+
     std::for_each(traversers.begin(), traversers.end(), [this, &min_values](Traverser& t){
         scope_group_t group_id = boost::any_cast<scope_group_t>(t.get_side_effects()[*this->scope_context->side_effect_key]);
+
         if(min_values.find(group_id) == min_values.end()) min_values[group_id] = t;
         else {
             auto old_min = min_values[group_id];
@@ -27,6 +30,7 @@ void MinStep::apply_local(GraphTraversal* traversal, TraverserSet& traversers) {
     });
     
     traversers.clear();
+
     for(auto it = min_values.begin(); it != min_values.end(); ++it) traversers.push_back(it->second);
 }
 

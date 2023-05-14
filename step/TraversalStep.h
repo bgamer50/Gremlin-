@@ -3,8 +3,9 @@
 #include <vector>
 #include <string>
 
+#include "traversal/TraverserSet.h"
+
 class GraphTraversal;
-class Traverser;
 
 enum TraversalStepType {MAP, FILTER, BARRIER, MODULATOR, SIDE_EFFECT};
 
@@ -19,6 +20,6 @@ public:
 	TraversalStep(bool is_barrier, TraversalStepType tsType, unsigned int id);
 	virtual std::string getInfo();
 	virtual std::string getInfo(size_t indent);
-	virtual void apply(GraphTraversal* trv, std::vector<Traverser>& traversers);
+	virtual void apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet* traversers);
 
 };
