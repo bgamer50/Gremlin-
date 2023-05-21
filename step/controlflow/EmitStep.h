@@ -4,12 +4,16 @@
 
 #include "step/TraversalStep.h"
 
-class EmitStep: public TraversalStep {
-    private:
-        GraphTraversal* traversal;
+namespace gremlinxx {
 
-    public:
-        EmitStep(GraphTraversal* traversal);
+    class EmitStep: public TraversalStep {
+        private:
+            GraphTraversal* traversal;
 
-        inline GraphTraversal* getTraversal() { return this->traversal; }
-};
+        public:
+            EmitStep(GraphTraversal* traversal);
+
+            inline GraphTraversal* getTraversal() { return this->traversal; }
+    };
+
+}

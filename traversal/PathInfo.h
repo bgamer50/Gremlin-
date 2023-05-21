@@ -5,6 +5,8 @@
 namespace gremlinxx {
     namespace traversal {
 
+        typedef uint32_t path_length_t;
+
         class PathInfo {
             public:
                 std::vector<maelstrom::vector> paths;
@@ -16,6 +18,13 @@ namespace gremlinxx {
                     traversers of interest.  If not set, no transformation is performed.
                 */
                 void advance(maelstrom::vector prev_traverser_data, maelstrom::vector origin=maelstrom::vector());
+
+                /*
+                    For each traverser's path info p, creates a new PathInfo object
+                    consisting only of the path info in p.  Returns a vector with the
+                    new PathInfo objects.
+                */
+                std::vector<PathInfo> unpack();
 
                 /*
                     Adds the path data in the other path info to this

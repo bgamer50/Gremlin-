@@ -7,13 +7,17 @@
 
 #define ID_STEP 0x66
 
-class IdStep : public TraversalStep {
-    public:
-        IdStep();
-        
-        using TraversalStep::getInfo;
-        virtual std::string getInfo();
+namespace gremlinxx {
 
-        virtual void apply(GraphTraversal* trv, TraverserSet& traversers);
-        
-};
+    class IdStep : public TraversalStep {
+        public:
+            IdStep();
+            
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
+
+            virtual void apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers);
+            
+    };
+
+}

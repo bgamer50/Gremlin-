@@ -6,15 +6,19 @@
 
 #define SUBGRAPH_EXTRACTION_STEP 0x65
 
-class SubgraphExtractionStep : public TraversalStep {
-    private:
-        std::string subgraph_name;
+namespace gremlinxx {
 
-    public:
-        SubgraphExtractionStep(std::string sg_name);
- 
-        inline std::string get_subgraph_name() { return this->subgraph_name; }
+    class SubgraphExtractionStep : public TraversalStep {
+        private:
+            std::string subgraph_name;
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+        public:
+            SubgraphExtractionStep(std::string sg_name);
+    
+            inline std::string get_subgraph_name() { return this->subgraph_name; }
 
-};
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+
+    };
+
+}

@@ -6,12 +6,15 @@
 #include "traversal/GraphTraversal.h"
 #include "traversal/Traverser.h"
 
-class LoopsStep: public TraversalStep {
-    private:
-        GraphTraversal* traversal;
+namespace gremlinxx {
+    class LoopsStep: public TraversalStep {
+        private:
+            GraphTraversal* traversal;
 
-    public:
-        LoopsStep();
+        public:
+            LoopsStep();
 
-        virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet* traversers);
-};
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+    };
+
+}

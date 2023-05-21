@@ -6,17 +6,22 @@
 #include "step/TraversalStep.h"
 #include "traversal/Traverser.h"
 
-class LimitStep: public TraversalStep {
-    private:
-        uint64_t limit;
+namespace gremlinxx {
 
-    public:
-        LimitStep(uint64_t limit);
+    class LimitStep: public TraversalStep {
+        private:
+            uint64_t limit;
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
-        
-        using TraversalStep::getInfo;
-        virtual std::string getInfo();
-        
-        inline uint64_t get_limit() { return this->limit; }
-};
+        public:
+            LimitStep(uint64_t limit);
+
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+            
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
+            
+            inline uint64_t get_limit() { return this->limit; }
+    };
+
+
+}

@@ -8,14 +8,18 @@
 #include "traversal/Traverser.h"
 #include "step/TraversalStep.h"
 
-class UnionStep: public TraversalStep {
-    private:
-        std::vector<GraphTraversal*> traversals;
-    public:
-        UnionStep(std::vector<GraphTraversal*>& traversals);
-        std::vector<GraphTraversal*>& get_traversals();
-        virtual void apply(GraphTraversal* parent_traversal, TraverserSet& traversers);
+namespace gremlinxx {
 
-        using TraversalStep::getInfo;
-        virtual std::string getInfo();
-};
+    class UnionStep: public TraversalStep {
+        private:
+            std::vector<GraphTraversal*> traversals;
+        public:
+            UnionStep(std::vector<GraphTraversal*>& traversals);
+            std::vector<GraphTraversal*>& get_traversals();
+            virtual void apply(GraphTraversal* parent_traversal, gremlinxx::traversal::TraverserSet& traversers);
+
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
+    };
+
+}

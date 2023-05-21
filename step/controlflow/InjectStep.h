@@ -7,16 +7,20 @@
 #include <vector>
 #include <boost/any.hpp>
 
+namespace gremlinxx {
+
 class GraphTraversal;
 
-class InjectStep : public TraversalStep {
-    private:
-        std::vector<boost::any> objects;
-        
-    public:
-        InjectStep(std::vector<boost::any>& injects);
+    class InjectStep : public TraversalStep {
+        private:
+            std::vector<boost::any> objects;
+            
+        public:
+            InjectStep(std::vector<boost::any>& injects);
 
-        InjectStep(boost::any& b);
+            InjectStep(boost::any& b);
 
-        virtual void apply(GraphTraversal* trv, TraverserSet& traversers);
-};
+            virtual void apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers);
+    };
+
+}

@@ -7,59 +7,59 @@
 #include <typeindex>
 #include <boost/any.hpp>
 
+#include "maelstrom/storage/datatype.h"
 #include "traversal/TraverserSet.h"
 
-class Graph;
-class Vertex;
-class Edge;
-class TraversalStep;
-class GraphTraversal;
-typedef std::function<void(std::vector<TraversalStep*>&)> TraversalStrategy;
-typedef std::function<int(boost::any,boost::any)> compare_func_t;
-typedef std::function<bool(boost::any,boost::any)> equals_func_t;
-typedef std::function<size_t(boost::any)> hash_func_t;
+namespace gremlinxx {
+	class Graph;
+	class Vertex;
+	class Edge;
+	class TraversalStep;
+	class GraphTraversal;
+	typedef std::function<void(std::vector<TraversalStep*>&)> TraversalStrategy;
+	typedef std::function<int(boost::any,boost::any)> compare_func_t;
+	typedef std::function<bool(boost::any,boost::any)> equals_func_t;
+	typedef std::function<size_t(boost::any)> hash_func_t;
 
-class GraphTraversalSource {
-private:
-	Graph* graph;
+	class GraphTraversalSource {
+	private:
+		Graph* graph;
 
-protected:
-	std::vector<TraversalStrategy> strategies;
-	std::unordered_map<std::type_index, std::tuple<compare_func_t, equals_func_t, hash_func_t>> type_registrations;
-	std::unordered_map<std::string, std::string> options;
+	protected:
+		std::vector<TraversalStrategy> strategies;
+		std::unordered_map<std::type_index, maelstrom::dtype_t> type_registrations;
+		std::unordered_map<std::string, std::string> options;
 
-public:
-	GraphTraversalSource(Graph* gr);
-	
-	Graph* getGraph();
+	public:
+		GraphTraversalSource(Graph* gr);
+		
+		Graph* getGraph();
 
-	/*
-		Constructs and returns a new traverser set object.
-	*/
-	gremlinxx::traversal::TraverserSet* getNewTraverserSet();
+		/*
+			Constructs and returns a new traverser set object.
+		*/
+		gremlinxx::traversal::TraverserSet* getNewTraverserSet();
 
-	GraphTraversalSource* withStrategy(TraversalStrategy strategy);
-	//GraphTraversalSource* withoutStrategy(TraversalStrategy strategy); TODO
-	GraphTraversalSource* withTypeRegistration(std::type_index tid, compare_func_t cmp, equals_func_t eql, hash_func_t hsh);
-	GraphTraversalSource* withTypeRegistration(std::type_index tid, compare_func_t cmp, hash_func_t hsh);
-	//GraphTraversalSource* withoutTypeRegistration(typeid_t tid); TODO
-	
-	GraphTraversalSource* withAdminOption(std::string option_name, std::string value);
-	std::string getOptionValue(std::string option_name);
+		GraphTraversalSource* withStrategy(TraversalStrategy strategy);
+		//GraphTraversalSource* withoutStrategy(TraversalStrategy strategy); TODO
+		GraphTraversalSource* withTypeRegistration(std::type_index tid, maelstrom::dtype_t dtype);
+		//GraphTraversalSource* withoutTypeRegistration(typeid_t tid); TODO
+		
+		GraphTraversalSource* withAdminOption(std::string option_name, std::string value);
+		std::string getOptionValue(std::string option_name);
 
-	std::vector<TraversalStrategy>& getStrategies();
+		maelstrom::dtype_t GraphTraversalSource::get_dtype(boost::any obj);
 
-	bool test_equals(boost::any a, boost::any b);
-	int test_compare(boost::any a, boost::any b);
-	size_t test_hash(boost::any v);
+		std::vector<TraversalStrategy>& getStrategies();
 
-	GraphTraversal* V();
-	GraphTraversal* V(Vertex* v);
-	GraphTraversal* V(boost::any v_id);
-	GraphTraversal* E();
-	GraphTraversal* addV();
-	GraphTraversal* addV(std::string label);
-	GraphTraversal* addE(std::string label);
-	GraphTraversal* inject(std::vector<boost::any> injects);
-};
+		GraphTraversal* V();
+		GraphTraversal* V(Vertex* v);
+		GraphTraversal* V(boost::any v_id);
+		GraphTraversal* E();
+		GraphTraversal* addV();
+		GraphTraversal* addV(std::string label);
+		GraphTraversal* addE(std::string label);
+		GraphTraversal* inject(std::vector<boost::any> injects);
+	};
 
+}

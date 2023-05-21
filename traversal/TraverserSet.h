@@ -26,9 +26,41 @@ namespace gremlinxx {
                 virtual std::vector<Traverser> toTraversers() = 0;
 
                 /*
+                    Realizes and returns the ith traverser.
+                */
+                virtual Traverser getTraverser(size_t i) = 0;
+
+                /*
                     Returns a copy of data associated with each traverser in this traverser set.
                 */
                 virtual maelstrom::vector getTraverserData() = 0;
+
+                /*
+                    Gets the data stored in the ith traverser.
+                */
+                virtual boost::any getData(size_t i) = 0;
+
+                /*
+                    Returns a copy of the side effects of each traverser in this traverser set.
+                */
+                virtual std::unordered_map<std::string, maelstrom::vector> getSideEffects() = 0;
+
+                /*
+                    Returns a copy of the paths in this traverser set.
+                */
+                virtual gremlinxx::traversal::PathInfo getPathInfo() = 0;
+
+                /*
+                    Reinitializes this traverser set with the given data, side effects, and paths.
+                    Often used in conjunction with unpack().
+                */
+                virtual void reinitialize(maelstrom::vector new_data, std::unordered_map<std::string, maelstrom::vector> side_effects, gremlinxx::traversal::PathInfo path_info) = 0;
+
+                /*
+                    Resizes this traverser set.  The new size cannot be larger than the current size.
+                    Will delete any extra traversers to fit the new size.
+                */
+                virtual void resize(size_t new_size) = 0;
 
                 /*
                     Advances the traversers in this traverser set.
@@ -40,9 +72,9 @@ namespace gremlinxx {
                     ---------
                     func: std::function
                         It should take the following parameters:
-                            const maelstrom::vector& traverser_data
-                            const std::unordered_map<std::string, maelstrom::vector>& traverser_side_effects
-                            const gremlinxx::traversal::PathInfo& paths
+                            maelstrom::vector& traverser_data
+                            std::unordered_map<std::string, maelstrom::vector>& traverser_side_effects
+                            gremlinxx::traversal::PathInfo& paths
                     
                     Returns
                     -------
@@ -52,7 +84,13 @@ namespace gremlinxx {
                             If empty, it's assumed that the index of the new traversers corresponds to the index
                             of the old traversers (and the sizes must match in that case).
                 */
-                virtual void advance(std::function<std::pair<maelstrom::vector, maelstrom::vector>(const maelstrom::vector&, const std::unordered_map<std::string, maelstrom::vector>&, const gremlinxx::traversal::PathInfo&)> func) = 0;
+                virtual void advance(std::function<std::pair<maelstrom::vector, maelstrom::vector>(maelstrom::vector&, std::unordered_map<std::string, maelstrom::vector>&, gremlinxx::traversal::PathInfo&)> func) = 0;
+
+                /*
+                    Splits the data, side effects, and paths of this dataset.  Each element of the returned vector corresponds to those values
+                    for a single traverser.
+                */
+                virtual std::vector<std::tuple<maelstrom::vector, std::unordered_map<std::string, maelstrom::vector>, gremlinxx::traversal::PathInfo>> unpack() = 0;
 
                 /*
                     Updates the side effects for all traversers for the given key.
@@ -63,6 +101,12 @@ namespace gremlinxx {
                     Inserts additional traversers into this traverser set.
                */
                virtual void addTraversers(maelstrom::vector& other_traverser_data, std::unordered_map<std::string, maelstrom::vector>& other_side_effects, gremlinxx::traversal::PathInfo& other_paths) = 0;
+
+                /*
+                    Inserts additional traversers into this traverser set.
+                    The data added is a copy of the data in the provided traverser set.
+                */
+               virtual void addTraversers(TraverserSet& other_traversers) = 0;
 
                /*
                     Returns the number of traversers.

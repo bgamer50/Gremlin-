@@ -8,19 +8,23 @@
 #include <unordered_map>
 #include <string>
 
-class GraphTraversal;
+namespace gremlinxx {
 
-class IsStep: public TraversalStep {
-    private:
-        P predicate = P(P::Comparison::EQ, boost::any());
+    class GraphTraversal;
 
-    public:
-        IsStep(P predicate);
+    class IsStep: public TraversalStep {
+        private:
+            P predicate = P(P::Comparison::EQ, boost::any());
 
-        inline P getPredicate() { return this->predicate; }
+        public:
+            IsStep(P predicate);
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
-        
-        using TraversalStep::getInfo;
-        virtual std::string getInfo();
-};
+            inline P getPredicate() { return this->predicate; }
+
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+            
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
+    };
+
+}

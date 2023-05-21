@@ -1,5 +1,4 @@
-#ifndef P_PREDICATE_H
-#define P_PREDICATE_H
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -7,51 +6,53 @@
 #include <stdlib.h>
 #include <functional>
 
-/**
-    Equivalent of P in Java-Gremlin.
-**/
-class P {
-	public:
-		enum Comparison { EQ, NEQ, GT, GTE, LT, LTE, BETWEEN};
-		Comparison comparison;
-		boost::any operand;
+namespace gremlinxx {
 
-		P(P::Comparison comparison, boost::any operand) {
-			this->comparison = comparison;
-			this->operand = operand;
-		}
+	/**
+		Equivalent of P in Java-Gremlin.
+	**/
+	class P {
+		public:
+			enum Comparison { EQ, NEQ, GT, GTE, LT, LTE, BETWEEN};
+			Comparison comparison;
+			boost::any operand;
 
-		inline std::string getInfo() {
-			return std::string("P<?>");
-		}
+			P(P::Comparison comparison, boost::any operand) {
+				this->comparison = comparison;
+				this->operand = operand;
+			}
 
-		inline static P eq(boost::any t) {
-			return P(EQ, t);
-		}
+			inline std::string getInfo() {
+				return std::string("P<?>");
+			}
 
-		inline static P neq(boost::any t) {
-			return P(NEQ, t);
-		}
+			inline static P eq(boost::any t) {
+				return P(EQ, t);
+			}
 
-		inline static P gt(boost::any t) {
-			return P(GT, t);
-		}
+			inline static P neq(boost::any t) {
+				return P(NEQ, t);
+			}
 
-		inline static P gte(boost::any t) {
-			return P(GTE, t);
-		}
+			inline static P gt(boost::any t) {
+				return P(GT, t);
+			}
 
-		inline static P lt(boost::any t) {
-			return P(LT, t);
-		}
+			inline static P gte(boost::any t) {
+				return P(GTE, t);
+			}
 
-		inline static P lte(boost::any t) {
-			return P(LTE, t);
-		}
+			inline static P lt(boost::any t) {
+				return P(LT, t);
+			}
 
-		inline static P between(boost::any t, boost::any u) {
-			return P(BETWEEN, std::make_pair(t,u));
-		}
-};
+			inline static P lte(boost::any t) {
+				return P(LTE, t);
+			}
 
-#endif
+			inline static P between(boost::any t, boost::any u) {
+				return P(BETWEEN, std::make_pair(t,u));
+			}
+	};
+
+}

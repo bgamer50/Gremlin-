@@ -9,20 +9,22 @@
 #include <string>
 #include <boost/any.hpp>
 
-class GraphTraversal;
+namespace gremlinxx {
 
-class WhereStep: public TraversalStep {
-    private:
-        std::string label;
-        P predicate = P(P::Comparison::EQ, boost::any());
+    class GraphTraversal;
 
-    public:
-        WhereStep(std::string label, P predicate);
+    class WhereStep: public TraversalStep {
+        private:
+            std::string label;
+            P predicate = P(P::Comparison::EQ, boost::any());
 
-        inline std::string getLabel() { return this->label; }
-        inline P getPredicate() { return this->predicate; }
+        public:
+            WhereStep(std::string label, P predicate);
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
-};
+            inline std::string getLabel() { return this->label; }
+            inline P getPredicate() { return this->predicate; }
 
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+    };
 
+}

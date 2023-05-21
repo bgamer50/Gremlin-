@@ -1,17 +1,29 @@
 #include "step/graph/IdStep.h"
+#include "traversal/GraphTraversal.h"
 
-IdStep::IdStep()
-: TraversalStep(MAP, ID_STEP) {}
+namespace gremlinxx {
 
-std::string IdStep::getInfo() {
-    return "IdStep()";
-}
+    IdStep::IdStep()
+    : TraversalStep(MAP, ID_STEP) {}
 
-void IdStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
-    std::for_each(traversers.begin(), traversers.end(), [](Traverser& trv) {
-        const std::type_info& t = trv.get().type();
-        if(t == typeid(Vertex*)) trv.replace_data(boost::any_cast<Vertex*>(trv.get())->id());
-        else if(t == typeid(Edge*)) trv.replace_data(boost::any_cast<Edge*>(trv.get())->id());
-        else throw std::runtime_error("Error: Traverser does not appear to contain an element.");
-    });
+    std::string IdStep::getInfo() {
+        return "IdStep()";
+    }
+
+    void IdStep::apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers) {
+        traversers.advance([trv](maelstrom::vector& traverser_data, std::unordered_map<std::string, maelstrom::vector>& traverser_side_effects, gremlinxx::traversal::PathInfo& traverser_paths){
+            if(traverser_data.get_dtype() == trv->getGraph()->get_vertex_dtype()) {
+                // In gremlin++, vertices in a traversal are represented by IDs, not pointers.
+                // Therefore, this step only casts to the primitive type.
+                return std::make_pair(
+                    std::move(maelstrom::as_primitive_vector(traverser_data, false)),
+                    std::move(maelstrom::vector())
+                );
+
+            } else {
+                throw std::runtime_error("Only vertices are currently supported by Id Step!");
+            }
+        });
+    }
+
 }

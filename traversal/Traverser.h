@@ -5,31 +5,34 @@
 #include <string.h>
 #include <boost/any.hpp>
 
-class Traverser {
-	private:
-		boost::any my_data;
-		std::vector<boost::any> path;
-		std::unordered_map<std::string, boost::any> side_effects;
+namespace gremlinxx {
 
-	public:
-		Traverser(boost::any t);
+	class Traverser {
+		private:
+			boost::any my_data;
+			std::vector<boost::any> path;
+			std::unordered_map<std::string, boost::any> side_effects;
 
-		Traverser(boost::any t, std::unordered_map<std::string, boost::any>& new_side_effects);
+		public:
+			Traverser(boost::any t);
 
-		Traverser();
+			Traverser(boost::any t, std::unordered_map<std::string, boost::any>& new_side_effects);
 
-		virtual boost::any get();
+			Traverser();
 
-		virtual void replace_data(boost::any t);
+			virtual boost::any get();
 
-		/**
-		 * Returns a reference to this traverser's side effect map.
-		 * **/
-		virtual std::unordered_map<std::string, boost::any>& access_side_effects();
+			virtual void replace_data(boost::any t);
 
-		/*
-			Returns a reference to this traverser's path info.
-		*/
-		virtual std::vector<boost::any>& access_path();
-};
+			/**
+			 * Returns a reference to this traverser's side effect map.
+			 * **/
+			virtual std::unordered_map<std::string, boost::any>& access_side_effects();
 
+			/*
+				Returns a reference to this traverser's path info.
+			*/
+			virtual std::vector<boost::any>& access_path();
+	};
+
+}

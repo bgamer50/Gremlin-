@@ -5,12 +5,16 @@
 #include "step/TraversalStep.h"
 #include "traversal/GraphTraversal.h"
 
-class UntilStep: public TraversalStep {
-    private:
-        GraphTraversal* traversal;
+namespace gremlinxx {
 
-    public:
-        UntilStep(GraphTraversal* traversal);
+    class UntilStep: public TraversalStep {
+        private:
+            GraphTraversal* traversal;
 
-        inline GraphTraversal* getTraversal() { return this->traversal; }
-};
+        public:
+            UntilStep(GraphTraversal* traversal);
+
+            inline GraphTraversal* getTraversal() { return this->traversal; }
+    };
+
+}

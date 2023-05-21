@@ -5,11 +5,10 @@
 #include "maelstrom/algorithms/select.h"
 #include "maelstrom/algorithms/increment.h"
 #include "maelstrom/algorithms/set.h"
+#include "maelstrom/algorithms/unpack.h"
 
 namespace gremlinxx {
     namespace traversal {
-
-        typedef uint32_t path_length_t;
 
         void PathInfo::advance(maelstrom::vector prev_traverser_data, maelstrom::vector origin) {
             if(prev_traverser_data.empty()) {
@@ -28,17 +27,21 @@ namespace gremlinxx {
 
             // Step 1: update path lengths
             if(!empty_start) {
-                maelstrom::vector new_path_lengths = maelstrom::select(
-                    this->path_lengths,
-                    origin
-                );
+                if(!origin.empty()) {
+                    maelstrom::vector new_path_lengths = maelstrom::select(
+                        this->path_lengths,
+                        origin
+                    );
 
-                maelstrom::increment(new_path_lengths, static_cast<path_length_t>(1));
-                
-                this->path_lengths.clear();
-                this->path_lengths = std::move(new_path_lengths);
+                    maelstrom::increment(new_path_lengths, static_cast<path_length_t>(1));
+                    this->path_lengths.clear();
+                    this->path_lengths = std::move(new_path_lengths);
+                } else {
+                    maelstrom::increment(this->path_lengths, static_cast<path_length_t>(1));
+                }                
             } else {
-                this->path_lengths.resize(origin.size());
+                size_t starting_size = origin.empty() ? prev_traverser_data.size() : origin.size();
+                this->path_lengths.resize(starting_size);
                 maelstrom::set(
                     this->path_lengths,
                     0,
@@ -47,7 +50,7 @@ namespace gremlinxx {
                 );
             }
 
-            if(origin.size() == 0) return;
+            if(origin.empty()) return;
 
             // Step 2: perform selection
             for(size_t k = 0; k < this->paths.size(); ++k) {
@@ -60,6 +63,27 @@ namespace gremlinxx {
                 this->paths[k] = std::move(selected_traversers);
             }         
             
+        }
+
+        std::vector<PathInfo> PathInfo::unpack() {
+            std::vector<std::vector<maelstrom::vector>> unpacked_paths;
+            unpacked_paths.resize(this->path_lengths.size());
+            for(size_t k = 0; k < this->paths.size(); ++k) {
+                unpacked_paths[k] = maelstrom::unpack(this->paths[k]);
+            }
+
+            auto unpacked_path_lengths = maelstrom::unpack(this->path_lengths);
+
+            std::vector<PathInfo> unpacked_path_info;
+            unpacked_path_info.resize(this->path_lengths.size());
+            for(size_t k = 0; k < this->path_lengths.size(); ++k) {
+                for(size_t p = 0; p < this->paths.size(); ++p) {
+                    unpacked_path_info[k].paths[p] = std::move(unpacked_paths[p][k]);
+                }
+                unpacked_path_info[k].path_lengths = std::move(unpacked_path_lengths[k]);
+            }
+
+            return unpacked_path_info;
         }
 
         void PathInfo::add_paths(PathInfo& other_path_info) {

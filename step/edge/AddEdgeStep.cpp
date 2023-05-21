@@ -4,72 +4,110 @@
 #include "traversal/GraphTraversal.h"
 #include "traversal/GraphTraversalSource.h"
 
-AddEdgeStep::AddEdgeStep(std::string label_arg)
-: TraversalStep(MAP, ADD_EDGE_STEP) {
-    label = label_arg;
-    out_vertex_traversal = NULL;
-    in_vertex_traversal = NULL;
-}
+#include <tuple>
 
-std::string AddEdgeStep::getInfo() {
-    std::string info = "AddEdgeStep(";
-    info += label + ")";
-    return info;
-}
-
-void AddEdgeStep::modulate_from(boost::any arg) { 
-    if(arg.type() == typeid(Vertex*)) {
-        this->out_vertex_traversal = new GraphTraversal();
-        this->out_vertex_traversal->setInitialTraversers({Traverser(arg)});
+namespace gremlinxx {
+    
+    AddEdgeStep::AddEdgeStep(std::string label_arg)
+    : TraversalStep(MAP, ADD_EDGE_STEP) {
+        label = label_arg;
+        out_vertex_traversal = NULL;
+        in_vertex_traversal = NULL;
     }
-    else if(arg.type() == typeid(GraphTraversal*)) this->out_vertex_traversal = boost::any_cast<GraphTraversal*>(arg); 
-    else throw std::runtime_error("Invalid object passed in from() to AddEdgeStep");			
-}
 
-void AddEdgeStep::modulate_to(boost::any arg) {
-    if(arg.type() == typeid(Vertex*)) {
-        this->in_vertex_traversal = new GraphTraversal();
-        this->in_vertex_traversal->setInitialTraversers({Traverser(arg)});
+    std::string AddEdgeStep::getInfo() {
+        std::string info = "AddEdgeStep(";
+        info += label + ")";
+        return info;
     }
-    else if(arg.type() == typeid(GraphTraversal*)) this->in_vertex_traversal = boost::any_cast<GraphTraversal*>(arg);
-    else throw std::runtime_error("Invalid object passed in to() to AddEdgeStep");		
-}
 
-void AddEdgeStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    // For each traverser
-    std::for_each(traversers.begin(), traversers.end(), [&, this](Traverser& trv) {
-        // Need to check if there is enough info to add the Edge, then add it if we can.
-        
-        GraphTraversalSource* my_traversal_source = traversal->getTraversalSource();
-        if(my_traversal_source == NULL) throw std::runtime_error("Cannot call this step from an anonymous traversal!");
-
-        Vertex* from_vertex;
-        Vertex* to_vertex;
-        bool used_current_traverser = false;
-        if(this->out_vertex_traversal == nullptr) {
-            from_vertex = boost::any_cast<Vertex*>(trv.get());
-            used_current_traverser = true;
-        } else { 
-            GraphTraversal from_traversal(my_traversal_source, this->out_vertex_traversal);
-            from_traversal.setInitialTraversers({trv});
-            //std::cout << "about to call from_traversal.next()" << std::endl;
-            //std::cout << from_traversal.explain() << std::endl;
-            from_vertex = boost::any_cast<Vertex*>(from_traversal.next());
+    void AddEdgeStep::modulate_from(boost::any arg) { 
+        if(arg.type() == typeid(GraphTraversal*)) this->out_vertex_traversal = boost::any_cast<GraphTraversal*>(arg);
+        else {
+            this->out_vertex_traversal = new GraphTraversal();
+            this->out_vertex_traversal->inject({arg});
         }
+    }
 
-        if(this->in_vertex_traversal == nullptr) {
-            if(used_current_traverser) {
-                throw std::runtime_error("No from/to step was provided.");
+    void AddEdgeStep::modulate_to(boost::any arg) {
+        if(arg.type() == typeid(GraphTraversal*)) this->in_vertex_traversal = boost::any_cast<GraphTraversal*>(arg);
+        else {
+            this->in_vertex_traversal = new GraphTraversal();
+            this->in_vertex_traversal->inject({arg});
+        }
+    }
+
+    void AddEdgeStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        // TODO run the traversals on everything at once - don't unpack anything, instead use the final traversal results
+        // TODO allow multiple src/dst outputted by the traversal
+
+        GraphTraversalSource* src = traversal->getTraversalSource();
+        Graph* graph = traversal->getGraph();
+
+        if(src == nullptr) throw std::runtime_error("Cannot call AddEdgeStep from an anonymous traversal!");
+        if(graph == nullptr) throw std::runtime_error("Cannot add edges without access to the graph!");
+
+        auto unpacked_traversers = traversers.unpack();
+        std::vector<boost::any> added_edges;
+        added_edges.reserve(traversers.size());
+        for(auto it = unpacked_traversers.begin(); it != unpacked_traversers.end(); ++it) {
+            Vertex* from_vertex;
+            Vertex* to_vertex;
+            bool used_current_traverser = false;
+
+            if(this->out_vertex_traversal == nullptr) {
+                try {
+                    from_vertex = boost::any_cast<Vertex*>(std::get<0>(*it).get(0));
+                } catch(boost::bad_any_cast& exc) { throw std::runtime_error("Attempted to add an edge from something that is not a Vertex!"); }
+                catch(std::out_of_range& exr) { throw std::runtime_error("Attempted to add an edge but incoming traversal was empty!"); }
+                
+                used_current_traverser = true;
+            } else {
+                GraphTraversal from_traversal(src, out_vertex_traversal);
+                from_traversal.getTraverserSet().reinitialize(
+                    std::move(std::get<0>(*it)),
+                    std::move(std::get<1>(*it)),
+                    std::move(std::get<2>(*it))
+                );
+                
+                from_vertex = boost::any_cast<Vertex*>(from_traversal.next());
             }
-            to_vertex = boost::any_cast<Vertex*>(trv.get());
-        } else { 
-            GraphTraversal to_traversal(my_traversal_source, this->in_vertex_traversal);
-            to_traversal.setInitialTraversers({trv});
-            to_vertex = boost::any_cast<Vertex*>(to_traversal.next()); 
+
+            if(this->in_vertex_traversal == nullptr) {
+                if(used_current_traverser) throw std::runtime_error("No from/to step was provided.");
+
+                try {
+                    to_vertex = boost::any_cast<Vertex*>(std::get<0>(*it).get(0));
+                } catch(boost::bad_any_cast& exc) { throw std::runtime_error("Attempted to add an edge to something that is not a Vertex!"); }
+                catch(std::out_of_range& exr) { throw std::runtime_error("Attempted to add an edge but incoming traversal was empty!"); }
+            } else {
+                GraphTraversal to_traversal(src, in_vertex_traversal);
+                to_traversal.getTraverserSet().reinitialize(
+                    std::move(std::get<0>(*it)),
+                    std::move(std::get<1>(*it)),
+                    std::move(std::get<2>(*it))
+                );
+                
+                to_vertex = boost::any_cast<Vertex*>(to_traversal.next());
+            }
+
+            added_edges.push_back(
+                graph->add_edge(from_vertex, to_vertex, label)
+            );
         }
 
-        Graph* my_graph = my_traversal_source->getGraph();
-        Edge* new_edge = my_graph->add_edge(from_vertex, to_vertex, label);
-        trv.replace_data(new_edge);
-    });
+        traversers.advance([&added_edges, graph](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
+            auto m_edges = maelstrom::make_vector_from_anys(
+                traverser_data.get_mem_type(),
+                graph->get_edge_dtype(),
+                added_edges
+            );
+
+            return std::make_pair(
+                m_edges,
+                maelstrom::vector()
+            );
+        });
+    }
+
 }

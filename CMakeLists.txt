@@ -36,7 +36,7 @@ add_library(
     step/filter/LimitStep.cpp
     step/filter/WhereStep.cpp
 
-    step/graph/GraphStep.cpp
+    step/graph/VStep.cpp
     step/graph/IdStep.cpp
     step/graph/SubgraphExtractionStep.cpp
     step/graph/SubgraphStep.cpp

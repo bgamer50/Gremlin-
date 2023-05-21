@@ -1,12 +1,16 @@
 #include "step/filter/LimitStep.h"
 
-LimitStep::LimitStep(uint64_t limit)
-: TraversalStep(FILTER, LIMIT_STEP) {
-    this->limit = limit;
-}
+namespace gremlinxx {
 
-std::string LimitStep::getInfo() { return "LimitStep(" + std::to_string(limit) + ")"; }
+    LimitStep::LimitStep(uint64_t limit)
+    : TraversalStep(FILTER, LIMIT_STEP) {
+        this->limit = limit;
+    }
 
-void LimitStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    if(traversers.size() > this->limit) traversers.resize(limit);
+    std::string LimitStep::getInfo() { return "LimitStep(" + std::to_string(limit) + ")"; }
+
+    void LimitStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        traversers.resize(limit);
+    }
+
 }

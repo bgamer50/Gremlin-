@@ -4,12 +4,16 @@
 
 #include "step/TraversalStep.h"
 
-class TimesStep: public TraversalStep {
-    private:
-        size_t times;
+namespace gremlinxx {
 
-    public:
-        TimesStep(size_t times);
+    class TimesStep: public TraversalStep {
+        private:
+            size_t times;
 
-        inline size_t get_times() { return this->times; }
-};
+        public:
+            TimesStep(size_t times);
+
+            inline size_t get_times() { return this->times; }
+    };
+
+}

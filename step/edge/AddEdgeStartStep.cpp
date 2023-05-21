@@ -7,50 +7,63 @@
 #include "structure/Vertex.h"
 #include "structure/Edge.h"
 
-AddEdgeStartStep::AddEdgeStartStep(std::string label_arg)
-: TraversalStep(MAP, ADD_EDGE_START_STEP) {
-	this->label = label_arg;
-	this->out_vertex_traversal = NULL;
-	this->in_vertex_traversal = NULL;
-}
-
-std::string AddEdgeStartStep::getInfo() {
-    std::string info = "AddEdgeStartStep(";
-    info += label + ")";
-    return info;
-}
-
-void AddEdgeStartStep::modulate_from(boost::any arg) { 
-    if(arg.type() == typeid(Vertex*)) {
-        this->out_vertex_traversal = new GraphTraversal();
-        this->out_vertex_traversal->setInitialTraversers({Traverser(arg)});
+namespace gremlinxx {
+    AddEdgeStartStep::AddEdgeStartStep(std::string label_arg)
+    : TraversalStep(MAP, ADD_EDGE_START_STEP) {
+        this->label = label_arg;
+        this->out_vertex_traversal = NULL;
+        this->in_vertex_traversal = NULL;
     }
-    else if(arg.type() == typeid(GraphTraversal*)) this->out_vertex_traversal = boost::any_cast<GraphTraversal*>(arg); 
-    else throw std::runtime_error("Invalid object passed in from() to AddEdgeStep");			
-}
 
-void AddEdgeStartStep::modulate_to(boost::any arg) {
-    if(arg.type() == typeid(Vertex*)) {
-        this->in_vertex_traversal = new GraphTraversal();
-        this->in_vertex_traversal->setInitialTraversers({Traverser(arg)});
+    std::string AddEdgeStartStep::getInfo() {
+        std::string info = "AddEdgeStartStep(";
+        info += label + ")";
+        return info;
     }
-    else if(arg.type() == typeid(GraphTraversal*)) this->in_vertex_traversal = boost::any_cast<GraphTraversal*>(arg);
-    else throw std::runtime_error("Invalid object passed in to() to AddEdgeStep");		
-}
 
-void AddEdgeStartStep::apply(GraphTraversal* trv, TraverserSet& traversers) {
-	// Need to check if there is enough info to add the Edge, then add it
-	// if we can.
-	// from() and to() are both always required here.
-	GraphTraversalSource* my_traversal_source = trv->getTraversalSource();
-	if(my_traversal_source == NULL) throw std::runtime_error("Cannot call this step from an anonymous traversal!\n");
+    void AddEdgeStartStep::modulate_from(boost::any arg) { 
+        if(arg.type() == typeid(Vertex*)) {
+            this->out_vertex_traversal = new GraphTraversal();
+            this->out_vertex_traversal->inject({arg});
+        }
+        else if(arg.type() == typeid(GraphTraversal*)) this->out_vertex_traversal = boost::any_cast<GraphTraversal*>(arg); 
+        else throw std::runtime_error("Invalid object passed in from() to AddEdgeStep");			
+    }
 
-	GraphTraversal from_traversal(my_traversal_source, this->out_vertex_traversal);
-	GraphTraversal to_traversal(my_traversal_source, this->in_vertex_traversal);
+    void AddEdgeStartStep::modulate_to(boost::any arg) {
+        if(arg.type() == typeid(Vertex*)) {
+            this->in_vertex_traversal = new GraphTraversal();
+            this->in_vertex_traversal->inject({arg});
+        }
+        else if(arg.type() == typeid(GraphTraversal*)) this->in_vertex_traversal = boost::any_cast<GraphTraversal*>(arg);
+        else throw std::runtime_error("Invalid object passed in to() to AddEdgeStep");		
+    }
 
-	Vertex* from_vertex = boost::any_cast<Vertex*>(from_traversal.next());
-	Vertex* to_vertex = boost::any_cast<Vertex*>(to_traversal.next());
+    void AddEdgeStartStep::apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers) {
+        // Need to check if there is enough info to add the Edge, then add it
+        // if we can.
+        // from() and to() are both always required here.
+        GraphTraversalSource* my_traversal_source = trv->getTraversalSource();
+        if(my_traversal_source == NULL) throw std::runtime_error("Cannot call this step from an anonymous traversal!\n");
 
-	Edge* new_edge = trv->getGraph()->add_edge(from_vertex, to_vertex, label);
-	traversers.push_back(Traverser(new_edge));
+        GraphTraversal from_traversal(my_traversal_source, this->out_vertex_traversal);
+        GraphTraversal to_traversal(my_traversal_source, this->in_vertex_traversal);
+
+        Vertex* from_vertex = boost::any_cast<Vertex*>(from_traversal.next());
+        Vertex* to_vertex = boost::any_cast<Vertex*>(to_traversal.next());
+
+        Edge* new_edge = trv->getGraph()->add_edge(from_vertex, to_vertex, label);
+        traversers.advance([new_edge, my_traversal_source](maelstrom::vector& data, std::unordered_map<std::string, maelstrom::vector>& se, gremlinxx::traversal::PathInfo paths){
+            std::vector<boost::any> any_vec = {new_edge};
+            return std::make_pair(
+                maelstrom::make_vector_from_anys(
+                    data.get_mem_type(),
+                    my_traversal_source->getGraph()->get_edge_dtype(),
+                    any_vec
+                ),
+                maelstrom::vector()
+            );
+        });
+    }
+
 }

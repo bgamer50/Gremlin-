@@ -3,18 +3,26 @@
 #include "structure/Vertex.h"
 #include "structure/Edge.h"
 
-SubgraphStep::SubgraphStep(std::string name) : TraversalStep(SIDE_EFFECT, SUBGRAPH_STEP) {
-    this->subgraph_name = name;
-}
+namespace gremlinxx {
 
-void SubgraphStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    boost::any subgraph_property = traversal->getTraversalProperty(SUBGRAPH_PREFIX + subgraph_name);
-    if(subgraph_property.empty()) subgraph_property = std::unordered_set<Edge*>();
-    
-    std::unordered_set<Edge*> subgraph_edges = boost::any_cast<std::unordered_set<Edge*>>(subgraph_property);
-    for(Traverser& trv : traversers) {
-        subgraph_edges.insert(boost::any_cast<Edge*>(trv.get()));
+    SubgraphStep::SubgraphStep(std::string name) : TraversalStep(SIDE_EFFECT, SUBGRAPH_STEP) {
+        this->subgraph_name = name;
     }
 
-    traversal->setTraversalProperty(SUBGRAPH_PREFIX + subgraph_name, subgraph_edges);
+    void SubgraphStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        boost::any subgraph_property = traversal->getTraversalProperty(SUBGRAPH_PREFIX + subgraph_name);
+        if(subgraph_property.empty()) subgraph_property = std::unordered_set<Edge*>();
+        
+        std::unordered_set<Edge*> subgraph_edges = boost::any_cast<std::unordered_set<Edge*>>(subgraph_property);
+        auto traverser_data_copy = traversers.getTraverserData();
+        auto traverser_data_host = maelstrom::as_host_vector(traverser_data_copy);
+
+        for(size_t k = 0; k < traverser_data_host.size(); ++k) {
+            boost::any e = traverser_data_host.get(k);
+            subgraph_edges.insert(boost::any_cast<Edge*>(e));
+        }
+
+        traversal->setTraversalProperty(SUBGRAPH_PREFIX + subgraph_name, subgraph_edges);
+    }
+
 }

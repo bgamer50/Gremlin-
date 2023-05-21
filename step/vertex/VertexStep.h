@@ -6,12 +6,13 @@
 #include <algorithm>
 #include "step/TraversalStep.h"
 #include "structure/Direction.h"
-#include "step/graph/GraphStep.h"
 
 class Traverser;
 class GraphTraversal;
 
 #define VERTEX_STEP 0x80
+
+enum GraphStepType{VERTEX, EDGE};
 
 class VertexStep : public TraversalStep {
 	private:
