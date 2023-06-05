@@ -5,13 +5,16 @@
 #include "traversal/Traverser.h"
 #include "traversal/GraphTraversal.h"
 
-class IdentityStep: public TraversalStep {
-    public:
-        IdentityStep();
+namespace gremlinxx {
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+    class IdentityStep: public TraversalStep {
+        public:
+            IdentityStep();
 
-        using TraversalStep::getInfo;
-        virtual std::string getInfo();
-};
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
 
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
+    };
+
+}

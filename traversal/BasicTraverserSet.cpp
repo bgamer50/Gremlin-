@@ -1,7 +1,9 @@
 #include "traversal/BasicTraverserSet.h"
 #include "maelstrom/algorithms/unpack.h"
+#include "maelstrom/algorithms/increment.h"
 
 #include <tuple>
+#include <iostream>
 
 namespace gremlinxx {
     namespace traversal {
@@ -170,6 +172,44 @@ namespace gremlinxx {
             }
 
             return unpacked_tuples;
+        }
+
+        void BasicTraverserSet::trim_paths(size_t ix_start, size_t ix_end) {
+            // TODO figure out a clean way to do this without a host copy
+
+            size_t current_max_path_length = this->path_info.paths.size();
+            if(ix_start >= current_max_path_length) throw std::runtime_error("Start out of bounds!");
+            if(ix_end > current_max_path_length) throw std::runtime_error("End out of bounds!");
+            if(ix_end < ix_start) throw std::runtime_error("Start index must be <= end index!");
+
+            if(ix_start == 0 && ix_end == current_max_path_length) return;
+            
+            // Now we need to figure out how much to subtract from the beginning.
+            if(ix_start > 0) {
+                std::cerr << "Warning: truncating paths from the left is not efficient. Consider an alternate approach if possible." << std::endl;
+                auto host_lengths_vec = maelstrom::as_host_vector(this->path_info.path_lengths);
+                size_t* host_lengths = static_cast<size_t*>(host_lengths_vec.data());
+                for(size_t k = 0; k < host_lengths_vec.size(); ++k) {
+                    if(host_lengths[k] >= current_max_path_length - 2) {
+                        host_lengths[k] -= current_max_path_length - 2;
+                    }
+                }
+                this->path_info.path_lengths = host_lengths_vec.to(this->path_info.path_lengths.get_mem_type());
+            }
+
+            // Increment corresponding to the part of the path truncated from the end.
+            if(ix_end < current_max_path_length) {
+                maelstrom::increment(
+                    this->path_info.path_lengths,
+                    static_cast<size_t>(current_max_path_length - ix_end)
+                );
+            }
+            
+            std::vector<maelstrom::vector> new_paths(
+                this->path_info.paths.begin() + ix_start,
+                this->path_info.paths.begin() + ix_end
+            );
+            this->path_info.paths = std::move(new_paths);
         }
 
         void BasicTraverserSet::set_side_effects(std::string se_key, maelstrom::vector values) {

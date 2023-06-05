@@ -1,10 +1,14 @@
 #include "step/logic/NoOpStep.h"
 
-NoOpStep::NoOpStep()
-: TraversalStep(MAP, NO_OP_STEP) {}
+namespace gremlinxx {
 
-std::string NoOpStep::getInfo() {
-    return "NoOpStep()";
+    NoOpStep::NoOpStep()
+    : TraversalStep(MAP, NO_OP_STEP) {}
+
+    std::string NoOpStep::getInfo() {
+        return "NoOpStep()";
+    }
+
+    void NoOpStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers){}
+
 }
-
-void NoOpStep::apply(GraphTraversal* traversal, TraverserSet& traversers){}

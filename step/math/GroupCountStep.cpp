@@ -3,33 +3,59 @@
 #include "traversal/Traverser.h"
 #include "traversal/GraphTraversal.h"
 
-GroupCountStep::GroupCountStep()
-: TraversalStep(true, MAP, GROUP_COUNT_STEP) {}
+#include "maelstrom/algorithms/sort.h"
+#include "maelstrom/algorithms/select.h"
+#include "maelstrom/algorithms/count_unique.h"
 
-std::string GroupCountStep::getInfo() {
-    return std::string("GroupCount{}");
-}
+#include <sstream>
 
-void GroupCountStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    GraphTraversalSource* src = traversal->getTraversalSource();
+namespace gremlinxx {
 
-    if(by_key) {
-        throw std::runtime_error("By key is currently unsupported!");
+    GroupCountStep::GroupCountStep()
+    : TraversalStep(true, MAP, GROUP_COUNT_STEP) {}
+
+    std::string GroupCountStep::getInfo() {
+        return std::string("GroupCount{}");
     }
 
-    std::unordered_map<std::pair<GraphTraversalSource*, boost::any>, size_t, gc_global_hash, gc_global_equals> counts;
-    for(Traverser& trv : traversers) {
-        auto key = std::make_pair(src, trv.get());
-        auto f = counts.find(key);
-        if(f != counts.end()) f->second += 1;
-        else counts[key] = 1;
+    void GroupCountStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        if(by_key) {
+            std::string key = *(this->by_key);
+            traversers.advance([key](auto traverser_data, auto traverser_se, auto traverser_paths){
+                if(traverser_se.find(key) == traverser_se.end()) {
+                    std::stringstream sx;
+                    sx << "Invalid side effect key " << key;
+                    throw std::runtime_error(sx.str());
+                }
+                maelstrom::vector keys = std::move(traverser_se[key]);
+
+                traverser_se.clear();
+                traverser_paths.clear();
+
+                maelstrom::sort(keys);
+
+                return maelstrom::count_unique(
+                    keys,
+                    true
+                );  
+            });
+
+            traversers.trim_paths(0,0);
+        } else {
+            traversers.advance([](auto traverser_data, auto traverser_se, auto traverser_paths){
+                traverser_se.clear();
+                traverser_paths.clear();
+
+                maelstrom::sort(traverser_data);
+
+                return maelstrom::count_unique(
+                    traverser_data,
+                    true
+                );  
+            });
+
+            traversers.trim_paths(0,0);
+        }
     }
-    traversers.clear();
 
-    std::vector<std::pair<boost::any, size_t>> count_vec;
-    count_vec.resize(counts.size());
-    size_t k = 0;
-    for(auto p : counts) count_vec[k++] = std::make_pair(p.first.second, p.second);
-
-    traversers.push_back(Traverser(count_vec));
 }

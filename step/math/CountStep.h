@@ -6,14 +6,17 @@
 #include "traversal/Traverser.h"
 #include <functional>
 
-class CountStep : public TraversalStep {
-    public:
-        CountStep();
+namespace gremlinxx {
 
-        using TraversalStep::getInfo;
-        virtual std::string getInfo();
+    class CountStep : public TraversalStep {
+        public:
+            CountStep();
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
-    
-};
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
 
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+        
+    };
+
+}

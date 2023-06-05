@@ -10,22 +10,24 @@
 #include "step/modulate/ByModulating.h"
 #include "traversal/Traverser.h"
 
-// In the future this may get optimized away for most traversals by moving
-// the barrier to the left of the step and testing each element upon appearance
-class DedupStep: public TraversalStep, virtual public ByModulating {
-    private:
-        std::optional<std::string> dedup_by_key; // TODO make this actually do something
+namespace gremlinxx {
 
-    public:
-        // This is a barrier step
-        DedupStep();
+    // In the future this may get optimized away for most traversals by moving
+    // the barrier to the left of the step and testing each element upon appearance
+    class DedupStep: public TraversalStep, virtual public ByModulating {
+        private:
+            std::optional<std::string> dedup_by_key; // TODO make this actually do something
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+        public:
+            // This is a barrier step
+            DedupStep();
 
-        using TraversalStep::getInfo;
-        virtual std::string getInfo();
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
 
-        virtual void modulate_by(boost::any arg);
-};
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
 
+            virtual void modulate_by(boost::any arg);
+    };
 
+}

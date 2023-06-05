@@ -7,33 +7,31 @@
 #include "traversal/GraphTraversalSource.h"
 #include <optional>
 
-class GroupCountStep : public TraversalStep {
-    private:
-        std::optional<std::string> by_key;
+namespace gremlinxx {
 
-        struct gc_global_hash {
-            size_t operator() (const std::pair<GraphTraversalSource*, boost::any>& p) const {
-                return p.first->test_hash(p.second);
-            }
-        };
+    class GroupCountStep : public TraversalStep {
+        private:
+            const std::string DEFAULT_KEY = "GROUP";
+            std::optional<std::string> by_key;
 
-        struct gc_global_equals {
-            size_t operator() (const std::pair<GraphTraversalSource*, boost::any>& p, const std::pair<GraphTraversalSource*, boost::any>& q) const {
-                return p.first->test_equals(p.second, q.second);
-            }
-        };
+        public:
+            GroupCountStep();
 
-    public:
-        GroupCountStep();
+            inline void set_by_key(std::string by_key) { this->by_key = by_key; }
+            
+            inline std::optional<std::string> get_by_key() { return this->by_key; }
 
-        inline void set_by_key(std::string by_key) { this->by_key = by_key; }
-        
-        inline std::optional<std::string> get_by_key() { return this->by_key; }
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
 
-        using TraversalStep::getInfo;
-        virtual std::string getInfo();
+            /*
+                There are some important semantic differences with the GroupCount step in Gremlin++:
+                    (1) All paths and side effects are invalidated upon calling this step.
+                    (2) Each output traverser is a size_t with a single side effect (the by key).
+                    (3) If there was no by key, the side effect key is "GROUP"
+            */
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+    };
 
-};
-
+}

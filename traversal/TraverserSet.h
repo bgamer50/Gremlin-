@@ -51,6 +51,11 @@ namespace gremlinxx {
                 virtual gremlinxx::traversal::PathInfo getPathInfo() = 0;
 
                 /*
+                    Returns the maximum path length in this traverser set.
+                */
+                virtual size_t getPathLength() = 0;
+
+                /*
                     Reinitializes this traverser set with the given data, side effects, and paths.
                     Often used in conjunction with unpack().
                 */
@@ -91,6 +96,11 @@ namespace gremlinxx {
                     for a single traverser.
                 */
                 virtual std::vector<std::tuple<maelstrom::vector, std::unordered_map<std::string, maelstrom::vector>, gremlinxx::traversal::PathInfo>> unpack() = 0;
+
+                /*
+                    Trims the path structure so that it only contains paths from [ix_start, ix_end).
+                */
+                virtual void trim_paths(size_t ix_start, size_t ix_end);
 
                 /*
                     Updates the side effects for all traversers for the given key.

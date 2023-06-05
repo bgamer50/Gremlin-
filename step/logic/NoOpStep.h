@@ -6,17 +6,20 @@
 #include "traversal/GraphTraversal.h"
 #include "traversal/Traverser.h"
 
-// Not technically part of Gremlin; just for
-// use as a intermediate representation.
-// Should not be confused with the identity
-// step.
-class NoOpStep: public TraversalStep {
-	public:
-		NoOpStep();
+namespace gremlinxx {
 
-		using TraversalStep::getInfo;
-		virtual std::string getInfo();
+	// Not technically part of Gremlin; just for
+	// use as a intermediate representation.
+	// Should not be confused with the identity
+	// step.
+	class NoOpStep: public TraversalStep {
+		public:
+			NoOpStep();
 
-		virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
-};
+			using TraversalStep::getInfo;
+			virtual std::string getInfo();
 
+			virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+	};
+
+}

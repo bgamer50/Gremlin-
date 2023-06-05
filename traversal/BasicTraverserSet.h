@@ -81,6 +81,11 @@ namespace gremlinxx {
                     return this->path_info;
                 }
 
+                using TraverserSet::getPathLength;
+                inline virtual size_t getPathLength() {
+                    return this->path_info.paths.size();
+                }
+
                 using TraverserSet::reinitialize;
                 virtual void reinitialize(maelstrom::vector new_data, std::unordered_map<std::string, maelstrom::vector> side_effects, gremlinxx::traversal::PathInfo path_info);
 
@@ -114,6 +119,9 @@ namespace gremlinxx {
 
                 using TraverserSet::unpack;
                 virtual std::vector<std::tuple<maelstrom::vector, std::unordered_map<std::string, maelstrom::vector>, gremlinxx::traversal::PathInfo>> unpack();
+
+                using TraverserSet::trim_paths;
+                inline virtual void trim_paths(size_t ix_start, size_t ix_end);
 
                 /*
                     Updates the side effects for all traversers for the given key.
