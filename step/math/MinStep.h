@@ -7,30 +7,27 @@
 #include "traversal/Scope.h"
 #include "traversal/Comparison.h"
 
-#include <functional>
+#include <optional>
 
-class MinStep : public TraversalStep {
-    private:
-        std::optional<ScopeContext> scope_context;
-        gremlinxx::comparison::C comparison_type;
+namespace gremlinxx {
 
-        void apply_global(GraphTraversal* traversal, TraverserSet& traversers);
+    class MinStep : public TraversalStep {
+        private:
+            std::optional<ScopeContext> scope_context;
 
-        void apply_local(GraphTraversal* traversal, TraverserSet& traversers);
+            void apply_global(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
 
-    public:
-        MinStep(gremlinxx::comparison::C cmp_type);
+            void apply_local(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
 
-        inline void set_scope_context(ScopeContext sc) { this->scope_context = sc; }
-        
-        inline gremlinxx::comparison::C get_comparison_type() { return this->comparison_type; }
+        public:
+            MinStep();
 
-        inline Traverser min(Traverser& t1, Traverser& t2) {
-            return C_LESS(this->comparison_type, t1.get(), t2.get()) ? t1 : t2;
-        }
+            inline void set_scope_context(ScopeContext sc) { this->scope_context = sc; }
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
 
-        using TraversalStep::getInfo;
-        virtual std::string getInfo();
-};
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
+    };
+
+}
