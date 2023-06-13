@@ -1,44 +1,74 @@
 #include "step/property/PropertyStep.h"
+
+#include "step/math/MinStep.h"
+
+#include "structure/Element.h"
 #include "structure/Vertex.h"
-#include "structure/Edge.h"
-#include "structure/VertexProperty.h"
 
-PropertyStep::PropertyStep(PropertyStepType type, std::vector<std::string> property_keys)
-: TraversalStep(MAP, PROPERTY_STEP) {
-    this->keys = property_keys;
-    this->ps_type = type;
-}
+#include "traversal/GraphTraversal.h"
+#include "traversal/GraphTraversalSource.h"
 
-std::string PropertyStep::getInfo() {
-    std::string s = "PropertyStep{";
-    s += (this->ps_type == VALUE ? "Value" : "Property");
-    s += "}";
-    return s;
-}
+namespace gremlinxx {
 
-void PropertyStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    TraverserSet new_traversers;
-    bool get_value = this->ps_type == VALUE;
+	PropertyStep::PropertyStep(std::string property_key, boost::any value)
+	: TraversalStep(MAP, ADD_PROPERTY_STEP) {
+		this->cardinality = SINGLE;
+		this->key = std::string(property_key);
+		this->value = boost::any(value);
+	}
 
-    for(Traverser& trv : traversers) {
-        for(std::string key : keys) {
-            boost::any x = trv.get();
-            if(x.type() == typeid(Vertex*)) {
-                Vertex* v = boost::any_cast<Vertex*>(x);
-                VertexProperty* p = static_cast<VertexProperty*>(v->property(key)); //TODO multiproperties?
-                if(p != nullptr) {
-                    if(get_value) new_traversers.push_back(Traverser(p->value(), trv.get_side_effects()));
-                    else new_traversers.push_back(Traverser(boost::any(p), trv.get_side_effects()));
-                }
-            }
-            else if(x.type() == typeid(Edge*)) {
-                Edge* e = boost::any_cast<Edge*>(x);
-                Property* p = e->property(key);
-            } else {
-                throw std::runtime_error("Can only access properties on Vertices or Edges.");
-            }
-        }
-    }
+	PropertyStep::PropertyStep(Cardinality card, std::string property_key, boost::any value)
+	: TraversalStep(MAP, ADD_PROPERTY_STEP) {
+		this->cardinality = card;
+		this->key = std::string(property_key);
+		this->value = boost::any(value);
+	}
 
-    traversers.swap(new_traversers);
+	void PropertyStep::apply(GraphTraversal* current_traversal, gremlinxx::traversal::TraverserSet& traversers) {
+		auto g = current_traversal->getTraversalSource();
+		if(traversers.getCurrentDataType() != g->getGraph()->get_vertex_dtype()) {
+			throw std::runtime_error("Can't add a property to something other than a vertex!");
+		}
+
+		if(this->value.type() == typeid(GraphTraversal*)) {
+			GraphTraversal* ap_anonymous_trv = boost::any_cast<GraphTraversal*>(value);
+			
+			for(TraversalStep* step : ap_anonymous_trv->getSteps()) {
+				auto reduction_step = dynamic_cast<ReductionStep*>(step);
+				if(reduction_step != nullptr) {
+					reduction_step->set_scope_context(ScopeContext{Scope::local, ADD_PROPERTY_STEP_SIDE_EFFECT_KEY});
+				}
+			}
+			
+			// Need to initialize the scope context side effect
+			traversers.set_side_effects(ADD_PROPERTY_STEP_SIDE_EFFECT_KEY, traversers.getTraverserData());
+
+			GraphTraversal new_trv(current_traversal->getTraversalSource(), ap_anonymous_trv);
+			new_trv.setInitialTraversers(traversers);
+			new_trv.iterate();
+
+			auto retrieved_traversers = new_trv.getTraversers();
+			if(retrieved_traversers.size() < traversers.size()) {
+				throw std::runtime_error("One of more traversers did not produce a valid property value!");
+			}
+
+			for(Traverser& trv : retrieved_traversers) {
+				scope_group_t g_id = boost::any_cast<scope_group_t>(trv.get_side_effects()[ADD_PROPERTY_STEP_SIDE_EFFECT_KEY]);
+				boost::any prop_value = trv.get();
+				Vertex* v = boost::any_cast<Vertex*>(g->V(any_from_group_id(g_id, eid_type))->next());
+				v->property(this->cardinality, this->key, prop_value);
+			}
+		} 
+		else {
+			// Store the propety; TODO deal w/ edges
+			std::for_each(traversers.begin(), traversers.end(), [&](Traverser& trv){
+				Vertex* e = boost::any_cast<Vertex*>(trv.get());
+				e->property(this->cardinality, this->key, this->value);	
+			});
+			//std::cout << "property stored!\n";
+		}
+
+		// Traversers aren't modified in this step.
+	}
+
 }

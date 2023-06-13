@@ -1,30 +1,37 @@
 #pragma once
 
+#define ADD_PROPERTY_STEP 0x75
+#define ADD_PROPERTY_STEP_SIDE_EFFECT_KEY "__AddPropertyStep__originating_traverser__"
+
 #include "step/TraversalStep.h"
+#include "structure/VertexProperty.h"
+#include "traversal/Scope.h"
 #include "traversal/Traverser.h"
-#include "structure/Property.h"
-#include <vector>
-#include <string>
-#include <boost/any.hpp>
 
-#define PROPERTY_STEP 0x67
+namespace gremlinxx {
 
-enum PropertyStepType { VALUE, PROPERTY };
+	class MinStep;
+	class Element;
+	class Vertex;
 
-class PropertyStep: public TraversalStep {
-    private:
-        std::vector<std::string> keys; //duplicates are allowed, per api
-        PropertyStepType ps_type;
+	// Edge properties currently not supported.
+	class PropertyStep : public TraversalStep {
+		private:
+			Cardinality cardinality;
+			std::string key;
+			boost::any value;
+		public:
+			PropertyStep(std::string property_key, boost::any value);
 
-    public:
-        PropertyStep(PropertyStepType type, std::vector<std::string> property_keys);
+			PropertyStep(Cardinality card, std::string property_key, boost::any value);
 
-        inline std::vector<std::string>& get_keys() { return keys; }
+			inline Cardinality get_cardinality() { return this->cardinality; }
 
-        inline PropertyStepType get_type() { return ps_type; }
+			inline std::string get_key() { return this->key; }
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+			inline boost::any get_value() { return this->value; };
+			
+			virtual void apply(GraphTraversal* current_traversal, gremlinxx::traversal::TraverserSet& traversers);
+	};
 
-        using TraversalStep::getInfo;
-        std::string getInfo();
-};
+}

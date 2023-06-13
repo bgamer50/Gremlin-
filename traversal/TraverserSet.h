@@ -36,6 +36,11 @@ namespace gremlinxx {
                 virtual maelstrom::vector getTraverserData() = 0;
 
                 /*
+                    Returns the datatype of the currently-traversed objects in this traverser set.
+                */
+                virtual maelstrom::dtype_t getCurrentDataType() = 0;
+
+                /*
                     Gets the data stored in the ith traverser.
                 */
                 virtual boost::any getData(size_t i) = 0;

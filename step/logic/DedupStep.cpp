@@ -8,6 +8,7 @@
 namespace gremlinxx {
 
     // This is a barrier step
+    // it should become a reduction step
     DedupStep::DedupStep()
     : TraversalStep(true, FILTER, DEDUP_STEP) {}
 

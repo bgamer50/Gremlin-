@@ -65,6 +65,11 @@ namespace gremlinxx {
                     return this->traverser_data;
                 }
 
+                using TraverserSet::getCurrentDataType;
+                inline virtual maelstrom::dtype_t getCurrentDataType() {
+                    return this->traverser_data.get_dtype();
+                }
+
                 /*
                     Returns a copy of the side effects of each traverser in this traverser set.
                 */
