@@ -7,24 +7,23 @@
 #include <string>
 #include <boost/any.hpp>
 
-#define PROPERTY_STEP 0x67
+#define VALUE_STEP 0x67
 
-enum PropertyStepType { VALUE, PROPERTY };
+namespace gremlinxx {
 
-class PropertyStep: public TraversalStep {
-    private:
-        std::vector<std::string> keys; //duplicates are allowed, per api
-        PropertyStepType ps_type;
+    class ValueStep: public TraversalStep {
+        private:
+            std::vector<std::string> keys; //duplicates are allowed, per api
 
-    public:
-        PropertyStep(PropertyStepType type, std::vector<std::string> property_keys);
+        public:
+            ValueStep(std::vector<std::string> property_keys);
 
-        inline std::vector<std::string>& get_keys() { return keys; }
+            inline std::vector<std::string>& get_keys() { return keys; }
 
-        inline PropertyStepType get_type() { return ps_type; }
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+            using TraversalStep::getInfo;
+            std::string getInfo();
+    };
 
-        using TraversalStep::getInfo;
-        std::string getInfo();
-};
+}

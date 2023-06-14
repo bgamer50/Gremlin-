@@ -8,17 +8,22 @@
 #include "traversal/GraphTraversal.h"
 #include "traversal/GraphTraversalSource.h"
 
+#include "maelstrom/algorithms/arange.h"
+#include "maelstrom/algorithms/select.h"
+#include "maelstrom/algorithms/unique.h"
+#include "maelstrom/algorithms/set.h"
+
 namespace gremlinxx {
 
 	PropertyStep::PropertyStep(std::string property_key, boost::any value)
-	: TraversalStep(MAP, ADD_PROPERTY_STEP) {
+	: TraversalStep(MAP, PROPERTY_STEP) {
 		this->cardinality = SINGLE;
 		this->key = std::string(property_key);
 		this->value = boost::any(value);
 	}
 
 	PropertyStep::PropertyStep(Cardinality card, std::string property_key, boost::any value)
-	: TraversalStep(MAP, ADD_PROPERTY_STEP) {
+	: TraversalStep(MAP, PROPERTY_STEP) {
 		this->cardinality = card;
 		this->key = std::string(property_key);
 		this->value = boost::any(value);
@@ -36,36 +41,53 @@ namespace gremlinxx {
 			for(TraversalStep* step : ap_anonymous_trv->getSteps()) {
 				auto reduction_step = dynamic_cast<ReductionStep*>(step);
 				if(reduction_step != nullptr) {
-					reduction_step->set_scope_context(ScopeContext{Scope::local, ADD_PROPERTY_STEP_SIDE_EFFECT_KEY});
+					reduction_step->set_scope_context(ScopeContext{Scope::local, PROPERTY_STEP_SIDE_EFFECT_KEY});
 				}
 			}
-			
-			// Need to initialize the scope context side effect
-			traversers.set_side_effects(ADD_PROPERTY_STEP_SIDE_EFFECT_KEY, traversers.getTraverserData());
 
 			GraphTraversal new_trv(current_traversal->getTraversalSource(), ap_anonymous_trv);
 			new_trv.setInitialTraversers(traversers);
+
+			// Need to initialize the scope context side effect
+			auto indv = maelstrom::arange(traversers.getCurrentMemType(), traversers.size());
+			new_trv.getTraverserSet().set_side_effects(PROPERTY_STEP_SIDE_EFFECT_KEY, std::move(indv));
+			
+			// Iterate the traversal
 			new_trv.iterate();
+			auto& retrieved_traversers = new_trv.getTraverserSet();
 
-			auto retrieved_traversers = new_trv.getTraversers();
-			if(retrieved_traversers.size() < traversers.size()) {
-				throw std::runtime_error("One of more traversers did not produce a valid property value!");
-			}
+			// Will not update vertices without a given property value
 
-			for(Traverser& trv : retrieved_traversers) {
-				scope_group_t g_id = boost::any_cast<scope_group_t>(trv.get_side_effects()[ADD_PROPERTY_STEP_SIDE_EFFECT_KEY]);
-				boost::any prop_value = trv.get();
-				Vertex* v = boost::any_cast<Vertex*>(g->V(any_from_group_id(g_id, eid_type))->next());
-				v->property(this->cardinality, this->key, prop_value);
-			}
-		} 
+			maelstrom::vector original_keys = std::move(retrieved_traversers.getSideEffects()[PROPERTY_STEP_SIDE_EFFECT_KEY]);
+			maelstrom::vector property_vals = retrieved_traversers.getTraverserData();
+			retrieved_traversers.clear();
+
+			auto unique_ix = maelstrom::unique(original_keys);
+			original_keys = maelstrom::select(original_keys, unique_ix);
+			property_vals = maelstrom::select(property_vals, unique_ix);
+			
+			maelstrom::vector vertices = traversers.getTraverserData();
+			vertices = maelstrom::select(vertices, original_keys);
+			original_keys.clear();
+
+			g->getGraph()->setVertexProperties(this->key, vertices, property_vals);
+			
+		}
 		else {
-			// Store the propety; TODO deal w/ edges
-			std::for_each(traversers.begin(), traversers.end(), [&](Traverser& trv){
-				Vertex* e = boost::any_cast<Vertex*>(trv.get());
-				e->property(this->cardinality, this->key, this->value);	
-			});
-			//std::cout << "property stored!\n";
+			// Store the property
+			auto vertices = traversers.getTraverserData();
+			auto unique_ix = maelstrom::unique(vertices);
+			vertices = maelstrom::select(vertices, unique_ix);
+			unique_ix.clear();
+
+			maelstrom::vector val_vector(
+				vertices.get_mem_type(),
+				g->get_dtype(this->value),
+				vertices.size()
+			);
+			maelstrom::set(val_vector, this->value);
+
+			g->getGraph()->setVertexProperties(this->key, vertices, val_vector);
 		}
 
 		// Traversers aren't modified in this step.

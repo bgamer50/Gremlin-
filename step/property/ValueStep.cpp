@@ -1,44 +1,71 @@
-#include "step/property/PropertyStep.h"
+#include "step/property/ValueStep.h"
 #include "structure/Vertex.h"
 #include "structure/Edge.h"
 #include "structure/VertexProperty.h"
+#include "traversal/GraphTraversal.h"
 
-PropertyStep::PropertyStep(PropertyStepType type, std::vector<std::string> property_keys)
-: TraversalStep(MAP, PROPERTY_STEP) {
-    this->keys = property_keys;
-    this->ps_type = type;
-}
+#include "maelstrom/algorithms/intersection.h"
+#include "maelstrom/algorithms/sort.h"
+#include "maelstrom/algorithms/select.h"
 
-std::string PropertyStep::getInfo() {
-    std::string s = "PropertyStep{";
-    s += (this->ps_type == VALUE ? "Value" : "Property");
-    s += "}";
-    return s;
-}
+#include <sstream>
 
-void PropertyStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    TraverserSet new_traversers;
-    bool get_value = this->ps_type == VALUE;
-
-    for(Traverser& trv : traversers) {
-        for(std::string key : keys) {
-            boost::any x = trv.get();
-            if(x.type() == typeid(Vertex*)) {
-                Vertex* v = boost::any_cast<Vertex*>(x);
-                VertexProperty* p = static_cast<VertexProperty*>(v->property(key)); //TODO multiproperties?
-                if(p != nullptr) {
-                    if(get_value) new_traversers.push_back(Traverser(p->value(), trv.get_side_effects()));
-                    else new_traversers.push_back(Traverser(boost::any(p), trv.get_side_effects()));
-                }
-            }
-            else if(x.type() == typeid(Edge*)) {
-                Edge* e = boost::any_cast<Edge*>(x);
-                Property* p = e->property(key);
-            } else {
-                throw std::runtime_error("Can only access properties on Vertices or Edges.");
-            }
-        }
+namespace gremlinxx {
+        
+    ValueStep::ValueStep(std::vector<std::string> property_keys)
+    : TraversalStep(MAP, VALUE_STEP) {
+        this->keys = property_keys;
     }
 
-    traversers.swap(new_traversers);
+    std::string ValueStep::getInfo() {
+        std::stringstream sx;
+        sx << "ValueStep{";
+        for(std::string s : this->keys) sx << s << ", ";
+        sx << "}";
+
+        return sx.str();
+    }
+
+    void ValueStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        auto g = traversal->getTraversalSource();
+        auto& prop_names = this->keys;
+
+        traversers.advance([&g, &prop_names](auto traverser_data, auto traverser_se, auto traverser_path_info){
+            // TODO efficiently get multiple properties at once
+            // TODO sort
+
+            maelstrom::vector values;
+            maelstrom::vector output_origin;
+
+            for(std::string key : prop_names) {
+                maelstrom::vector current_vertices;
+                maelstrom::vector current_values;
+
+                std::tie(
+                    current_vertices,
+                    current_values
+                ) = g->getGraph()->getVertexProperties(
+                    key,
+                    traverser_data,
+                    true
+                );
+
+                // the intersection index is the output origin for the current property
+                auto intersection_ix = maelstrom::intersection(traverser_data, current_vertices);
+                
+                if(values.empty())
+                    // do something
+                
+                if(output_origin())
+                    // do something
+            }
+            
+
+            return std::make_pair(
+                maelstrom::vector(),
+                maelstrom::vector()
+            );
+        });
+    }
+
 }

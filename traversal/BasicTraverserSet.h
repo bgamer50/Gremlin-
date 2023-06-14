@@ -70,6 +70,11 @@ namespace gremlinxx {
                     return this->traverser_data.get_dtype();
                 }
 
+                using TraverserSet::getCurrentMemType;
+                inline virtual maelstrom::storage getCurrentMemType() {
+                    return this->traverser_data.get_mem_type();
+                }
+
                 /*
                     Returns a copy of the side effects of each traverser in this traverser set.
                 */

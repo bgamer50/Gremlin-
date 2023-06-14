@@ -1,7 +1,7 @@
 #pragma once
 
-#define ADD_PROPERTY_STEP 0x75
-#define ADD_PROPERTY_STEP_SIDE_EFFECT_KEY "__AddPropertyStep__originating_traverser__"
+#define PROPERTY_STEP 0x75
+#define PROPERTY_STEP_SIDE_EFFECT_KEY "__PropertyStep__originating_traverser__"
 
 #include "step/TraversalStep.h"
 #include "structure/VertexProperty.h"
