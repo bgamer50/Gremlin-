@@ -5,74 +5,80 @@
 #include "structure/Vertex.h"
 #include "structure/Edge.h"
 
-VertexStep::VertexStep(Direction dir, std::vector<std::string> edge_labels_arg, GraphStepType gsType_arg)
-: TraversalStep(MAP, VERTEX_STEP) {
-    direction = dir;
-    std::for_each(edge_labels_arg.begin(), edge_labels_arg.end(), [&](std::string str){ this->edge_labels.insert(str); });
-    this->gsType = gsType_arg;
-}
+namespace gremlinxx {
 
-VertexStep::VertexStep(Direction dir, GraphStepType gsType_arg)
-: TraversalStep(MAP, VERTEX_STEP) {
-    direction = dir;
-    this->gsType = gsType_arg;
-}
-
-std::string VertexStep::getInfo() {
-    std::string info = "VertexStep(";
-    info += (direction == IN ? "IN" : direction == OUT ? "OUT" : "BOTH");
-    info += ", ";
-    if(!edge_labels.empty()) {
-        info += "{";
-        auto p = edge_labels.begin();
-        for(int k = 0; k < edge_labels.size() - 1; k++) info = info + *(p++) + ", ";
-        info = info + *p + "}";
+    VertexStep::VertexStep(Direction dir, std::vector<std::string> edge_labels_arg, VertexStepType gsType_arg)
+    : TraversalStep(MAP, VERTEX_STEP) {
+        direction = dir;
+        std::for_each(edge_labels_arg.begin(), edge_labels_arg.end(), [&](std::string str){ this->edge_labels.insert(str); });
+        this->vsType = gsType_arg;
     }
-    else info += "{}";
-    info = info + ", " + (gsType == VERTEX ? "VERTEX" : "EDGE");
-    return info + ")";
-}
 
-void VertexStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    bool label_required = !this->edge_labels.empty();
+    VertexStep::VertexStep(Direction dir, VertexStepType gsType_arg)
+    : TraversalStep(MAP, VERTEX_STEP) {
+        direction = dir;
+        this->vsType = gsType_arg;
+    }
 
-    TraverserSet new_traversers;
-    
-    std::for_each(traversers.begin(), traversers.end(), [&, this](Traverser& trv) {
-        Vertex* v = boost::any_cast<Vertex*>(trv.get());
-        std::vector<Edge*> edges = v->edges(direction);
-        
-        for(size_t k = 0; k < edges.size(); ++k) {
-            Edge* e = edges[k];
-            if(label_required && this->edge_labels.count(e->label()) == 0) continue;
+    std::string VertexStep::getInfo() {
+        std::string info = "VertexStep(";
+        info += (direction == IN ? "IN" : direction == OUT ? "OUT" : "BOTH");
+        info += ", ";
+        if(!edge_labels.empty()) {
+            info += "{";
+            auto p = edge_labels.begin();
+            for(int k = 0; k < edge_labels.size() - 1; k++) info = info + *(p++) + ", ";
+            info = info + *p + "}";
+        }
+        else info += "{}";
+        info = info + ", " + (vsType == VERTEX_TO_VERTEX ? "VERTEX" : "EDGE");
+        return info + ")";
+    }
 
-            if(this->gsType == EDGE) {
-                new_traversers.push_back(Traverser(e, trv.get_side_effects()));
-            } 
-            else {
-                switch(direction) {
-                    case IN: {
-                        Vertex* w = e->outV();
-                        new_traversers.push_back(Traverser(w, trv.get_side_effects()));
-                        break;
-                    }
-                    case OUT: {
-                        Vertex* w = e->inV();
-                        new_traversers.push_back(Traverser(w, trv.get_side_effects()));
-                        break;
-                    }
-                    case BOTH: {
-                        Vertex* u = e->outV();
-                        Vertex* w = u == v ? e->inV() : u;
-                        new_traversers.push_back(Traverser(w, trv.get_side_effects()));
-                        break;
-                    }
+    void VertexStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        auto vs_type = this->vsType;
+        auto graph = traversal->getGraph();
+        std::vector<std::string> labels(this->edge_labels.begin(), this->edge_labels.end());
+        auto dir = this->direction;
+
+        traversers.advance([&graph, vs_type, &labels, dir](auto traverser_data, auto traverser_se, auto traverser_path_info){
+            maelstrom::vector successors;
+            maelstrom::vector output_origin;
+            switch(vs_type) {
+                case VERTEX_TO_VERTEX: {
+                    if(traverser_data.get_dtype() != graph->get_vertex_dtype()) throw std::runtime_error("Can only call out()/in() on vertices!");
+                    std::tie(
+                        successors,
+                        output_origin
+                    ) = graph->V(traverser_data, labels, dir);
+                    break;
+                }
+                case VERTEX_TO_EDGE: {
+                    if(traverser_data.get_dtype() != graph->get_edge_dtype()) throw std::runtime_error("Can only call out()/in() on vertices!");
+                    std::tie(
+                        successors,
+                        output_origin
+                    ) = graph->E(traverser_data, labels, dir);
+                    break;
+                }
+                case EDGE_TO_VERTEX: {
+                    if(traverser_data.get_dtype() != graph->get_vertex_dtype()) throw std::runtime_error("Can only call out()/in() on vertices!");
+                    std::tie(
+                        successors,
+                        output_origin
+                    ) = graph->toV(traverser_data, dir);
+                    break;
+                }
+                default: {
+                    throw std::runtime_error("Invalid vertex step type");
                 }
             }
 
-        }
-    });
+            return std::make_pair(
+                std::move(successors),
+                std::move(output_origin)
+            );
+        });
+    }
 
-
-    traversers.swap(new_traversers);
 }

@@ -7,37 +7,42 @@
 #include "step/TraversalStep.h"
 #include "structure/Direction.h"
 
-class Traverser;
-class GraphTraversal;
-
 #define VERTEX_STEP 0x80
 
-enum GraphStepType{VERTEX, EDGE};
+namespace gremlinxx {
 
-class VertexStep : public TraversalStep {
-	private:
-		Direction direction;
-		std::set<std::string> edge_labels;
-		GraphStepType gsType;
-	public:
-		VertexStep(Direction dir, std::vector<std::string> edge_labels_arg, GraphStepType gsType_arg);
+	enum VertexStepType{
+		VERTEX_TO_VERTEX = 0,
+		VERTEX_TO_EDGE = 1,
+		EDGE_TO_VERTEX = 2
+	};
 
-		VertexStep(Direction dir, GraphStepType gsType_arg);
+	class VertexStep : public TraversalStep {
+		private:
+			Direction direction;
+			std::set<std::string> edge_labels;
+			VertexStepType vsType;
+		public:
+			VertexStep(Direction dir, std::vector<std::string> edge_labels_arg, VertexStepType vs_type);
 
-		inline Direction get_direction() {
-			return this->direction;
-		}
+			VertexStep(Direction dir, VertexStepType vs_type);
 
-		inline std::set<std::string> get_labels() {
-			return this->edge_labels;
-		}
+			inline Direction get_direction() {
+				return this->direction;
+			}
 
-		inline GraphStepType get_type() {
-			return this->gsType;
-		}
+			inline std::set<std::string> get_labels() {
+				return this->edge_labels;
+			}
 
-		using TraversalStep::getInfo;
-		virtual std::string getInfo();
+			inline VertexStepType get_type() {
+				return this->vsType;
+			}
 
-		virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
-};
+			using TraversalStep::getInfo;
+			virtual std::string getInfo();
+
+			virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+	};
+
+}

@@ -10,18 +10,22 @@ class Vertex;
 
 #define FROM_STEP 0x90
 
-class FromStep : public TraversalStep {
-	private:
-		boost::any arg;
-	public:
-		FromStep(std::string side_effect_label);
+namespace gremlinxx {
+		
+	class FromStep : public TraversalStep {
+		private:
+			boost::any arg;
+		public:
+			FromStep(std::string side_effect_label);
 
-		FromStep(Vertex* to_vertex);
+			FromStep(Vertex* to_vertex);
 
-		FromStep(GraphTraversal* from_vertex_traversal);
+			FromStep(GraphTraversal* from_vertex_traversal);
 
-		using TraversalStep::getInfo;
-		virtual std::string getInfo();
+			using TraversalStep::getInfo;
+			virtual std::string getInfo();
 
-		inline boost::any get() { return arg; }
-};
+			inline boost::any get() { return arg; }
+	};
+
+}

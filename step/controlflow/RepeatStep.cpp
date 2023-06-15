@@ -1,5 +1,7 @@
 #include "step/controlflow/RepeatStep.h"
 #include "traversal/Traverser.h"
+#include "traversal/GraphTraversalSource.h"
+#include "traversal/GraphTraversal.h"
 
 namespace gremlinxx {
 

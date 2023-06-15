@@ -1,8 +1,6 @@
 #pragma once
 
 #include "step/TraversalStep.h"
-#include "traversal/Traverser.h"
-#include "traversal/GraphTraversal.h"
 
 #include <optional>
 

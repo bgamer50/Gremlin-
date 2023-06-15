@@ -9,22 +9,32 @@
 #include <boost/any.hpp>
 #include "Property.h"
 
-enum Cardinality {SINGLE, LIST, SET};
+namespace gremlinxx {
 
-class VertexProperty: public Property {
-	private:
-		// kv pairs
-		std::unordered_map<std::string, Property> my_values;
-	public:
-		VertexProperty(std::string new_key, boost::any new_value)
-		: Property(new_key, new_value) {}
+	/*
+		Deprecated
+	*/
+	enum Cardinality {SINGLE, LIST, SET};
 
-		VertexProperty(std::string new_key, boost::any new_value, std::unordered_map<std::string, Property>& new_values)
-		: Property(new_key, new_value) {
-			my_values = new_values;
-		}
+	/*
+		Deprecated
+	*/
+	class VertexProperty: public Property {
+		private:
+			// kv pairs
+			std::unordered_map<std::string, Property> my_values;
+		public:
+			VertexProperty(std::string new_key, boost::any new_value)
+			: Property(new_key, new_value) {}
 
-		virtual std::unordered_map<std::string, Property> values() {
-			return my_values;
-		}
-};
+			VertexProperty(std::string new_key, boost::any new_value, std::unordered_map<std::string, Property>& new_values)
+			: Property(new_key, new_value) {
+				my_values = new_values;
+			}
+
+			virtual std::unordered_map<std::string, Property> values() {
+				return my_values;
+			}
+	};
+
+}

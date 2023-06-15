@@ -1,24 +1,33 @@
 #include "step/sideeffect/SelectStep.h"
-#include <stdexcept>
+#include <iostream>
+#include <sstream>
 
-SelectStep::SelectStep(std::string se_label)
-: TraversalStep(SIDE_EFFECT, SELECT_STEP) {
-    this->sideEffectLabel = sideEffectLabel;
-}
+namespace gremlinxx {
 
-void SelectStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    //std::cout << traversers.size() << " traversers." << std::endl;
-    //std::for_each(traversers[0].get_side_effects().begin(), traversers[0].get_side_effects().end(), [](std::pair<std::string, boost::any> r){std::cout << r.first << "\t" << (r.second.type() == typeid(Vertex*)) << std::endl;});
-    for(Traverser& trv : traversers) {
-        auto p = trv.get_side_effects().find(this->sideEffectLabel);
-        if(p == trv.get_side_effects().end()) {
-            throw std::runtime_error("Side effect " + this->sideEffectLabel + " does not exist!");
-        }
-
-        trv.replace_data(p->second);
+    SelectStep::SelectStep(std::string se_label)
+    : TraversalStep(SIDE_EFFECT, SELECT_STEP) {
+        this->sideEffectLabel = sideEffectLabel;
     }
-}
 
-std::string SelectStep::getInfo() {
-    return "SelectStep(" + this->sideEffectLabel + ")";
+    void SelectStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        std::string se_label = this->sideEffectLabel;
+
+        traversers.advance([se_label](auto traverser_data, auto traverser_se, auto traverser_path_info){
+            if(traverser_se.find(se_label) == traverser_se.end()) {
+                std::stringstream sx;
+                sx << "Invalid side effect key " << se_label;
+                throw std::runtime_error(sx.str());
+            }
+
+            return std::make_pair(
+                traverser_se[se_label],
+                maelstrom::vector()
+            );
+        });
+    }
+
+    std::string SelectStep::getInfo() {
+        return "SelectStep(" + this->sideEffectLabel + ")";
+    }
+
 }

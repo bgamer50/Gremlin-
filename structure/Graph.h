@@ -26,9 +26,22 @@ namespace gremlinxx {
 			**/
 			virtual std::vector<Edge*> edges() = 0;
 
-			virtual Vertex* add_vertex(std::string label) = 0;
-			virtual Vertex* add_vertex() = 0;
+			// Vertex labels are optional, implementer should check if the label is empty and react appropriately
+			virtual Vertex* add_vertex(std::string label="") = 0;
+			virtual maelstrom::vector add_vertices(size_t n_new_vertices, std::string label="") = 0;
+
+			// Edge labels are always required
 			virtual Edge* add_edge(Vertex* from_vertex, Vertex* to_vertex, std::string label) = 0;
+			virtual maelstrom::vector add_edges(maelstrom::vector& from_vertices, maelstrom::vector& to_vertices, std::string label) = 0;
+
+			// Traversers vertices to their neighbors.  Returns the resulting vertices (first element) and originating index (second element).
+			virtual std::pair<maelstrom::vector, maelstrom::vector> V(maelstrom::vector& current_vertices, std::vector<std::string>& labels, Direction direction) = 0;
+
+			// Traversers vertices to their edges.  Returns the resulting edges (first element) and originating index (second element).
+			virtual std::pair<maelstrom::vector, maelstrom::vector> E(maelstrom::vector& current_vertices, std::vector<std::string>& labels, Direction direction) = 0;
+
+			// Traversers edges to their vertices.  Returns the results vertices (first element) and originating index (second element).
+			virtual std::pair<maelstrom::vector, maelstrom::vector> toV(maelstrom::vector& current_edges, Direction direction) = 0;
 
 			/*
 				Sets the vertex properties of the given vertices to the given values.
@@ -44,6 +57,10 @@ namespace gremlinxx {
 				If return_values is false, an empty vector is returned in place of the values.
 			*/
 			virtual std::pair<maelstrom::vector, maelstrom::vector> getVertexProperties(std::string property_name, maelstrom::vector& vertices, bool return_values=true) = 0;
+
+			virtual std::vector<std::string> getVertexPropertyNames() = 0;
+
+			virtual maelstrom::vector getVertexLabels(maelstrom::vector& vertices);
 
 			virtual maelstrom::dtype_t get_vertex_dtype() = 0;
 			virtual maelstrom::dtype_t get_edge_dtype() = 0;

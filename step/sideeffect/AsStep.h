@@ -6,15 +6,19 @@
 #include "step/TraversalStep.h"
 #include "traversal/Traverser.h"
 
-class AsStep: public TraversalStep {
-    private:
-        std::string sideEffectLabel;
+namespace gremlinxx {
 
-    public:
-        AsStep(std::string se_label);
+    class AsStep: public TraversalStep {
+        private:
+            std::string sideEffectLabel;
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+        public:
+            AsStep(std::string se_label);
 
-        using TraversalStep::getInfo;
-        virtual std::string getInfo();
-};
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
+    };
+
+}

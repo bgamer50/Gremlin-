@@ -3,22 +3,29 @@
 #include <string>
 #include <boost/any.hpp>
 
-class Property {
-	private:
-		std::string my_key;
-		boost::any my_value;
+namespace gremlinxx {
 
-	public:		
-		Property(std::string new_key, boost::any new_value) {
-			this->my_key = new_key;
-			this->my_value = new_value;
-		}
+	/*
+		Deprecated
+	*/
+	class Property {
+		private:
+			std::string my_key;
+			boost::any my_value;
 
-		virtual std::string key() {
-			return this->my_key;
-		}
+		public:		
+			Property(std::string new_key, boost::any new_value) {
+				this->my_key = new_key;
+				this->my_value = new_value;
+			}
 
-		virtual boost::any value() {
-			return this->my_value;
-		}
-};
+			virtual std::string key() {
+				return this->my_key;
+			}
+
+			virtual boost::any value() {
+				return this->my_value;
+			}
+	};
+
+}

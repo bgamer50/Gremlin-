@@ -11,18 +11,21 @@ class Traverser;
 
 #define ADD_VERTEX_START_STEP 0x70
 
-class AddVertexStartStep: public TraversalStep {
-	private:
-		std::string label;
-		bool has_label;
-	public:
-		AddVertexStartStep(std::string label_arg);
+namespace gremlinxx {
 
-		AddVertexStartStep();
-		
-		using TraversalStep::getInfo;
-		virtual std::string getInfo();
+	class AddVertexStartStep: public TraversalStep {
+		private:
+			std::string label;
+			bool has_label;
+		public:
+			AddVertexStartStep(std::string label_arg);
 
-		virtual void apply(GraphTraversal* trv, TraverserSet& traversers);
-};
+			AddVertexStartStep();
+			
+			using TraversalStep::getInfo;
+			virtual std::string getInfo();
 
+			virtual void apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers);
+	};
+
+}

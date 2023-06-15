@@ -3,28 +3,37 @@
 #include "traversal/GraphTraversal.h"
 #include "structure/Graph.h"
 
-AddVertexStep::AddVertexStep(std::string label_arg)
-: TraversalStep(MAP, ADD_VERTEX_STEP) {
-    label = label_arg;
-    has_label = true;
-}
+namespace gremlinxx {
 
-AddVertexStep::AddVertexStep()
-: TraversalStep(MAP, ADD_VERTEX_STEP) {
-    has_label = false;
-}
+    AddVertexStep::AddVertexStep(std::string label_arg)
+    : TraversalStep(MAP, ADD_VERTEX_STEP) {
+        this->label = label_arg;
+        this->has_label = true;
+    }
 
-std::string AddVertexStep::getInfo() {
-    std::string info = "AddVertexStep(";
-    info += has_label ? label : "";
-    info += ")";
-    return info;
-}
+    AddVertexStep::AddVertexStep()
+    : TraversalStep(MAP, ADD_VERTEX_STEP) {
+        this->has_label = false;
+    }
 
-void AddVertexStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    // For each traverser, a new Vertex should be created and replace the original traverser
-    std::for_each(traversers.begin(), traversers.end(), [&, this](Traverser& trv) {
-        Vertex* v = this->has_label ? traversal->getGraph()->add_vertex(this->label) : traversal->getGraph()->add_vertex();
-        trv.replace_data(v);
-    });
+    std::string AddVertexStep::getInfo() {
+        std::string info = "AddVertexStep(";
+        info += has_label ? label : "";
+        info += ")";
+        return info;
+    }
+
+    void AddVertexStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        auto graph = traversal->getGraph();
+        std::string label_str = this->label;
+
+        // For each traverser, a new Vertex should be created and replace the original traverser
+        traversers.advance([&graph, label_str](auto traverser_data, auto traverser_se, auto traverser_path_info){
+            return std::make_pair(
+                std::move(graph->add_vertices(traverser_data.size(), label_str)),
+                maelstrom::vector()
+            );
+        });
+    }
+
 }

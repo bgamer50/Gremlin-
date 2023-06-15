@@ -9,18 +9,22 @@ class Vertex;
 
 #define TO_STEP 0x91
 
-class ToStep : public TraversalStep {
-	private:
-		boost::any arg;
-	public:
-		ToStep(std::string side_effect_label);
+namespace gremlinxx {
 
-		ToStep(Vertex* to_vertex);
+	class ToStep : public TraversalStep {
+		private:
+			boost::any arg;
+		public:
+			ToStep(std::string side_effect_label);
 
-		ToStep(GraphTraversal* to_vertex_traversal);
+			ToStep(Vertex* to_vertex);
 
-		inline boost::any get() { return arg; }
+			ToStep(GraphTraversal* to_vertex_traversal);
 
-		using TraversalStep::getInfo;
-		virtual std::string getInfo();
-};
+			inline boost::any get() { return arg; }
+
+			using TraversalStep::getInfo;
+			virtual std::string getInfo();
+	};
+
+}

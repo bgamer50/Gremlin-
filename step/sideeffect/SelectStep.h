@@ -9,18 +9,21 @@
 #include "step/TraversalStep.h"
 #include "traversal/Traverser.h"
 
-class SelectStep: public TraversalStep {
-    private:
-        std::string sideEffectLabel;
+namespace gremlinxx {
 
-    public:
-        SelectStep(std::string se_label);
+    class SelectStep: public TraversalStep {
+        private:
+            std::string sideEffectLabel;
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+        public:
+            SelectStep(std::string se_label);
 
-        using TraversalStep::getInfo;
-        virtual std::string getInfo();
-        
-        inline std::string get_side_effect_label() { return this->sideEffectLabel; }
-};
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
 
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
+            
+            inline std::string get_side_effect_label() { return this->sideEffectLabel; }
+    };
+
+}

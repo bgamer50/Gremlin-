@@ -1,3 +1,7 @@
 #pragma once
 
-enum Direction {IN, OUT, BOTH};
+namespace gremlinxx {
+
+    enum Direction {IN, OUT, BOTH};
+
+}

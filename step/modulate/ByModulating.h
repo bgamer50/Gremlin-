@@ -2,8 +2,11 @@
 
 #include <boost/any.hpp>
 
-class ByModulating {
-    public:
-        virtual void modulate_by(boost::any arg) = 0;
-};
+namespace gremlinxx {
 
+    class ByModulating {
+        public:
+            virtual void modulate_by(boost::any arg) = 0;
+    };
+
+}

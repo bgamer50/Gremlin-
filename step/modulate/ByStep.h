@@ -8,14 +8,18 @@
 #include "traversal/GraphTraversal.h"
 #include "step/TraversalStep.h"
 
-class ByStep : public TraversalStep {
-	private:
-		boost::any arg;
-	public:
-		ByStep(boost::any arg);
+namespace gremlinxx {
 		
-		inline boost::any get() { return arg; }
+	class ByStep : public TraversalStep {
+		private:
+			boost::any arg;
+		public:
+			ByStep(boost::any arg);
+			
+			inline boost::any get() { return arg; }
 
-		using TraversalStep::getInfo;
-		virtual std::string getInfo();
-};
+			using TraversalStep::getInfo;
+			virtual std::string getInfo();
+	};
+
+}

@@ -1,8 +1,5 @@
 #pragma once
 
-class Traverser;
-class GraphTraversal;
-
 #include "step/TraversalStep.h"
 #include "traversal/Traverser.h"
 #include <string>
@@ -10,18 +7,21 @@ class GraphTraversal;
 
 #define ADD_VERTEX_STEP 0x71
 
-class AddVertexStep: public TraversalStep {
-	private:
-		std::string label;
-		bool has_label;
-	public:
-		AddVertexStep(std::string label_arg);
+namespace gremlinxx {
 
-		AddVertexStep();
+	class AddVertexStep: public TraversalStep {
+		private:
+			std::string label;
+			bool has_label;
+		public:
+			AddVertexStep(std::string label_arg);
 
-		using TraversalStep::getInfo;
-		virtual std::string getInfo();
+			AddVertexStep();
 
-		virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
-};
+			using TraversalStep::getInfo;
+			virtual std::string getInfo();
 
+			virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+	};
+
+}

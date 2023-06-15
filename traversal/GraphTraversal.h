@@ -13,6 +13,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include <boost/any.hpp>
+
 #include "structure/Direction.h"
 #include "traversal/P.h"
 #include "structure/Direction.h"
@@ -231,10 +233,7 @@ namespace gremlinxx {
 		//GraphTraversal until(Predicate predicate);
 		GraphTraversal* until(GraphTraversal* untilTraversal);
 		//GraphTraversal value();
-		//GraphTraversal valueMap();
-		GraphTraversal* valueMap(std::vector<std::string> labels);
-		//GraphTraversal valueMap(bool includeIdLabelKeyValue);
-		//GraphTraversal valueMap(bool includeIdLabelKeyValue, std::vector<std::string> labels);
+		GraphTraversal* elementMap(std::vector<std::string> labels);
 		//GraphTraversal values();
 		GraphTraversal* values(std::vector<std::string> labels);
 
@@ -247,7 +246,8 @@ namespace gremlinxx {
 		GraphTraversal* bothE();
 		GraphTraversal* bothE(std::vector<std::string> labels);
 		//GraphTraversal* bothV();
-		//GraphTraversal* inV();
+		GraphTraversal* outV();
+		GraphTraversal* inV();
 		//GraphTraversal* otherV();
 		GraphTraversal* out();
 		GraphTraversal* out(std::vector<std::string> labels);
