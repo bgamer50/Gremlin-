@@ -1,17 +1,15 @@
 #include "step/controlflow/RepeatStep.h"
-#include "traversal/Traverser.h"
-#include "traversal/GraphTraversalSource.h"
 #include "traversal/GraphTraversal.h"
 
 namespace gremlinxx {
 
-    RepeatStep::RepeatStep(GraphTraversal* actionTraversal) 
+    RepeatStep::RepeatStep(GraphTraversal actionTraversal) 
     : TraversalStep(true, MAP, REPEAT_STEP) {
         this->actionTraversal = actionTraversal;
     }
 
     std::string RepeatStep::getInfo() { 
-        std::string info = "RepeatStep{\n" + this->actionTraversal->explain(1) ;
+        std::string info = "RepeatStep{\n" + this->actionTraversal.explain(1) ;
         //if(this->emitTraversal != nullptr) info += ",\nemit = " + emitTraversal->explain();
         //if(this->untilTraversal != nullptr) info += ",\nuntil = " + untilTraversal->explain();
         info += "\n}";
@@ -31,29 +29,36 @@ namespace gremlinxx {
             if(this->times && loops >= this->times.value()) break;
 
             // Build and evaulate the until traversal
-            if(this->untilTraversal != nullptr) {
-                GraphTraversal currentUntilTraversal(src, untilTraversal);
+            if(this->untilTraversal) {
+                GraphTraversal currentUntilTraversal(src, untilTraversal.value());
                 currentUntilTraversal.setTraversalProperty(LOOPS_TRAVERSAL_PROPERTY, loops);
                 currentUntilTraversal.setInitialTraversers(traversers);
                 cont = currentUntilTraversal.hasNext();
             }
 
             // Build and evalulate the emit traversals
-            if(this->emitTraversal != nullptr) {
+            if(this->emitTraversal) {
                 // TODO allow using streams to do this (somehow)
                 gremlinxx::traversal::TraverserSet& emitted_traversers = emissionTraversal.getTraverserSet();
 
-                std::vector<std::tuple<maelstrom::vector, std::unordered_map<std::string, maelstrom::vector>, gremlinxx::traversal::PathInfo>> unpacked_traversers = traversers.unpack();
+                auto unpacked_traversers = traversers.unpack();
                 for(size_t i = 0; i < unpacked_traversers.size(); ++i) {
                     auto& t = unpacked_traversers[i];
-                    GraphTraversal currentEmitTraversal(src, emitTraversal);
+                    GraphTraversal currentEmitTraversal(src, emitTraversal.value());
                     currentEmitTraversal.setTraversalProperty(LOOPS_TRAVERSAL_PROPERTY, loops);
 
                     // Should copy the data in t, not move it
+                    std::unordered_map<std::string, maelstrom::vector> temp_se;
+                    for(auto& p : std::get<1>(t)) temp_se[p.first] = maelstrom::vector(p.second);
+                    
+                    gremlinxx::traversal::PathInfo temp_path_info;
+                    temp_path_info.paths = std::vector(std::get<2>(t).paths.begin(), std::get<2>(t).paths.end());
+                    temp_path_info.path_lengths = maelstrom::vector(std::get<2>(t).path_lengths);
+
                     currentEmitTraversal.getTraverserSet().reinitialize(
-                        std::get<0>(t),
-                        std::get<1>(t),
-                        std::get<2>(t)
+                        std::get<0>(t), //should not be a move!
+                        std::move(temp_se),
+                        std::move(temp_path_info)
                     );
 
                     if(currentEmitTraversal.hasNext()) {

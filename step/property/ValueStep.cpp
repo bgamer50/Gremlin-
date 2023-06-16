@@ -1,12 +1,15 @@
 #include "step/property/ValueStep.h"
-#include "structure/Vertex.h"
-#include "structure/Edge.h"
-#include "structure/VertexProperty.h"
+
 #include "traversal/GraphTraversal.h"
+#include "traversal/GraphTraversalSource.h"
 
 #include "maelstrom/algorithms/intersection.h"
 #include "maelstrom/algorithms/sort.h"
 #include "maelstrom/algorithms/select.h"
+
+#include "structure/Vertex.h"
+#include "structure/Edge.h"
+#include "structure/Graph.h"
 
 #include <sstream>
 
@@ -30,7 +33,7 @@ namespace gremlinxx {
         auto g = traversal->getTraversalSource();
         auto& prop_names = this->keys;
 
-        traversers.advance([&g, &prop_names](auto traverser_data, auto traverser_se, auto traverser_path_info){
+        traversers.advance([&g, &prop_names](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
             // TODO efficiently get multiple properties at once
             // TODO sort
 

@@ -9,12 +9,12 @@ namespace gremlinxx {
         return info;
     }
 
-    UnionStep::UnionStep(std::vector<GraphTraversal*>& traversals)
+    UnionStep::UnionStep(std::vector<GraphTraversal>& traversals)
     : TraversalStep(MAP, UNION_STEP) {
-        for(auto it = traversals.begin(); it != traversals.end(); ++it) this->traversals.push_back(*it);
+        for(auto it = traversals.begin(); it != traversals.end(); ++it) this->traversals.push_back(GraphTraversal(*it));
     }
 
-    std::vector<GraphTraversal*>& UnionStep::get_traversals() {
+    std::vector<GraphTraversal>& UnionStep::get_traversals() {
         return this->traversals;
     }
 
@@ -23,7 +23,7 @@ namespace gremlinxx {
         gremlinxx::traversal::TraverserSet& new_traversers = bogus_traversal.getTraverserSet();
 
         for(auto it = this->traversals.begin(); it != this->traversals.end(); ++it) {
-            GraphTraversal* current_union_traversal = *it;
+            GraphTraversal current_union_traversal = *it;
 
             GraphTraversal executing_traversal(parent_traversal->getTraversalSource(), current_union_traversal);
             executing_traversal.setInitialTraversers(traversers);

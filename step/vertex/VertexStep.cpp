@@ -4,6 +4,7 @@
 #include "traversal/GraphTraversal.h"
 #include "structure/Vertex.h"
 #include "structure/Edge.h"
+#include "structure/Graph.h"
 
 namespace gremlinxx {
 
@@ -41,7 +42,7 @@ namespace gremlinxx {
         std::vector<std::string> labels(this->edge_labels.begin(), this->edge_labels.end());
         auto dir = this->direction;
 
-        traversers.advance([&graph, vs_type, &labels, dir](auto traverser_data, auto traverser_se, auto traverser_path_info){
+        traversers.advance([&graph, vs_type, &labels, dir](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
             maelstrom::vector successors;
             maelstrom::vector output_origin;
             switch(vs_type) {

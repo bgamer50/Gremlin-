@@ -19,12 +19,20 @@ namespace gremlinxx {
             TraversalStep* currentStep = steps[k];
             if(currentStep->uid == FROM_STEP) {
                 int i = k - 1; while(steps[i]->uid == NO_OP_STEP) --i;
-                dynamic_cast<FromToModulating*>(steps[i])->modulate_from(static_cast<FromStep*>(currentStep)->get());
+                auto base_step = dynamic_cast<FromToModulating*>(steps[i]);
+                auto from_modulator = static_cast<FromStep*>(currentStep);
+                GraphTraversal trv(from_modulator->get_traversal());
+                base_step->modulate_from(std::move(trv));
+
                 delete steps[k];
                 steps[k] = new NoOpStep();
             } else if(currentStep->uid == TO_STEP) {
                 int i = k-1; while(steps[i]->uid == NO_OP_STEP) --i;
-                dynamic_cast<FromToModulating*>(steps[i])->modulate_to(static_cast<ToStep*>(currentStep)->get());
+                auto base_step = dynamic_cast<FromToModulating*>(steps[i]);
+                auto to_modulator = static_cast<ToStep*>(currentStep);
+                GraphTraversal trv(to_modulator->get_traversal());
+                base_step->modulate_to(std::move(trv));
+                
                 delete steps[k];
                 steps[k] = new NoOpStep();
             }

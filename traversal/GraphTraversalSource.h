@@ -48,18 +48,18 @@ namespace gremlinxx {
 		GraphTraversalSource* withAdminOption(std::string option_name, std::string value);
 		std::string getOptionValue(std::string option_name);
 
-		maelstrom::dtype_t GraphTraversalSource::get_dtype(boost::any obj);
+		maelstrom::dtype_t get_dtype(boost::any obj);
 
 		std::vector<TraversalStrategy>& getStrategies();
 
-		GraphTraversal* V();
-		GraphTraversal* V(Vertex* v);
-		GraphTraversal* V(boost::any v_id);
-		GraphTraversal* E();
-		GraphTraversal* addV();
-		GraphTraversal* addV(std::string label);
-		GraphTraversal* addE(std::string label);
-		GraphTraversal* inject(std::vector<boost::any> injects);
+		GraphTraversal V();
+		GraphTraversal V(Vertex v);
+		GraphTraversal V(boost::any v_id);
+		GraphTraversal E();
+		GraphTraversal addV();
+		GraphTraversal addV(std::string label);
+		GraphTraversal addE(std::string label);
+		GraphTraversal inject(std::vector<boost::any> injects);
 	};
 
 }

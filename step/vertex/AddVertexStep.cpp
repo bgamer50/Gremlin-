@@ -28,7 +28,7 @@ namespace gremlinxx {
         std::string label_str = this->label;
 
         // For each traverser, a new Vertex should be created and replace the original traverser
-        traversers.advance([&graph, label_str](auto traverser_data, auto traverser_se, auto traverser_path_info){
+        traversers.advance([&graph, label_str](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
             return std::make_pair(
                 std::move(graph->add_vertices(traverser_data.size(), label_str)),
                 maelstrom::vector()

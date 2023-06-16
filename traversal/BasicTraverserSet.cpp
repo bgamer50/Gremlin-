@@ -67,12 +67,15 @@ namespace gremlinxx {
 
             // Paths
             if(!this->path_info.path_lengths.empty()) {
-                trv.access_path().resize(
+                trv.access_path().reserve(
                     boost::any_cast<path_length_t>(this->path_info.path_lengths.get(i))
                 );
 
                 for(size_t k = 0; k < trv.access_path().size(); ++k) {
-                    trv.access_path()[trv.access_path().size() - k - 1] = this->path_info.paths[this->path_info.paths.size() - k - 1];
+                    trv.access_path().insert(
+                        trv.access_path().begin(), 
+                        this->path_info.paths[this->path_info.paths.size() - k - 1].get(i)
+                    );
                 }
             }
 
@@ -165,7 +168,7 @@ namespace gremlinxx {
                 unpacked_tuples.push_back(
                     std::make_tuple(
                         std::move(unpacked_data[k]),
-                        se_map,
+                        std::move(se_map),
                         std::move(unpacked_path_info[k])
                     )
                 );

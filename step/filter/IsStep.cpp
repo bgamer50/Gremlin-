@@ -25,67 +25,11 @@ namespace gremlinxx {
         auto cmp = this->predicate.comparison;
 
         traversers.advance([cmp, val](auto& data, auto& se, auto& paths){
-            maelstrom::vector ix;
-            switch(cmp) {
-                case P::Comparison::EQ: {
-                    ix = maelstrom::filter(
-                        data,
-                        maelstrom::comparator::EQUALS,
-                        val
-                    );
-                    break;
-                }
-                case P::Comparison::LT: {
-                    ix = maelstrom::filter(
-                        data,
-                        maelstrom::comparator::LESS_THAN,
-                        val
-                    );
-                    break;
-                }
-                case P::Comparison::LTE: {
-                    ix = maelstrom::filter(
-                        data,
-                        maelstrom::comparator::LESS_THAN_OR_EQUAL,
-                        val
-                    );
-                    break;
-                }
-                case P::Comparison::GT: {
-                    ix = maelstrom::filter(
-                        data,
-                        maelstrom::comparator::GREATER_THAN,
-                        val
-                    );
-                    break;
-                }
-                case P::Comparison::GTE: {
-                    ix = maelstrom::filter(
-                        data,
-                        maelstrom::comparator::GREATER_THAN_OR_EQUAL,
-                        val
-                    );
-                    break;
-                }
-                case P::Comparison::NEQ: {
-                    ix = maelstrom::filter(
-                        data,
-                        maelstrom::comparator::NOT_EQUALS,
-                        val
-                    );
-                    break;
-                }
-                case P::Comparison::BETWEEN: {
-                    ix = maelstrom::filter(
-                        data,
-                        maelstrom::comparator::BETWEEN,
-                        val
-                    );
-                    break;
-                }
-                default:
-                    throw std::runtime_error("Invalid comparison type in IsStep");
-            }
+            maelstrom::vector ix = maelstrom::filter(
+                data,
+                cmp,
+                val
+            );
             
             return std::make_pair(
                 std::move(maelstrom::select(data, ix)),

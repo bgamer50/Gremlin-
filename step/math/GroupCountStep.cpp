@@ -21,7 +21,7 @@ namespace gremlinxx {
     void GroupCountStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
         if(by_key) {
             std::string key = *(this->by_key);
-            traversers.advance([key](auto traverser_data, auto traverser_se, auto traverser_paths){
+            traversers.advance([key](auto& traverser_data, auto& traverser_se, auto& traverser_paths){
                 if(traverser_se.find(key) == traverser_se.end()) {
                     std::stringstream sx;
                     sx << "Invalid side effect key " << key;
@@ -42,7 +42,7 @@ namespace gremlinxx {
 
             traversers.trim_paths(0,0);
         } else {
-            traversers.advance([](auto traverser_data, auto traverser_se, auto traverser_paths){
+            traversers.advance([](auto& traverser_data, auto& traverser_se, auto& traverser_paths){
                 traverser_se.clear();
                 traverser_paths.clear();
 

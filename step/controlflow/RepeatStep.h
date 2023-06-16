@@ -1,6 +1,7 @@
 #pragma once
 
 #include "step/TraversalStep.h"
+#include "traversal/GraphTraversal.h"
 
 #include <optional>
 
@@ -12,29 +13,37 @@ namespace gremlinxx {
     class RepeatStep: public TraversalStep {
         private:
             // Will emit anything out of the loop that passes through this traversal.
-            GraphTraversal* emitTraversal = nullptr;
+            std::optional<GraphTraversal> emitTraversal;
             
             // Will end the loop when this traversal is completed.
-            GraphTraversal* untilTraversal = nullptr;
+            std::optional<GraphTraversal> untilTraversal;
 
             // The action to be repeated.
-            GraphTraversal* actionTraversal = nullptr;
+            GraphTraversal actionTraversal;
 
             // The # of times to run the loop
             std::optional<size_t> times;
 
         public:
-            RepeatStep(GraphTraversal* actionTraversal);
+            RepeatStep(GraphTraversal actionTraversal);
 
-            inline GraphTraversal* getActionTraversal() { return this->actionTraversal; }
+            inline GraphTraversal& getActionTraversal() { 
+                return this->actionTraversal;
+            }
 
-            inline void setEmitTraversal(GraphTraversal* emitTraversal) { this->emitTraversal = emitTraversal; }
-            inline GraphTraversal* getEmitTraversal() { return this->emitTraversal; }
+            inline void setEmitTraversal(GraphTraversal emitTraversal) { this->emitTraversal.emplace(emitTraversal); }
+            inline GraphTraversal& getEmitTraversal() { 
+                if(!this->emitTraversal) throw std::runtime_error("Traversal does not have an emit traversal!");
+                return this->emitTraversal.value(); 
+            }
 
-            inline void setUntilTraversal(GraphTraversal* untilTraversal) { this->untilTraversal = untilTraversal; }
-            inline GraphTraversal* getUntilTraversal() { return this->untilTraversal; }
+            inline void setUntilTraversal(GraphTraversal untilTraversal) { this->untilTraversal.emplace(untilTraversal); }
+            inline GraphTraversal& getUntilTraversal() { 
+                if(!this->untilTraversal) throw std::runtime_error("Traversal does not have an until traversal!");
+                return this->untilTraversal.value(); 
+            }
 
-            inline void setTimes(size_t times) { this->times = times; }
+            inline void setTimes(size_t times) { *(this->times) = times; }
 
             virtual void apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers);
 

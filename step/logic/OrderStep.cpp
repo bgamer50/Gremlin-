@@ -20,7 +20,7 @@ namespace gremlinxx {
     }
 
     void OrderStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
-        traversers.advance([](auto traverser_data, auto traverser_se, auto traverser_paths){
+        traversers.advance([](auto& traverser_data, auto& traverser_se, auto& traverser_paths){
             maelstrom::vector sorted_data(traverser_data);
             auto perm = maelstrom::sort(sorted_data);
             

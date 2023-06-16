@@ -1,7 +1,9 @@
 #include "step/property/HasStep.h"
-#include "structure/Vertex.h"
 #include "traversal/GraphTraversal.h"
 #include "traversal/GraphTraversalSource.h"
+
+#include "structure/Vertex.h"
+#include "structure/Graph.h"
 
 #include "maelstrom/algorithms/intersection.h"
 #include "maelstrom/algorithms/filter.h"
@@ -27,7 +29,7 @@ namespace gremlinxx {
         
         auto p = this->predicate;
         auto prop_name = this->property_key_or_label;
-        traversers.advance([&g, p, prop_name](auto traverser_data, auto traverser_se, auto traverser_path_info){
+        traversers.advance([&g, p, prop_name](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
             maelstrom::vector found_vertices;
             maelstrom::vector found_values;
             std::tie(

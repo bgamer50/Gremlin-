@@ -11,10 +11,10 @@
 namespace gremlinxx {
     class CoalesceStep: public TraversalStep {
         private:
-            std::vector<GraphTraversal*> traversals;
+            std::vector<GraphTraversal> traversals;
         public:
-            CoalesceStep(std::vector<GraphTraversal*>& traversals);
-            std::vector<GraphTraversal*>& get_traversals();
+            CoalesceStep(std::vector<GraphTraversal>& traversals);
+            std::vector<GraphTraversal>& get_traversals();
             virtual void apply(GraphTraversal* parent_traversal, gremlinxx::traversal::TraverserSet& traversers);
     };
 }

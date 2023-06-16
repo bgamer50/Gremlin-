@@ -80,7 +80,11 @@ namespace gremlinxx {
                 */
                 using TraverserSet::getSideEffects;
                 inline virtual std::unordered_map<std::string, maelstrom::vector> getSideEffects() {
-                    return this->side_effects;
+                    std::unordered_map<std::string, maelstrom::vector> se_copy;
+
+                    for(auto& p : this->side_effects) se_copy[p.first] = maelstrom::vector(p.second);
+
+                    return se_copy;
                 }
 
                 /*
@@ -88,7 +92,11 @@ namespace gremlinxx {
                 */
                 using TraverserSet::getPathInfo;
                 inline virtual gremlinxx::traversal::PathInfo getPathInfo() {
-                    return this->path_info;
+                    gremlinxx::traversal::PathInfo path_info_copy;
+                    path_info_copy.paths = std::vector(this->path_info.paths.begin(), this->path_info.paths.end());
+                    path_info_copy.path_lengths = maelstrom::vector(this->path_info.path_lengths);
+
+                    return path_info_copy;
                 }
 
                 using TraverserSet::getPathLength;

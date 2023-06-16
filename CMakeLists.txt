@@ -15,9 +15,6 @@ set(INTERFACE_POSITION_INDEPENDENT_CODE True)
 add_library(
     gremlinxx
 
-    structure/Element.cpp
-    structure/Edge.cpp
-
     step/TraversalStep.cpp
 
     step/controlflow/CoalesceStep.cpp
@@ -38,16 +35,11 @@ add_library(
 
     step/graph/VStep.cpp
     step/graph/IdStep.cpp
-    step/graph/SubgraphExtractionStep.cpp
-    step/graph/SubgraphStep.cpp
 
     step/logic/DedupStep.cpp
-    step/logic/FoldStep.cpp
     step/logic/IdentityStep.cpp
-    step/logic/MapStep.cpp
     step/logic/NoOpStep.cpp
     step/logic/OrderStep.cpp
-    step/logic/UnfoldStep.cpp
 
     step/math/CountStep.cpp
     step/math/GroupCountStep.cpp
@@ -57,10 +49,10 @@ add_library(
     step/modulate/FromStep.cpp
     step/modulate/ToStep.cpp
 
-    step/property/AddPropertyStep.cpp
     step/property/HasStep.cpp
     step/property/PropertyStep.cpp
-    step/property/ValueMapStep.cpp
+    step/property/ElementMapStep.cpp
+    step/property/ValueStep.cpp
 
     step/sideeffect/AsStep.cpp
     step/sideeffect/SelectStep.cpp
@@ -79,6 +71,8 @@ add_library(
     traversal/GraphTraversalSource.cpp
     traversal/Scope.cpp
     traversal/Traverser.cpp
+    traversal/BasicTraverserSet.cpp
+    traversal/PathInfo.cpp
 )
 
 target_compile_options(
@@ -95,5 +89,5 @@ target_include_directories(
     gremlinxx
     PUBLIC
         "/mnt/gremlin++" # gremlinxx path
-        "/mnt/maelstrom" # maelstrom path
+        "/mnt/maelstrom/include" # maelstrom path
 )

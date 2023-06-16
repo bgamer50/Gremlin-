@@ -18,6 +18,8 @@ namespace gremlinxx {
         }
         sx << "...";
         sx << string_any(this->element_ids[this->element_ids.size() - 1]) << ")";
+
+        return sx.str();
     }
 
     void VStep::apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers) {

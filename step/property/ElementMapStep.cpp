@@ -5,6 +5,7 @@
 #include "structure/Property.h"
 #include "structure/Vertex.h"
 #include "structure/Edge.h"
+#include "structure/Graph.h"
 #include "util/gremlin_utils.h"
 
 #include "maelstrom/algorithms/intersection.h"
@@ -57,7 +58,7 @@ namespace gremlinxx {
         }
 
         // Use advance to reorder the traversers
-        traversers.advance([&origin, &traverser_data](auto old_traverser_data, auto traverser_se, auto traverser_paths){
+        traversers.advance([&origin, &traverser_data](auto& old_traverser_data, auto& traverser_se, auto& traverser_paths){
             return std::make_pair(
                 std::move(traverser_data),
                 std::move(origin)

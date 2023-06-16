@@ -31,6 +31,9 @@ namespace gremlinxx {
 		this->withTypeRegistration(std::type_index(typeid(uint8_t)), maelstrom::int8);
 		this->withTypeRegistration(std::type_index(typeid(double)), maelstrom::float64);
 		this->withTypeRegistration(std::type_index(typeid(float)), maelstrom::float32);
+
+		this->withTypeRegistration(std::type_index(typeid(Vertex)), graph->get_vertex_dtype());
+		this->withTypeRegistration(std::type_index(typeid(Edge)), graph->get_edge_dtype());
 	}
 
 	GraphTraversalSource* GraphTraversalSource::withStrategy(TraversalStrategy strategy) {
@@ -76,50 +79,49 @@ namespace gremlinxx {
 		return new gremlinxx::traversal::BasicTraverserSet();
 	}
 
-	GraphTraversal* GraphTraversalSource::V() {
-		GraphTraversal* trv = new GraphTraversal(this);
-		trv->appendStep(new VStep({}));
+	GraphTraversal GraphTraversalSource::V() {
+		GraphTraversal trv(this);
+		trv.appendStep(new VStep({}));
 		return trv;
 	}
 
-	GraphTraversal* GraphTraversalSource::V(Vertex* v) {
-		GraphTraversal* trv = new GraphTraversal(this);
-		trv->appendStep(new VStep({v->id()}));
+	GraphTraversal GraphTraversalSource::V(Vertex v) {
+		GraphTraversal trv(this);
+		trv.appendStep(new VStep({v.id}));
 		return trv;
 	}
 
-	GraphTraversal* GraphTraversalSource::V(boost::any v_id) {
-		GraphTraversal* trv = new GraphTraversal(this);
-		trv->appendStep(new VStep( {v_id}));
+	GraphTraversal GraphTraversalSource::V(boost::any v_id) {
+		GraphTraversal trv(this);
+		trv.appendStep(new VStep( {v_id}));
 		return trv;
 	}
 
-	//TODO should be a version of the Graph Step
-	GraphTraversal* GraphTraversalSource::E() {
-		return this->V()->outE();
+	GraphTraversal GraphTraversalSource::E() {
+		return this->V().outE();
 	}
 
-	GraphTraversal* GraphTraversalSource::addV() {
-		GraphTraversal* trv = new GraphTraversal(this);
-		trv->appendStep(new AddVertexStartStep());
+	GraphTraversal GraphTraversalSource::addV() {
+		GraphTraversal trv(this);
+		trv.appendStep(new AddVertexStartStep());
 		return trv;
 	}
 
-	GraphTraversal* GraphTraversalSource::addV(std::string label) {
-		GraphTraversal* trv = new GraphTraversal(this);
-		trv->appendStep(new AddVertexStartStep(label));
+	GraphTraversal GraphTraversalSource::addV(std::string label) {
+		GraphTraversal trv(this);
+		trv.appendStep(new AddVertexStartStep(label));
 		return trv;
 	}
 
-	GraphTraversal* GraphTraversalSource::addE(std::string label) {
-		GraphTraversal* trv = new GraphTraversal(this);
-		trv->appendStep(new AddEdgeStartStep(label));
+	GraphTraversal GraphTraversalSource::addE(std::string label) {
+		GraphTraversal trv(this);
+		trv.appendStep(new AddEdgeStartStep(label));
 		return trv;
 	}
 
-	GraphTraversal* GraphTraversalSource::inject(std::vector<boost::any> injects) {
-		GraphTraversal* trv = new GraphTraversal(this);
-		return trv->appendStep(new InjectStep(injects));
+	GraphTraversal GraphTraversalSource::inject(std::vector<boost::any> injects) {
+		GraphTraversal trv(this);
+		return trv.appendStep(new InjectStep(injects));
 	}
 
 }

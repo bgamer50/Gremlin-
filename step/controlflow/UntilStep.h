@@ -9,12 +9,12 @@ namespace gremlinxx {
 
     class UntilStep: public TraversalStep {
         private:
-            GraphTraversal* traversal;
+            GraphTraversal traversal;
 
         public:
-            UntilStep(GraphTraversal* traversal);
+            UntilStep(GraphTraversal traversal);
 
-            inline GraphTraversal* getTraversal() { return this->traversal; }
+            inline GraphTraversal getTraversal() { return this->traversal; }
     };
 
 }

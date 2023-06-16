@@ -7,7 +7,7 @@ namespace gremlinxx {
     std::string IdentityStep::getInfo() { return "IdentityStep{}"; }
 
     void IdentityStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers){
-        traversers.advance([](auto data, auto se, auto p){
+        traversers.advance([](auto& data, auto& se, auto& p){
             return std::make_pair(
                 maelstrom::vector(data),
                 maelstrom::vector()

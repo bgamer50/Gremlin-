@@ -1,5 +1,6 @@
 #include "step/graph/IdStep.h"
 #include "traversal/GraphTraversal.h"
+#include "structure/Graph.h"
 
 namespace gremlinxx {
 

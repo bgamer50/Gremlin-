@@ -7,6 +7,7 @@
 
 #include "traversal/GraphTraversal.h"
 #include "traversal/GraphTraversalSource.h"
+#include "structure/Graph.h"
 
 #include "maelstrom/algorithms/arange.h"
 #include "maelstrom/algorithms/select.h"
@@ -36,9 +37,9 @@ namespace gremlinxx {
 		}
 
 		if(this->value.type() == typeid(GraphTraversal*)) {
-			GraphTraversal* ap_anonymous_trv = boost::any_cast<GraphTraversal*>(value);
+			GraphTraversal ap_anonymous_trv = boost::any_cast<GraphTraversal>(value);
 			
-			for(TraversalStep* step : ap_anonymous_trv->getSteps()) {
+			for(TraversalStep* step : ap_anonymous_trv.getSteps()) {
 				auto reduction_step = dynamic_cast<ReductionStep*>(step);
 				if(reduction_step != nullptr) {
 					reduction_step->set_scope_context(ScopeContext{Scope::local, PROPERTY_STEP_SIDE_EFFECT_KEY});

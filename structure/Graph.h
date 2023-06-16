@@ -19,19 +19,19 @@ namespace gremlinxx {
 			/**
 			 * Returns a copy of this Graph's vertices.
 			 **/
-			virtual std::vector<Vertex*> vertices() = 0;
+			virtual std::vector<Vertex> vertices() = 0;
 
 			/**
 			 * Returns a copy of this Graph's edges.
 			**/
-			virtual std::vector<Edge*> edges() = 0;
+			virtual std::vector<Edge> edges() = 0;
 
 			// Vertex labels are optional, implementer should check if the label is empty and react appropriately
-			virtual Vertex* add_vertex(std::string label="") = 0;
+			virtual Vertex add_vertex(std::string label="") = 0;
 			virtual maelstrom::vector add_vertices(size_t n_new_vertices, std::string label="") = 0;
 
 			// Edge labels are always required
-			virtual Edge* add_edge(Vertex* from_vertex, Vertex* to_vertex, std::string label) = 0;
+			virtual Edge add_edge(Vertex from_vertex, Vertex to_vertex, std::string label) = 0;
 			virtual maelstrom::vector add_edges(maelstrom::vector& from_vertices, maelstrom::vector& to_vertices, std::string label) = 0;
 
 			// Traversers vertices to their neighbors.  Returns the resulting vertices (first element) and originating index (second element).

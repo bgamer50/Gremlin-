@@ -16,7 +16,7 @@ namespace gremlinxx {
     class WhereStep: public TraversalStep {
         private:
             std::string label;
-            P predicate = P(P::Comparison::EQ, boost::any());
+            P predicate = P(maelstrom::EQUALS, boost::any());
 
         public:
             WhereStep(std::string label, P predicate);

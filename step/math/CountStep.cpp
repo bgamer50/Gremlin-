@@ -12,7 +12,7 @@ namespace gremlinxx {
     }
 
     void CountStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
-        traversers.advance([](auto traverser_data, auto traverser_se, auto traverser_paths){
+        traversers.advance([](auto& traverser_data, auto& traverser_se, auto& traverser_paths){
             size_t sz = traverser_data.size();
             maelstrom::vector new_data(
                 traverser_data.get_mem_type(),

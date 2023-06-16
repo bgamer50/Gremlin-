@@ -12,7 +12,7 @@ namespace gremlinxx {
     void SelectStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
         std::string se_label = this->sideEffectLabel;
 
-        traversers.advance([se_label](auto traverser_data, auto traverser_se, auto traverser_path_info){
+        traversers.advance([se_label](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
             if(traverser_se.find(se_label) == traverser_se.end()) {
                 std::stringstream sx;
                 sx << "Invalid side effect key " << se_label;

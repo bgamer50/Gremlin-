@@ -1,5 +1,3 @@
-#pragma once
-
 #include "traversal/PathInfo.h"
 #include "maelstrom/algorithms/remove_if.h"
 #include "maelstrom/algorithms/select.h"
@@ -23,7 +21,7 @@ namespace gremlinxx {
                 throw std::runtime_error("next vector size must match path size");
             }
 
-            this->paths.push_back(prev_traverser_data);
+            this->paths.push_back(std::move(prev_traverser_data));
 
             // Step 1: update path lengths
             if(!empty_start) {
@@ -100,7 +98,7 @@ namespace gremlinxx {
                     dummy_path.resize(sz);
                     this->paths.insert(
                         this->paths.begin() + k,
-                        dummy_path
+                        std::move(dummy_path)
                     );
                 }
             }

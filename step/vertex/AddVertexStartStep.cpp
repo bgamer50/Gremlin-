@@ -24,7 +24,7 @@ namespace gremlinxx {
     }
 
     void AddVertexStartStep::apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers) {
-        Vertex* v = this->has_label ? trv->getGraph()->add_vertex(this->label) : trv->getGraph()->add_vertex();
+        Vertex v = this->has_label ? trv->getGraph()->add_vertex(this->label) : trv->getGraph()->add_vertex();
 
         std::vector<boost::any> anys = {boost::any(v)};
         

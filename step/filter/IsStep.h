@@ -14,7 +14,7 @@ namespace gremlinxx {
 
     class IsStep: public TraversalStep {
         private:
-            P predicate = P(P::Comparison::EQ, boost::any());
+            P predicate = P(maelstrom::EQUALS, boost::any());
 
         public:
             IsStep(P predicate);

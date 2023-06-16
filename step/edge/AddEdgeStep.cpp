@@ -11,8 +11,6 @@ namespace gremlinxx {
     AddEdgeStep::AddEdgeStep(std::string label_arg)
     : TraversalStep(MAP, ADD_EDGE_STEP) {
         label = label_arg;
-        out_vertex_traversal = NULL;
-        in_vertex_traversal = NULL;
     }
 
     std::string AddEdgeStep::getInfo() {
@@ -21,20 +19,12 @@ namespace gremlinxx {
         return info;
     }
 
-    void AddEdgeStep::modulate_from(boost::any arg) { 
-        if(arg.type() == typeid(GraphTraversal*)) this->out_vertex_traversal = boost::any_cast<GraphTraversal*>(arg);
-        else {
-            this->out_vertex_traversal = new GraphTraversal();
-            this->out_vertex_traversal->inject({arg});
-        }
+    void AddEdgeStep::modulate_from(GraphTraversal t_from) {
+        this->out_vertex_traversal.emplace(t_from); 
     }
 
-    void AddEdgeStep::modulate_to(boost::any arg) {
-        if(arg.type() == typeid(GraphTraversal*)) this->in_vertex_traversal = boost::any_cast<GraphTraversal*>(arg);
-        else {
-            this->in_vertex_traversal = new GraphTraversal();
-            this->in_vertex_traversal->inject({arg});
-        }
+    void AddEdgeStep::modulate_to(GraphTraversal t_to) {
+        this->in_vertex_traversal.emplace(t_to);
     }
 
     void AddEdgeStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
@@ -51,44 +41,44 @@ namespace gremlinxx {
         std::vector<boost::any> added_edges;
         added_edges.reserve(traversers.size());
         for(auto it = unpacked_traversers.begin(); it != unpacked_traversers.end(); ++it) {
-            Vertex* from_vertex;
-            Vertex* to_vertex;
+            Vertex from_vertex;
+            Vertex to_vertex;
             bool used_current_traverser = false;
 
-            if(this->out_vertex_traversal == nullptr) {
+            if(!this->out_vertex_traversal) {
                 try {
-                    from_vertex = boost::any_cast<Vertex*>(std::get<0>(*it).get(0));
+                    from_vertex = boost::any_cast<Vertex>(std::get<0>(*it).get(0));
                 } catch(boost::bad_any_cast& exc) { throw std::runtime_error("Attempted to add an edge from something that is not a Vertex!"); }
                 catch(std::out_of_range& exr) { throw std::runtime_error("Attempted to add an edge but incoming traversal was empty!"); }
                 
                 used_current_traverser = true;
             } else {
-                GraphTraversal from_traversal(src, out_vertex_traversal);
+                GraphTraversal from_traversal(src, out_vertex_traversal.value());
                 from_traversal.getTraverserSet().reinitialize(
                     std::move(std::get<0>(*it)),
                     std::move(std::get<1>(*it)),
                     std::move(std::get<2>(*it))
                 );
                 
-                from_vertex = boost::any_cast<Vertex*>(from_traversal.next());
+                from_vertex = boost::any_cast<Vertex>(from_traversal.next());
             }
 
-            if(this->in_vertex_traversal == nullptr) {
+            if(!this->in_vertex_traversal) {
                 if(used_current_traverser) throw std::runtime_error("No from/to step was provided.");
 
                 try {
-                    to_vertex = boost::any_cast<Vertex*>(std::get<0>(*it).get(0));
+                    to_vertex = boost::any_cast<Vertex>(std::get<0>(*it).get(0));
                 } catch(boost::bad_any_cast& exc) { throw std::runtime_error("Attempted to add an edge to something that is not a Vertex!"); }
                 catch(std::out_of_range& exr) { throw std::runtime_error("Attempted to add an edge but incoming traversal was empty!"); }
             } else {
-                GraphTraversal to_traversal(src, in_vertex_traversal);
+                GraphTraversal to_traversal(src, in_vertex_traversal.value());
                 to_traversal.getTraverserSet().reinitialize(
                     std::move(std::get<0>(*it)),
                     std::move(std::get<1>(*it)),
                     std::move(std::get<2>(*it))
                 );
                 
-                to_vertex = boost::any_cast<Vertex*>(to_traversal.next());
+                to_vertex = boost::any_cast<Vertex>(to_traversal.next());
             }
 
             added_edges.push_back(
