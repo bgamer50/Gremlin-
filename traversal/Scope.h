@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/any.hpp>
+#include <any>
 #include <optional>
 #include <string>
 #include <inttypes.h>
@@ -16,8 +16,8 @@ namespace gremlinxx {
 
     typedef int64_t scope_group_t;
 
-    scope_group_t group_id_from_any(boost::any a);
+    scope_group_t group_id_from_any(std::any a);
 
-    boost::any any_from_group_id(scope_group_t group_id, const std::type_info& out_type);
+    std::any any_from_group_id(scope_group_t group_id, const std::type_info& out_type);
 
 }

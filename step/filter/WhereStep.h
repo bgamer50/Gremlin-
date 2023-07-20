@@ -7,7 +7,7 @@
 #include "traversal/Traverser.h"
 #include <unordered_map>
 #include <string>
-#include <boost/any.hpp>
+#include <any>
 
 namespace gremlinxx {
 
@@ -16,7 +16,7 @@ namespace gremlinxx {
     class WhereStep: public TraversalStep {
         private:
             std::string label;
-            P predicate = P(maelstrom::EQUALS, boost::any());
+            P predicate = P(maelstrom::EQUALS, std::any());
 
         public:
             WhereStep(std::string label, P predicate);

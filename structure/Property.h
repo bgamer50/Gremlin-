@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <boost/any.hpp>
+#include <any>
 
 namespace gremlinxx {
 
@@ -11,10 +11,10 @@ namespace gremlinxx {
 	class Property {
 		private:
 			std::string my_key;
-			boost::any my_value;
+			std::any my_value;
 
 		public:		
-			Property(std::string new_key, boost::any new_value) {
+			Property(std::string new_key, std::any new_value) {
 				this->my_key = new_key;
 				this->my_value = new_value;
 			}
@@ -23,7 +23,7 @@ namespace gremlinxx {
 				return this->my_key;
 			}
 
-			virtual boost::any value() {
+			virtual std::any value() {
 				return this->my_value;
 			}
 	};

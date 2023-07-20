@@ -14,7 +14,7 @@ namespace gremlinxx {
 
     void MinStep::apply_global(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
         traversers.advance([](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
-            boost::any min;
+            std::any min;
             size_t ix;
 
             std::tie(min, ix) = maelstrom::reduce(traverser_data, maelstrom::reductor::MIN);

@@ -5,7 +5,7 @@
 #include <tuple>
 #include <functional>
 #include <typeindex>
-#include <boost/any.hpp>
+#include <any>
 
 #include "maelstrom/storage/datatype.h"
 #include "traversal/TraverserSet.h"
@@ -17,9 +17,9 @@ namespace gremlinxx {
 	class TraversalStep;
 	class GraphTraversal;
 	typedef std::function<void(std::vector<TraversalStep*>&)> TraversalStrategy;
-	typedef std::function<int(boost::any,boost::any)> compare_func_t;
-	typedef std::function<bool(boost::any,boost::any)> equals_func_t;
-	typedef std::function<size_t(boost::any)> hash_func_t;
+	typedef std::function<int(std::any,std::any)> compare_func_t;
+	typedef std::function<bool(std::any,std::any)> equals_func_t;
+	typedef std::function<size_t(std::any)> hash_func_t;
 
 	class GraphTraversalSource {
 	private:
@@ -48,18 +48,18 @@ namespace gremlinxx {
 		GraphTraversalSource* withAdminOption(std::string option_name, std::string value);
 		std::string getOptionValue(std::string option_name);
 
-		maelstrom::dtype_t get_dtype(boost::any obj);
+		maelstrom::dtype_t get_dtype(std::any obj);
 
 		std::vector<TraversalStrategy>& getStrategies();
 
 		GraphTraversal V();
 		GraphTraversal V(Vertex v);
-		GraphTraversal V(boost::any v_id);
+		GraphTraversal V(std::any v_id);
 		GraphTraversal E();
 		GraphTraversal addV();
 		GraphTraversal addV(std::string label);
 		GraphTraversal addE(std::string label);
-		GraphTraversal inject(std::vector<boost::any> injects);
+		GraphTraversal inject(std::vector<std::any> injects);
 	};
 
 }

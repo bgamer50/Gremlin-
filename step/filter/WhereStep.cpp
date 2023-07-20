@@ -25,10 +25,10 @@ namespace gremlinxx {
         auto predicate = this->predicate;
         traversers.advance([label, predicate](auto& traverser_data, auto& side_effects, auto& path_info){
             maelstrom::vector ix;
-            if(predicate.operand.type() == typeid(std::string) && side_effects.find(boost::any_cast<std::string>(predicate.operand)) != side_effects.end()) {
+            if(predicate.operand.type() == typeid(std::string) && side_effects.find(std::any_cast<std::string>(predicate.operand)) != side_effects.end()) {
                 ix = maelstrom::compare(
                     side_effects[label],
-                    side_effects[boost::any_cast<std::string>(predicate.operand)],
+                    side_effects[std::any_cast<std::string>(predicate.operand)],
                     predicate.comparison
                 );
 

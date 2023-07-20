@@ -6,8 +6,7 @@
 #pragma once
 
 #include <cstdint>
-#include <boost/any.hpp>
-#include <boost/core/typeinfo.hpp>
+#include <any>
 #include "maelstrom/storage/datatype.h"
 
 class Vertex;

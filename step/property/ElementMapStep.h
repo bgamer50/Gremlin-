@@ -4,7 +4,7 @@
 #define ELEMENTMAP_ID_KEY "id"
 #define ElEMENTMAP_LABEL_KEY "label"
 
-#include <boost/any.hpp>
+#include <any>
 #include <vector>
 #include <unordered_map>
 
@@ -28,7 +28,7 @@ namespace gremlinxx {
             ElementMapStep(std::vector<std::string>& keys);
             virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
             
-            virtual void modulate_by(boost::any arg);
+            virtual void modulate_by(std::any arg);
 
             using TraversalStep::getInfo;
             std::string getInfo();

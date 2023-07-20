@@ -5,7 +5,7 @@
 
 namespace gremlinxx {
 
-    VStep::VStep(std::vector<boost::any> eids)
+    VStep::VStep(std::vector<std::any> eids)
     : TraversalStep(MAP, V_STEP) {
         this->element_ids = eids;
     }

@@ -4,7 +4,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/any.hpp>
+#include <any>
 
 #include "step/modulate/FromToModulating.h"
 #include "step/TraversalStep.h"

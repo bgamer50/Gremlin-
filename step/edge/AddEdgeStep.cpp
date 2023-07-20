@@ -5,6 +5,7 @@
 #include "traversal/GraphTraversalSource.h"
 
 #include <tuple>
+#include <any>
 
 namespace gremlinxx {
     
@@ -38,7 +39,7 @@ namespace gremlinxx {
         if(graph == nullptr) throw std::runtime_error("Cannot add edges without access to the graph!");
 
         auto unpacked_traversers = traversers.unpack();
-        std::vector<boost::any> added_edges;
+        std::vector<std::any> added_edges;
         added_edges.reserve(traversers.size());
         for(auto it = unpacked_traversers.begin(); it != unpacked_traversers.end(); ++it) {
             Vertex from_vertex;
@@ -47,8 +48,8 @@ namespace gremlinxx {
 
             if(!this->out_vertex_traversal) {
                 try {
-                    from_vertex = boost::any_cast<Vertex>(std::get<0>(*it).get(0));
-                } catch(boost::bad_any_cast& exc) { throw std::runtime_error("Attempted to add an edge from something that is not a Vertex!"); }
+                    from_vertex = std::any_cast<Vertex>(std::get<0>(*it).get(0));
+                } catch(std::bad_any_cast& exc) { throw std::runtime_error("Attempted to add an edge from something that is not a Vertex!"); }
                 catch(std::out_of_range& exr) { throw std::runtime_error("Attempted to add an edge but incoming traversal was empty!"); }
                 
                 used_current_traverser = true;
@@ -60,15 +61,15 @@ namespace gremlinxx {
                     std::move(std::get<2>(*it))
                 );
                 
-                from_vertex = boost::any_cast<Vertex>(from_traversal.next());
+                from_vertex = std::any_cast<Vertex>(from_traversal.next());
             }
 
             if(!this->in_vertex_traversal) {
                 if(used_current_traverser) throw std::runtime_error("No from/to step was provided.");
 
                 try {
-                    to_vertex = boost::any_cast<Vertex>(std::get<0>(*it).get(0));
-                } catch(boost::bad_any_cast& exc) { throw std::runtime_error("Attempted to add an edge to something that is not a Vertex!"); }
+                    to_vertex = std::any_cast<Vertex>(std::get<0>(*it).get(0));
+                } catch(std::bad_any_cast& exc) { throw std::runtime_error("Attempted to add an edge to something that is not a Vertex!"); }
                 catch(std::out_of_range& exr) { throw std::runtime_error("Attempted to add an edge but incoming traversal was empty!"); }
             } else {
                 GraphTraversal to_traversal(src, in_vertex_traversal.value());
@@ -78,7 +79,7 @@ namespace gremlinxx {
                     std::move(std::get<2>(*it))
                 );
                 
-                to_vertex = boost::any_cast<Vertex>(to_traversal.next());
+                to_vertex = std::any_cast<Vertex>(to_traversal.next());
             }
 
             added_edges.push_back(

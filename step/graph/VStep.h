@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/any.hpp>
+#include <any>
 #include "step/TraversalStep.h"
 #include "traversal/Traverser.h"
 
@@ -12,14 +12,14 @@ namespace gremlinxx {
 
 	class VStep : public TraversalStep {
 		protected:
-			std::vector<boost::any> element_ids;
+			std::vector<std::any> element_ids;
 		public:
-			VStep(std::vector<boost::any> eids);
+			VStep(std::vector<std::any> eids);
 
 			using TraversalStep::getInfo;
 			virtual std::string	getInfo();
 
-			inline std::vector<boost::any>& get_element_ids() { return this->element_ids; }
+			inline std::vector<std::any>& get_element_ids() { return this->element_ids; }
 
 			virtual void apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers);
 	};

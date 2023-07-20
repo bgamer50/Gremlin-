@@ -6,7 +6,7 @@ class Vertex;
 #include <vector>
 #include <stdexcept>
 #include <iostream>
-#include <boost/any.hpp>
+#include <any>
 #include "step/TraversalStep.h"
 #include "traversal/P.h"
 #include "traversal/Traverser.h"
@@ -27,7 +27,7 @@ namespace gremlinxx {
 			std::string property_key_or_label;
 
 			// Predicate
-			P predicate = P(maelstrom::EQUALS, boost::any());
+			P predicate = P(maelstrom::EQUALS, std::any());
 
 		public:
 			HasStep(std::string property_key_or_label, P predicate);
@@ -39,7 +39,7 @@ namespace gremlinxx {
 				return this->property_key_or_label;
 			}
 
-			inline boost::any get_value() {
+			inline std::any get_value() {
 				return this->predicate.operand;
 			}
 

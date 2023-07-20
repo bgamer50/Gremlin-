@@ -43,8 +43,6 @@
 #include "step/controlflow/RepeatStep.h"
 #include "step/math/MinStep.h"
 
-#include <boost/any.hpp>
-
 namespace gremlinxx {
 
 	/*
@@ -100,15 +98,15 @@ namespace gremlinxx {
 		return !this->traversers->empty();
 	}
 
-	std::vector<boost::any> GraphTraversal::toVector() {		
-		std::vector<boost::any> results;
-		this->forEachRemaining([&](boost::any& a){results.push_back(a);});
+	std::vector<std::any> GraphTraversal::toVector() {		
+		std::vector<std::any> results;
+		this->forEachRemaining([&](std::any& a){results.push_back(a);});
 		return results;
 	}
 
-	std::list<boost::any> GraphTraversal::toList() {
-		std::list<boost::any> results;
-		this->forEachRemaining([&](boost::any& a) {
+	std::list<std::any> GraphTraversal::toList() {
+		std::list<std::any> results;
+		this->forEachRemaining([&](std::any& a) {
 			results.push_back(a);
 		});
 		return results;
@@ -158,7 +156,7 @@ namespace gremlinxx {
 		return this->appendStep(new UnionStep(traversals));
 	}
 
-	GraphTraversal& GraphTraversal::property(std::string property_key, boost::any value) {
+	GraphTraversal& GraphTraversal::property(std::string property_key, std::any value) {
 		return this->appendStep(new PropertyStep(property_key, value));
 	}
 
@@ -171,13 +169,13 @@ namespace gremlinxx {
 	}
 
 	GraphTraversal& GraphTraversal::V(std::vector<Vertex> vertices) {
-		std::vector<boost::any> ids;
+		std::vector<std::any> ids;
 		for(Vertex v : vertices) ids.push_back(v.id);
 		return this->appendStep(new VStep(ids));
 	}
 
-	GraphTraversal& GraphTraversal::V(boost::any v_id) {
-		return this->appendStep(new VStep({boost::any(v_id)}));
+	GraphTraversal& GraphTraversal::V(std::any v_id) {
+		return this->appendStep(new VStep({std::any(v_id)}));
 	}
 
 	GraphTraversal& GraphTraversal::from(std::string sideEffectLabel) {
@@ -197,7 +195,7 @@ namespace gremlinxx {
 	}
 
 	// Modulator for valuemap and others
-	GraphTraversal& GraphTraversal::by(boost::any arg) {
+	GraphTraversal& GraphTraversal::by(std::any arg) {
 		return this->appendStep(new ByStep(arg));
 	}
 
@@ -273,7 +271,7 @@ namespace gremlinxx {
 		return this->appendStep(new IdentityStep());
 	}
 
-	GraphTraversal& GraphTraversal::is(boost::any val) {
+	GraphTraversal& GraphTraversal::is(std::any val) {
 		return this->is(P::eq(val));
 	}
 
@@ -298,12 +296,12 @@ namespace gremlinxx {
 		return this->appendStep(new HasStep(key, pred));
 	}
 
-	GraphTraversal& GraphTraversal::has(std::string key, boost::any value) {
+	GraphTraversal& GraphTraversal::has(std::string key, std::any value) {
 		return this->appendStep(new HasStep(key, P::eq(value)));
 	}
 
 	GraphTraversal& GraphTraversal::has(std::string key) {
-		return this->appendStep(new HasStep(key, P::neq(boost::any())));
+		return this->appendStep(new HasStep(key, P::neq(std::any())));
 	}
 
 	GraphTraversal& GraphTraversal::dedup() {
@@ -363,7 +361,7 @@ namespace gremlinxx {
 		return this->appendStep(new LimitStep(the_limit));
 	}
 
-	GraphTraversal& GraphTraversal::inject(std::vector<boost::any> injects) {
+	GraphTraversal& GraphTraversal::inject(std::vector<std::any> injects) {
 		return this->appendStep(new InjectStep(injects));
 	}
 
@@ -391,26 +389,26 @@ namespace gremlinxx {
 		return explanation + "}";
 	}
 
-	boost::any GraphTraversal::first() {
+	std::any GraphTraversal::first() {
 		this->iterate();
 		if(this->traversers->empty()) throw std::runtime_error("Traversal produced an empty set of final traversers!");
 
-		boost::any next_result = this->traversers->getData(0);
+		std::any next_result = this->traversers->getData(0);
 		traversers->clear();
 		return next_result;
 	}
 
-	boost::any GraphTraversal::next() { 
+	std::any GraphTraversal::next() { 
 		if(!this->has_iterated) this->iterate();
 		if(this->traversers->empty()) throw std::runtime_error("No traversers available when calling next()");
 
-		boost::any next_result = this->traversers->getData(0);
+		std::any next_result = this->traversers->getData(0);
 		traversers->erase(0);
 
 		return next_result;
 	}
 
-	void GraphTraversal::forEachRemaining(std::function<void(boost::any&)> func) {
+	void GraphTraversal::forEachRemaining(std::function<void(std::any&)> func) {
 		if(!this->has_iterated) this->iterate();
 
 		auto data = this->traversers->getTraverserData();

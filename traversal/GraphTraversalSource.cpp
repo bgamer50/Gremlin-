@@ -57,7 +57,7 @@ namespace gremlinxx {
 		else return kv->second;
 	}
 
-	maelstrom::dtype_t GraphTraversalSource::get_dtype(boost::any obj) {
+	maelstrom::dtype_t GraphTraversalSource::get_dtype(std::any obj) {
 		const std::type_index type = std::type_index(obj.type());
 		auto z = this->type_registrations.find(type);
 		if(z == this->type_registrations.end()) {
@@ -91,7 +91,7 @@ namespace gremlinxx {
 		return trv;
 	}
 
-	GraphTraversal GraphTraversalSource::V(boost::any v_id) {
+	GraphTraversal GraphTraversalSource::V(std::any v_id) {
 		GraphTraversal trv(this);
 		trv.appendStep(new VStep( {v_id}));
 		return trv;
@@ -119,7 +119,7 @@ namespace gremlinxx {
 		return trv;
 	}
 
-	GraphTraversal GraphTraversalSource::inject(std::vector<boost::any> injects) {
+	GraphTraversal GraphTraversalSource::inject(std::vector<std::any> injects) {
 		GraphTraversal trv(this);
 		return trv.appendStep(new InjectStep(injects));
 	}

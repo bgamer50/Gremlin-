@@ -88,6 +88,6 @@ target_compile_options(
 target_include_directories(
     gremlinxx
     PUBLIC
-        "/mnt/gremlin++" # gremlinxx path
-        "/mnt/maelstrom/include" # maelstrom path
+        "." # gremlinxx path
+        "../maelstrom/include" # maelstrom path
 )

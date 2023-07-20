@@ -12,8 +12,8 @@ namespace gremlinxx {
     DedupStep::DedupStep()
     : TraversalStep(true, FILTER, DEDUP_STEP) {}
 
-    void DedupStep::modulate_by(boost::any arg) { 
-        this->dedup_by_key = boost::any_cast<std::string>(arg);
+    void DedupStep::modulate_by(std::any arg) { 
+        this->dedup_by_key = std::any_cast<std::string>(arg);
     }
 
     void DedupStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {

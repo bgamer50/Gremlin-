@@ -27,7 +27,7 @@ namespace gremlinxx {
             using TraversalStep::getInfo;
             virtual std::string getInfo();
 
-            virtual void modulate_by(boost::any arg);
+            virtual void modulate_by(std::any arg);
     };
 
 }

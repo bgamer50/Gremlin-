@@ -5,7 +5,7 @@
 #include "structure/Property.h"
 #include <vector>
 #include <string>
-#include <boost/any.hpp>
+#include <any>
 
 #define VALUE_STEP 0x67
 

@@ -30,7 +30,7 @@ namespace gremlinxx {
             // Set the correct path length for each traverser.
             for(size_t t = 0; t < traversers.size(); ++t) {
                 traversers[t].access_path().resize(
-                    boost::any_cast<path_length_t>(current_path_lengths.get(t))
+                    std::any_cast<path_length_t>(current_path_lengths.get(t))
                 );
             }
 
@@ -68,7 +68,7 @@ namespace gremlinxx {
             // Paths
             if(!this->path_info.path_lengths.empty()) {
                 trv.access_path().reserve(
-                    boost::any_cast<path_length_t>(this->path_info.path_lengths.get(i))
+                    std::any_cast<path_length_t>(this->path_info.path_lengths.get(i))
                 );
 
                 for(size_t k = 0; k < trv.access_path().size(); ++k) {
@@ -82,7 +82,7 @@ namespace gremlinxx {
             return trv;
         }
 
-        boost::any BasicTraverserSet::getData(size_t i) {
+        std::any BasicTraverserSet::getData(size_t i) {
             return this->traverser_data.get(i);
         }
 

@@ -48,7 +48,7 @@ namespace gremlinxx {
                 /*
                     Gets the data stored in the ith traverser.
                 */
-                virtual boost::any getData(size_t i) = 0;
+                virtual std::any getData(size_t i) = 0;
 
                 /*
                     Returns a copy of the side effects of each traverser in this traverser set.

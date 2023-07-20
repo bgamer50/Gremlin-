@@ -39,12 +39,12 @@ namespace gremlinxx {
         GraphTraversal from_traversal(my_traversal_source, this->out_vertex_traversal.value());
         GraphTraversal to_traversal(my_traversal_source, this->in_vertex_traversal.value());
 
-        Vertex from_vertex = boost::any_cast<Vertex>(from_traversal.next());
-        Vertex to_vertex = boost::any_cast<Vertex>(to_traversal.next());
+        Vertex from_vertex = std::any_cast<Vertex>(from_traversal.next());
+        Vertex to_vertex = std::any_cast<Vertex>(to_traversal.next());
 
         Edge new_edge = trv->getGraph()->add_edge(from_vertex, to_vertex, label);
         traversers.advance([new_edge, my_traversal_source](maelstrom::vector& data, std::unordered_map<std::string, maelstrom::vector>& se, gremlinxx::traversal::PathInfo& paths){
-            std::vector<boost::any> any_vec = {new_edge};
+            std::vector<std::any> any_vec = {new_edge};
             return std::make_pair(
                 maelstrom::make_vector_from_anys(
                     data.get_mem_type(),

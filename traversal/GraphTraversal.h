@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <boost/any.hpp>
+#include <any>
 
 #include "structure/Direction.h"
 #include "traversal/P.h"
@@ -36,7 +36,7 @@ namespace gremlinxx {
 	protected:
 		std::vector<TraversalStep*> steps;
 		gremlinxx::traversal::TraverserSet* traversers;
-		std::unordered_map<std::string, boost::any> traversal_properties;
+		std::unordered_map<std::string, std::any> traversal_properties;
 	private:
 		GraphTraversalSource* source;
 		bool has_iterated = false;
@@ -77,13 +77,13 @@ namespace gremlinxx {
 			return *this;
 		}
 
-		inline void setTraversalProperty(std::string property_name, boost::any property_value) {
+		inline void setTraversalProperty(std::string property_name, std::any property_value) {
 			this->traversal_properties[property_name] = property_value;
 		}
 
-		inline boost::any getTraversalProperty(std::string property_name) {
+		inline std::any getTraversalProperty(std::string property_name) {
 			auto f = this->traversal_properties.find(property_name);
-			if(f == traversal_properties.end()) return boost::any();
+			if(f == traversal_properties.end()) return std::any();
 			return f->second;
 		}
 
@@ -99,7 +99,7 @@ namespace gremlinxx {
 
 		GraphTraversal& addV();
 
-		GraphTraversal& property(std::string property_key, boost::any value);
+		GraphTraversal& property(std::string property_key, std::any value);
 
 		//GraphTraversal<auto n> aggregate(std::string sideEffectLabel);
 		//GraphTraversal<auto n> _and();
@@ -108,7 +108,7 @@ namespace gremlinxx {
 		GraphTraversal& as(std::string sideEffectLabel);
 		
 		//GraphTraversal* barrier();
-		GraphTraversal& by(boost::any arg);
+		GraphTraversal& by(std::any arg);
 		GraphTraversal& cap(std::string sideEffectLabel);
 		//GraphTraversal<auto n> choose(GraphTraversal<A> ifTraversal, GraphTraversal<B> trueTraversal, GraphTraversal<C> falseTraversal);
 		//GraphTraversal<auto n> choose(GraphTraversal<A> withOptionTraversal);
@@ -136,7 +136,7 @@ namespace gremlinxx {
 
 		GraphTraversal& V(std::vector<Vertex> vertices);
 
-		GraphTraversal& V(boost::any v_id);
+		GraphTraversal& V(std::any v_id);
 
 		//GraphTraversal* V(void* objects, size_t sizeOfEach, int length);
 		//GraphTraversal group();
@@ -148,7 +148,7 @@ namespace gremlinxx {
 
 		GraphTraversal& has(std::string key, P pred);
 
-		GraphTraversal& has(std::string key, boost::any value);
+		GraphTraversal& has(std::string key, std::any value);
 
 		GraphTraversal& has(std::string key);
 
@@ -163,8 +163,8 @@ namespace gremlinxx {
 		GraphTraversal& id();
 
 		GraphTraversal& identity();
-		GraphTraversal& inject(std::vector<boost::any> objects);
-		GraphTraversal& is(boost::any val);
+		GraphTraversal& inject(std::vector<std::any> objects);
+		GraphTraversal& is(std::any val);
 		GraphTraversal& is(P predicate);
 		//GraphTraversal key();
 		//GraphTraversal* label();
@@ -291,16 +291,16 @@ namespace gremlinxx {
 
 		bool hasNext();
 
-		std::vector<boost::any> toVector();
+		std::vector<std::any> toVector();
 
-		std::list<boost::any> toList();
+		std::list<std::any> toList();
 
 		// much more efficient & memory-safe for getting the first result than next()
-		boost::any first();
+		std::any first();
 
-		boost::any next();
+		std::any next();
 
-		void forEachRemaining(std::function<void(boost::any&)> func);
+		void forEachRemaining(std::function<void(std::any&)> func);
 
 		void iterate();
 

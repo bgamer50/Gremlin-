@@ -1,12 +1,12 @@
 #pragma once
 
-#include <boost/any.hpp>
+#include <any>
 
 namespace gremlinxx {
 
     class ByModulating {
         public:
-            virtual void modulate_by(boost::any arg) = 0;
+            virtual void modulate_by(std::any arg) = 0;
     };
 
 }

@@ -7,9 +7,9 @@ namespace gremlinxx {
     inline GraphTraversal addE(std::string label) { return GraphTraversal().addE(label); }
     inline GraphTraversal addV(std::string label) { return GraphTraversal().addV(label); }
     inline GraphTraversal addV() { return GraphTraversal().addV(); }
-    inline GraphTraversal property(std::string property_key, boost::any value) { return GraphTraversal().property(property_key, value); }
+    inline GraphTraversal property(std::string property_key, std::any value) { return GraphTraversal().property(property_key, value); }
     inline GraphTraversal as(std::string sideEffectLabel) { return GraphTraversal().as(sideEffectLabel); }
-    inline GraphTraversal by(boost::any arg) { return GraphTraversal().by(arg); }
+    inline GraphTraversal by(std::any arg) { return GraphTraversal().by(arg); }
     inline GraphTraversal cap(std::string sideEffectLabel) { return GraphTraversal().cap(sideEffectLabel); }
     inline GraphTraversal coalesce(std::vector<GraphTraversal> traversals) { return GraphTraversal().coalesce(std::move(traversals)); }
     inline GraphTraversal count() { return GraphTraversal().count(); }
@@ -21,15 +21,15 @@ namespace gremlinxx {
     inline GraphTraversal V() { return GraphTraversal().V(); }
     inline GraphTraversal V(Vertex vertex) { return GraphTraversal().V(vertex); }
     inline GraphTraversal V(std::vector<Vertex> vertices) { return GraphTraversal().V(vertices); }
-    inline GraphTraversal V(boost::any v_id) { return GraphTraversal().V(v_id); }
+    inline GraphTraversal V(std::any v_id) { return GraphTraversal().V(v_id); }
     inline GraphTraversal groupCount() { return GraphTraversal().groupCount(); }
     inline GraphTraversal has(std::string key, P pred) { return GraphTraversal().has(key, pred); }
-    inline GraphTraversal has(std::string key, boost::any value) { return GraphTraversal().has(key, value); }
+    inline GraphTraversal has(std::string key, std::any value) { return GraphTraversal().has(key, value); }
     inline GraphTraversal has(std::string key) { return GraphTraversal().has(key); }
     inline GraphTraversal id() { return GraphTraversal().id(); }
     inline GraphTraversal identity() { return GraphTraversal().identity(); }
-    inline GraphTraversal inject(std::vector<boost::any> objects) { return GraphTraversal().inject(objects); }
-    inline GraphTraversal is(boost::any val) { return GraphTraversal().is(val); }
+    inline GraphTraversal inject(std::vector<std::any> objects) { return GraphTraversal().inject(objects); }
+    inline GraphTraversal is(std::any val) { return GraphTraversal().is(val); }
     inline GraphTraversal is(P predicate) { return GraphTraversal().is(predicate); }
     inline GraphTraversal limit(uint64_t the_limit) { return GraphTraversal().limit(the_limit); }
     inline GraphTraversal loops() { return GraphTraversal().loops(); }

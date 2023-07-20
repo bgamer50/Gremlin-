@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <boost/any.hpp>
+#include <any>
 
 #define BY_STEP 0x92
 
@@ -12,11 +12,11 @@ namespace gremlinxx {
 		
 	class ByStep : public TraversalStep {
 		private:
-			boost::any arg;
+			std::any arg;
 		public:
-			ByStep(boost::any arg);
+			ByStep(std::any arg);
 			
-			inline boost::any get() { return arg; }
+			inline std::any get() { return arg; }
 
 			using TraversalStep::getInfo;
 			virtual std::string getInfo();

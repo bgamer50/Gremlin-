@@ -3,7 +3,7 @@
 #define ORDER_STEP 0x47
 
 #include <string>
-#include <boost/any.hpp>
+#include <any>
 
 #include "step/TraversalStep.h"
 #include "traversal/GraphTraversal.h"
@@ -27,7 +27,7 @@ namespace gremlinxx {
             using TraversalStep::getInfo;
             virtual std::string getInfo();
 
-            virtual void modulate_by(boost::any arg);
+            virtual void modulate_by(std::any arg);
     };
 
 }

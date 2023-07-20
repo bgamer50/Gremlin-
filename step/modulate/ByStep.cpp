@@ -2,7 +2,7 @@
 
 namespace gremlinxx {
 		
-	ByStep::ByStep(boost::any arg)
+	ByStep::ByStep(std::any arg)
 	: TraversalStep(MODULATOR, BY_STEP) {
 		this->arg = arg;
 	}

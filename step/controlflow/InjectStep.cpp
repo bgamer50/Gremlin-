@@ -3,13 +3,15 @@
 #include "traversal/GraphTraversal.h"
 #include "traversal/GraphTraversalSource.h"
 
+#include <any>
+
 namespace gremlinxx {
         
-    InjectStep::InjectStep(std::vector<boost::any>& injects) : TraversalStep(SIDE_EFFECT, INJECT_STEP) {
+    InjectStep::InjectStep(std::vector<std::any>& injects) : TraversalStep(SIDE_EFFECT, INJECT_STEP) {
         std::copy(injects.begin(), injects.end(), std::back_inserter(objects));
     }
 
-    InjectStep::InjectStep(boost::any& b) : TraversalStep(SIDE_EFFECT, INJECT_STEP) {
+    InjectStep::InjectStep(std::any& b) : TraversalStep(SIDE_EFFECT, INJECT_STEP) {
         objects.push_back(b);
     }
 

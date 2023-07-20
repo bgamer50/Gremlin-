@@ -21,7 +21,7 @@ namespace gremlinxx {
     }
 
     void IsStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
-        boost::any val = this->predicate.operand;
+        std::any val = this->predicate.operand;
         auto cmp = this->predicate.comparison;
 
         traversers.advance([cmp, val](auto& data, auto& se, auto& paths){

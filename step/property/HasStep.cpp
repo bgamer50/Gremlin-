@@ -35,11 +35,11 @@ namespace gremlinxx {
             std::tie(
                 found_vertices,
                 found_values
-            ) = g->getGraph()->getVertexProperties(prop_name, traverser_data, !p.operand.empty());
+            ) = g->getGraph()->getVertexProperties(prop_name, traverser_data, p.operand.has_value());
 
             auto ix_found = maelstrom::intersection(traverser_data, found_vertices);
 
-            if(!p.operand.empty()) {
+            if(p.operand.has_value()) {
                 // filter down found_vertices using found_values
                 auto ix_matches = maelstrom::filter(
                     found_values,

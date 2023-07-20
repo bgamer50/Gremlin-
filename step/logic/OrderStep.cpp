@@ -12,7 +12,7 @@ namespace gremlinxx {
     : TraversalStep(true, MAP, ORDER_STEP) {}
 
 
-    void OrderStep::modulate_by(boost::any arg) { this->order_traversal = boost::any_cast<GraphTraversal*>(arg); }
+    void OrderStep::modulate_by(std::any arg) { this->order_traversal = std::any_cast<GraphTraversal*>(arg); }
 
     std::string OrderStep::getInfo() {
         if(this->order_traversal == nullptr) return "OrderStep()";

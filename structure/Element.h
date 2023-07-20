@@ -1,5 +1,5 @@
 #pragma once
-#include <boost/any.hpp>
+#include <any>
 #include <vector>
 
 namespace gremlinxx {

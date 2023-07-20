@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/any.hpp>
+#include <any>
 #include "structure/Property.h"
 #include "structure/VertexProperty.h"
 #include "structure/Element.h"

@@ -8,7 +8,7 @@ namespace gremlinxx {
     : TraversalStep(MAP, LOOPS_STEP) {}
 
     void LoopsStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
-        size_t loops = boost::any_cast<size_t>(
+        size_t loops = std::any_cast<size_t>(
             traversal->getTraversalProperty(LOOPS_TRAVERSAL_PROPERTY)
         );
 

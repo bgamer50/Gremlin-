@@ -19,17 +19,17 @@ namespace gremlinxx {
 		private:
 			Cardinality cardinality;
 			std::string key;
-			boost::any value;
+			std::any value;
 		public:
-			PropertyStep(std::string property_key, boost::any value);
+			PropertyStep(std::string property_key, std::any value);
 
-			PropertyStep(Cardinality card, std::string property_key, boost::any value);
+			PropertyStep(Cardinality card, std::string property_key, std::any value);
 
 			inline Cardinality get_cardinality() { return this->cardinality; }
 
 			inline std::string get_key() { return this->key; }
 
-			inline boost::any get_value() { return this->value; };
+			inline std::any get_value() { return this->value; };
 			
 			virtual void apply(GraphTraversal* current_traversal, gremlinxx::traversal::TraverserSet& traversers);
 	};

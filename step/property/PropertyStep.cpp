@@ -16,18 +16,18 @@
 
 namespace gremlinxx {
 
-	PropertyStep::PropertyStep(std::string property_key, boost::any value)
+	PropertyStep::PropertyStep(std::string property_key, std::any value)
 	: TraversalStep(MAP, PROPERTY_STEP) {
 		this->cardinality = SINGLE;
 		this->key = std::string(property_key);
-		this->value = boost::any(value);
+		this->value = std::any(value);
 	}
 
-	PropertyStep::PropertyStep(Cardinality card, std::string property_key, boost::any value)
+	PropertyStep::PropertyStep(Cardinality card, std::string property_key, std::any value)
 	: TraversalStep(MAP, PROPERTY_STEP) {
 		this->cardinality = card;
 		this->key = std::string(property_key);
-		this->value = boost::any(value);
+		this->value = std::any(value);
 	}
 
 	void PropertyStep::apply(GraphTraversal* current_traversal, gremlinxx::traversal::TraverserSet& traversers) {
@@ -37,16 +37,16 @@ namespace gremlinxx {
 		}
 
 		if(this->value.type() == typeid(GraphTraversal*)) {
-			GraphTraversal ap_anonymous_trv = boost::any_cast<GraphTraversal>(value);
+			GraphTraversal* ap_anonymous_trv = std::any_cast<GraphTraversal*>(value);
 			
-			for(TraversalStep* step : ap_anonymous_trv.getSteps()) {
+			for(TraversalStep* step : ap_anonymous_trv->getSteps()) {
 				auto reduction_step = dynamic_cast<ReductionStep*>(step);
 				if(reduction_step != nullptr) {
 					reduction_step->set_scope_context(ScopeContext{Scope::local, PROPERTY_STEP_SIDE_EFFECT_KEY});
 				}
 			}
 
-			GraphTraversal new_trv(current_traversal->getTraversalSource(), ap_anonymous_trv);
+			GraphTraversal new_trv(current_traversal->getTraversalSource(), *ap_anonymous_trv);
 			new_trv.setInitialTraversers(traversers);
 
 			// Need to initialize the scope context side effect

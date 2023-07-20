@@ -18,8 +18,8 @@ namespace gremlinxx {
         this->keys = std::vector<std::string>(keys.begin(), keys.end());
     }
 
-    void ElementMapStep::modulate_by(boost::any arg) { 
-        this->by_traversal = boost::any_cast<GraphTraversal*>(arg);
+    void ElementMapStep::modulate_by(std::any arg) { 
+        this->by_traversal = std::any_cast<GraphTraversal*>(arg);
     }
 
     std::string ElementMapStep::getInfo() {

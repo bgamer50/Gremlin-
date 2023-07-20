@@ -55,7 +55,7 @@ namespace gremlinxx {
                 virtual Traverser getTraverser(size_t i);
                 
                 using TraverserSet::getData;
-                virtual boost::any getData(size_t i);
+                virtual std::any getData(size_t i);
 
                 /*
                     Returns a copy of data associated with each traverser in this traverser set.

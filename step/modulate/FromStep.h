@@ -4,7 +4,7 @@
 #include "traversal/GraphTraversal.h"
 
 #include <string>
-#include <boost/any.hpp>
+#include <any>
 
 #define FROM_STEP 0x90
 
@@ -13,7 +13,7 @@ namespace gremlinxx {
 		
 	class FromStep : public TraversalStep {
 		private:
-			boost::any arg;
+			std::any arg;
 			std::optional<GraphTraversal> traversal;
 		public:
 			FromStep(std::string side_effect_label);
@@ -25,8 +25,8 @@ namespace gremlinxx {
 			using TraversalStep::getInfo;
 			virtual std::string getInfo();
 
-			inline boost::any get_arg() {
-				if(arg.empty()) throw std::runtime_error("step does not contain arg");
+			inline std::any get_arg() {
+				if(!arg.has_value()) throw std::runtime_error("step does not contain arg");
 				return arg; 
 			}
 
