@@ -26,7 +26,7 @@ namespace gremlinxx {
     }
 
     void AddEdgeStartStep::modulate_to(GraphTraversal t_to) {
-        this->in_vertex_traversal.emplace(t_to);		
+        this->in_vertex_traversal.emplace(std::move(t_to));		
     }
 
     void AddEdgeStartStep::apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers) {
@@ -42,13 +42,16 @@ namespace gremlinxx {
         Vertex from_vertex = std::any_cast<Vertex>(from_traversal.next());
         Vertex to_vertex = std::any_cast<Vertex>(to_traversal.next());
 
+        auto edge_dtype = my_traversal_source->getGraph()->get_edge_dtype();
         Edge new_edge = trv->getGraph()->add_edge(from_vertex, to_vertex, label);
-        traversers.advance([new_edge, my_traversal_source](maelstrom::vector& data, std::unordered_map<std::string, maelstrom::vector>& se, gremlinxx::traversal::PathInfo& paths){
-            std::vector<std::any> any_vec = {new_edge};
+        std::any new_edge_repr = edge_dtype.serialize(new_edge); // Have to do this since Edge isn't castable to a primitive
+
+        traversers.advance([edge_dtype, new_edge_repr, my_traversal_source](maelstrom::vector& data, std::unordered_map<std::string, maelstrom::vector>& se, gremlinxx::traversal::PathInfo& paths){
+            std::vector<std::any> any_vec = {new_edge_repr};
             return std::make_pair(
                 maelstrom::make_vector_from_anys(
                     data.get_mem_type(),
-                    my_traversal_source->getGraph()->get_edge_dtype(),
+                    edge_dtype,
                     any_vec
                 ),
                 maelstrom::vector()

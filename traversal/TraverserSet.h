@@ -110,7 +110,7 @@ namespace gremlinxx {
                 /*
                     Trims the path structure so that it only contains paths from [ix_start, ix_end).
                 */
-                virtual void trim_paths(size_t ix_start, size_t ix_end);
+                virtual void trim_paths(size_t ix_start, size_t ix_end) = 0;
 
                 /*
                     Updates the side effects for all traversers for the given key.

@@ -6,14 +6,15 @@
 
 namespace gremlinxx {
         
-    void by_modulating_strategy(std::vector<TraversalStep*>& steps) {
+    void by_modulating_strategy(std::vector<std::shared_ptr<TraversalStep>>& steps) {
         if(steps[0]->uid == BY_STEP) throw std::runtime_error("Cannot start a traversal with by()!");
 
         for(size_t k = 1; k < steps.size(); ++k) {
             if(steps[k]->uid == BY_STEP) {
-                dynamic_cast<ByModulating*>(steps[k-1])->modulate_by(static_cast<ByStep*>(steps[k])->get());
-                delete steps[k];
-                steps[k] = new NoOpStep();
+                dynamic_cast<ByModulating*>(steps[k-1].get())->modulate_by(static_cast<ByStep*>(steps[k].get())->get());
+                
+                // replace the step
+                steps[k] = std::shared_ptr<TraversalStep>(new NoOpStep());
             }
         }
     }

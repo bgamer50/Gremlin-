@@ -16,7 +16,7 @@ namespace gremlinxx {
             size_t sz = traverser_data.size();
             maelstrom::vector new_data(
                 traverser_data.get_mem_type(),
-                traverser_data.get_dtype(),
+                maelstrom::uint64,
                 1
             );
             maelstrom::set(new_data, sz);
@@ -24,7 +24,7 @@ namespace gremlinxx {
             if(sz > 0) {
                 maelstrom::vector output_origin(
                     traverser_data.get_mem_type(),
-                    traverser_data.get_dtype(),
+                    maelstrom::uint64,
                     1
                 );
                 maelstrom::set(output_origin, static_cast<size_t>(0));

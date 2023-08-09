@@ -30,14 +30,14 @@ namespace gremlinxx {
         auto p = this->predicate;
         auto prop_name = this->property_key_or_label;
         traversers.advance([&g, p, prop_name](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
-            maelstrom::vector found_vertices;
+            maelstrom::vector ix_found;
             maelstrom::vector found_values;
             std::tie(
-                found_vertices,
-                found_values
-            ) = g->getGraph()->getVertexProperties(prop_name, traverser_data, p.operand.has_value());
+                found_values,
+                ix_found
+            ) = g->getGraph()->get_vertex_properties(prop_name, traverser_data, p.operand.has_value());
 
-            auto ix_found = maelstrom::intersection(traverser_data, found_vertices);
+            auto found_vertices = maelstrom::select(traverser_data, ix_found);
 
             if(p.operand.has_value()) {
                 // filter down found_vertices using found_values

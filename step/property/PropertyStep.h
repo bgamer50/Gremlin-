@@ -32,6 +32,9 @@ namespace gremlinxx {
 			inline std::any get_value() { return this->value; };
 			
 			virtual void apply(GraphTraversal* current_traversal, gremlinxx::traversal::TraverserSet& traversers);
+
+			using TraversalStep::getInfo;
+			virtual std::string getInfo();
 	};
 
 }

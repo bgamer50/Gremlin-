@@ -40,11 +40,9 @@ namespace gremlinxx {
 
         for(std::string key : prop_keys) {
             maelstrom::vector next_values;
-            maelstrom::vector next_origin;
-            std::tie(next_origin, next_values) = graph->getVertexProperties(key, traverser_data, true);
+            maelstrom::vector ix;
+            std::tie(next_values, ix) = graph->get_vertex_properties(key, traverser_data, true);
 
-            auto ix = maelstrom::intersection(traverser_data, next_origin);
-            next_origin.clear();
             traverser_data = maelstrom::select(traverser_data, ix);
 
             if(origin.empty()) {
@@ -67,7 +65,7 @@ namespace gremlinxx {
 
         traverser_data = traversers.getTraverserData();
         traversers.set_side_effects(ELEMENTMAP_ID_KEY, std::move(maelstrom::vector(traverser_data)));
-        traversers.set_side_effects(ElEMENTMAP_LABEL_KEY, std::move(graph->getVertexLabels(traverser_data)));
+        traversers.set_side_effects(ElEMENTMAP_LABEL_KEY, std::move(graph->get_vertex_labels(traverser_data)));
         for(size_t i = 0; i < prop_keys.size(); ++i) traversers.set_side_effects(prop_keys[i], std::move(values[i]));
     }
 }

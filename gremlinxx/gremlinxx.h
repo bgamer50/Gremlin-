@@ -7,8 +7,6 @@
 #include "structure/Vertex.h"
 #include "structure/Edge.h"
 #include "structure/Graph.h"
-#include "structure/reference/ReferenceVertex.h"
-#include "structure/reference/ReferenceEdge.h"
 
 #include "traversal/Traverser.h"
 #include "traversal/GraphTraversalSource.h"
@@ -35,18 +33,15 @@
 #include "step/filter/LimitStep.h"
 #include "step/filter/WhereStep.h"
 
-#include "step/graph/GraphStep.h"
+#include "step/graph/VStep.h"
 #include "step/graph/IdStep.h"
 #include "step/graph/SubgraphExtractionStep.h"
 #include "step/graph/SubgraphStep.h"
 
 #include "step/logic/DedupStep.h"
-#include "step/logic/FoldStep.h"
 #include "step/logic/IdentityStep.h"
-#include "step/logic/MapStep.h"
 #include "step/logic/NoOpStep.h"
 #include "step/logic/OrderStep.h"
-#include "step/logic/UnfoldStep.h"
 
 #include "step/math/CountStep.h"
 #include "step/math/MinStep.h"
@@ -58,10 +53,11 @@
 #include "step/modulate/FromToModulating.h"
 #include "step/modulate/ToStep.h"
 
-#include "step/property/AddPropertyStep.h"
+#include "step/property/PropertyStep.h"
 #include "step/property/HasStep.h"
 #include "step/property/PropertyStep.h"
-#include "step/property/ValueMapStep.h"
+#include "step/property/ValueStep.h"
+#include "step/property/ElementMapStep.h"
 
 #include "step/sideeffect/AsStep.h"
 #include "step/sideeffect/SelectStep.h"

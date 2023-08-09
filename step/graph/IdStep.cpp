@@ -2,6 +2,8 @@
 #include "traversal/GraphTraversal.h"
 #include "structure/Graph.h"
 
+#include "maelstrom/algorithms/arange.h"
+
 namespace gremlinxx {
 
     IdStep::IdStep()
@@ -16,9 +18,10 @@ namespace gremlinxx {
             if(traverser_data.get_dtype() == trv->getGraph()->get_vertex_dtype()) {
                 // In gremlin++, vertices in a traversal are represented by IDs, not pointers.
                 // Therefore, this step only casts to the primitive type.
+
                 return std::make_pair(
                     std::move(maelstrom::as_primitive_vector(traverser_data, false)),
-                    std::move(maelstrom::vector())
+                    std::move(maelstrom::arange(traverser_data.get_mem_type(), static_cast<size_t>(0), static_cast<size_t>(traverser_data.size())))
                 );
 
             } else {

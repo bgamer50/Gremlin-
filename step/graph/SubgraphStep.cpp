@@ -6,10 +6,18 @@
 namespace gremlinxx {
 
     struct edge_hash {
-        size_t operator() (Edge e) {
+        size_t operator() (const Edge& e) const {
             return e.id;
         }
     };
+
+    struct edge_equals {
+        bool operator() (const Edge& e1, const Edge& e2) const {
+            return e1.id == e2.id;
+        }
+    };
+
+    typedef std::unordered_set<Edge, edge_hash, edge_equals> edge_set_t;
 
     SubgraphStep::SubgraphStep(std::string name) : TraversalStep(SIDE_EFFECT, SUBGRAPH_STEP) {
         this->subgraph_name = name;
@@ -17,9 +25,9 @@ namespace gremlinxx {
 
     void SubgraphStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
         std::any subgraph_property = traversal->getTraversalProperty(SUBGRAPH_PREFIX + subgraph_name);
-        if(subgraph_property.empty()) subgraph_property = std::unordered_set<Edge, edge_hash>();
+        if(!subgraph_property.has_value()) subgraph_property = edge_set_t();
         
-        std::unordered_set<Edge> subgraph_edges = std::any_cast<std::unordered_set<Edge, edge_hash>>(subgraph_property);
+        edge_set_t subgraph_edges = std::any_cast<edge_set_t>(subgraph_property);
         auto traverser_data_copy = traversers.getTraverserData();
         auto traverser_data_host = maelstrom::as_host_vector(traverser_data_copy);
 

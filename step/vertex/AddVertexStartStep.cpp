@@ -23,13 +23,13 @@ namespace gremlinxx {
         return info;
     }
 
-    void AddVertexStartStep::apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers) {
+    void AddVertexStartStep::apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers) {        
         Vertex v = this->has_label ? trv->getGraph()->add_vertex(this->label) : trv->getGraph()->add_vertex();
-
-        std::vector<std::any> anys = {std::any(v)};
+        auto vertex_dtype = trv->getTraversalSource()->get_dtype(v);
+        std::vector<std::any> anys = {vertex_dtype.serialize(v)}; // Vertex isn't castable to a primitive so calling serialize manually is necessary
         
         traversers.reinitialize(
-            std::move(maelstrom::make_vector_from_anys(traversers.getCurrentMemType(), anys)),
+            std::move(maelstrom::make_vector_from_anys(traversers.getCurrentMemType(), trv->getTraversalSource()->get_dtype(v), anys)),
             std::move(std::unordered_map<std::string, maelstrom::vector>()),
             std::move(gremlinxx::traversal::PathInfo())
         );

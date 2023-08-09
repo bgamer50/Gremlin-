@@ -75,7 +75,7 @@ namespace gremlinxx {
 			return graph;
 	}
 
-	gremlinxx::traversal::TraverserSet* getNewTraverserSet() {
+	gremlinxx::traversal::TraverserSet* GraphTraversalSource::getNewTraverserSet() {
 		return new gremlinxx::traversal::BasicTraverserSet();
 	}
 

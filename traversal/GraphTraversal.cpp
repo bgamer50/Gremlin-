@@ -65,13 +65,15 @@ namespace gremlinxx {
 	
 	GraphTraversal::GraphTraversal(GraphTraversal& trv) : GraphTraversal() {
 		this->steps = trv.getSteps();
-		this->source = trv.getTraversalSource();
-		this->traversers = this->source->getNewTraverserSet();
+		this->source = trv.source;
+		if(this->source != nullptr) {
+			this->traversers = this->source->getNewTraverserSet();
+		}
 	}
 
 	GraphTraversal::GraphTraversal(GraphTraversal&& trv) : GraphTraversal() {
 		this->steps = std::move(trv.getSteps());
-		this->source = trv.getTraversalSource();
+		this->source = trv.source;
 		this->traversers = std::move(trv.traversers);
 	}
 
@@ -122,9 +124,9 @@ namespace gremlinxx {
 	*/
 	void GraphTraversal::getInitialTraversal() {
 		// Apply each strategy to this traversal's traversers.
-		std::for_each(this->source->getStrategies().begin(), this->source->getStrategies().end(), [this](TraversalStrategy strategy) {
+		for(auto& strategy : this->source->getStrategies()) {
 			strategy(this->steps);
-		});
+		}
 	}
 
 	/*
@@ -412,6 +414,7 @@ namespace gremlinxx {
 		if(!this->has_iterated) this->iterate();
 
 		auto data = this->traversers->getTraverserData();
+		std::cout << "num traversers: " << data.size() << std::endl;
 		auto data_host = maelstrom::as_host_vector(data);
 		
 		for(size_t k = 0; k < data_host.size(); ++k) {
@@ -427,11 +430,14 @@ namespace gremlinxx {
 		
 		this->getInitialTraversal();
 		
-		std::for_each(this->steps.begin(), this->steps.end(), [&](TraversalStep* step){
-			std::cout << "step: " << step->uid << std::endl;
-			std::cout << step->getInfo() << std::endl;
+		bool debug_mode = (this->source != nullptr) ? (this->source->getOptionValue("debug") == "True") : false;
+		for(auto& step : this->steps) {
+			if(debug_mode) {
+				std::cout << "step: 0x" << std::hex << step->uid << std::dec << std::endl;
+				std::cout << step->getInfo() << std::endl;
+			}
 			step->apply(this, *this->traversers);
-		});
+		}
 
 		this->has_iterated = true;
 	}

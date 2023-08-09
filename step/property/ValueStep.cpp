@@ -45,29 +45,21 @@ namespace gremlinxx {
             maelstrom::vector output_origin;
 
             for(std::string key : prop_names) {
-                maelstrom::vector current_vertices;
+                maelstrom::vector current_origin;
                 maelstrom::vector current_values;
 
                 std::tie(
-                    current_vertices,
-                    current_values
-                ) = g->getGraph()->getVertexProperties(
+                    current_values,
+                    current_origin
+                ) = g->getGraph()->get_vertex_properties(
                     key,
                     traverser_data_copy,
                     true
                 );
-
-                auto current_vertices_sorted_ix = maelstrom::sort(current_vertices);
-                current_values = maelstrom::select(current_values, current_vertices_sorted_ix);
-                current_vertices_sorted_ix.clear();
-
-                // the intersection index is the output origin for the current property
-                auto intersection_ix = maelstrom::intersection(traverser_data_copy, current_vertices, true);
-                intersection_ix = maelstrom::select(original_unsorted_ix, intersection_ix);
                 
                 if(values.empty()) {
                     values = std::move(current_values);
-                    output_origin = std::move(intersection_ix);
+                    output_origin = std::move(current_origin);
                 } else {
                     if(values.get_dtype() != current_values.get_dtype()) {
                         auto current_dtype = current_values.get_dtype();
@@ -79,7 +71,7 @@ namespace gremlinxx {
                     }
 
                     values.insert(values.size(), current_values);
-                    output_origin.insert(values.size(), intersection_ix);
+                    output_origin.insert(values.size(), current_origin);
                 }
                 
             }                

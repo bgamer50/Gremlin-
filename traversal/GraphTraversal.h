@@ -14,6 +14,7 @@
 #include <unordered_set>
 
 #include <any>
+#include <memory>
 
 #include "structure/Direction.h"
 #include "traversal/P.h"
@@ -34,7 +35,7 @@ namespace gremlinxx {
 
 	class GraphTraversal {
 	protected:
-		std::vector<TraversalStep*> steps;
+		std::vector<std::shared_ptr<TraversalStep>> steps;
 		gremlinxx::traversal::TraverserSet* traversers;
 		std::unordered_map<std::string, std::any> traversal_properties;
 	private:
@@ -63,17 +64,17 @@ namespace gremlinxx {
 
 		GraphTraversalSource* getTraversalSource();
 
-		inline std::vector<TraversalStep*>& getSteps() {
+		inline std::vector<std::shared_ptr<TraversalStep>>& getSteps() {
 			return this->steps;
 		}
 
 		inline GraphTraversal& appendStep(TraversalStep* step) {
-			this->steps.push_back(step);
+			this->steps.push_back(std::unique_ptr<TraversalStep>(step));
 			return *this;
 		}
 
 		inline GraphTraversal& insertStep(size_t k, TraversalStep* step) {
-			this->steps.insert(steps.begin() + k, step);
+			this->steps.insert(steps.begin() + k, std::unique_ptr<TraversalStep>(step));
 			return *this;
 		}
 

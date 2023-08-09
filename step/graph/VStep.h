@@ -21,6 +21,7 @@ namespace gremlinxx {
 
 			inline std::vector<std::any>& get_element_ids() { return this->element_ids; }
 
+			using TraversalStep::apply;
 			virtual void apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers);
 	};
 

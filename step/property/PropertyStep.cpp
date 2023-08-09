@@ -14,6 +14,8 @@
 #include "maelstrom/algorithms/unique.h"
 #include "maelstrom/algorithms/set.h"
 
+#include <sstream>
+
 namespace gremlinxx {
 
 	PropertyStep::PropertyStep(std::string property_key, std::any value)
@@ -39,8 +41,8 @@ namespace gremlinxx {
 		if(this->value.type() == typeid(GraphTraversal*)) {
 			GraphTraversal* ap_anonymous_trv = std::any_cast<GraphTraversal*>(value);
 			
-			for(TraversalStep* step : ap_anonymous_trv->getSteps()) {
-				auto reduction_step = dynamic_cast<ReductionStep*>(step);
+			for(auto& step : ap_anonymous_trv->getSteps()) {
+				auto reduction_step = dynamic_cast<ReductionStep*>(step.get());
 				if(reduction_step != nullptr) {
 					reduction_step->set_scope_context(ScopeContext{Scope::local, PROPERTY_STEP_SIDE_EFFECT_KEY});
 				}
@@ -71,7 +73,7 @@ namespace gremlinxx {
 			vertices = maelstrom::select(vertices, original_keys);
 			original_keys.clear();
 
-			g->getGraph()->setVertexProperties(this->key, vertices, property_vals);
+			g->getGraph()->set_vertex_properties(this->key, vertices, property_vals);
 			
 		}
 		else {
@@ -88,10 +90,16 @@ namespace gremlinxx {
 			);
 			maelstrom::set(val_vector, this->value);
 
-			g->getGraph()->setVertexProperties(this->key, vertices, val_vector);
+			g->getGraph()->set_vertex_properties(this->key, vertices, val_vector);
 		}
 
 		// Traversers aren't modified in this step.
+	}
+
+	std::string PropertyStep::getInfo() {
+		std::stringstream sx;
+		sx << "PropertyStep{" << this->key << "}";
+		return sx.str();
 	}
 
 }

@@ -173,7 +173,7 @@ namespace gremlinxx {
                */
                using TraverserSet::empty;
                inline virtual bool empty() {
-                    return this->traverser_data.size() > 0;
+                    return this->traverser_data.size() == 0;
                }
 
                /*
@@ -181,7 +181,13 @@ namespace gremlinxx {
                */
                using TraverserSet::erase;
                inline virtual void erase(size_t i) {
-                    throw std::runtime_error("erase currently unimplemented for BasicTraverserSet");
+                    this->traverser_data.erase(i);
+                    for(auto& se: this->side_effects) {
+                        se.second.erase(i);
+                    }
+                    for(auto& p : this->path_info.paths) {
+                        p.erase(i);
+                    }
                }
         };
     }

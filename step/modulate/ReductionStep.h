@@ -31,7 +31,7 @@ namespace gremlinxx {
             }
 
             using TraversalStep::getInfo;
-            virtual std::string getInfo();
+            virtual std::string getInfo() = 0;
 
     };
 

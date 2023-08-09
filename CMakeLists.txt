@@ -13,7 +13,7 @@ set(POSITION_INDEPENDENT_CODE True)
 set(INTERFACE_POSITION_INDEPENDENT_CODE True)
 
 add_library(
-    gremlinxx
+    gremlinxx SHARED
 
     step/TraversalStep.cpp
 
@@ -35,6 +35,8 @@ add_library(
 
     step/graph/VStep.cpp
     step/graph/IdStep.cpp
+    step/graph/SubgraphStep.cpp
+    step/graph/SubgraphExtractionStep.cpp
 
     step/logic/DedupStep.cpp
     step/logic/IdentityStep.cpp
@@ -73,6 +75,8 @@ add_library(
     traversal/Traverser.cpp
     traversal/BasicTraverserSet.cpp
     traversal/PathInfo.cpp
+
+    structure/Structure.cpp
 )
 
 target_compile_options(
