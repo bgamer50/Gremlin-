@@ -83,16 +83,17 @@ namespace gremlinxx {
             }
 
             added_edges.push_back(
-                graph->add_edge(from_vertex, to_vertex, label)
+                graph->add_edge(from_vertex, to_vertex, label).id
             );
         }
 
         traversers.advance([&added_edges, graph](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
             auto m_edges = maelstrom::make_vector_from_anys(
                 traverser_data.get_mem_type(),
-                graph->get_edge_dtype(),
                 added_edges
             );
+            m_edges = m_edges.astype(graph->get_edge_dtype());
+            
 
             return std::make_pair(
                 m_edges,

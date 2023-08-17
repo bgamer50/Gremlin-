@@ -3,7 +3,6 @@
 #include "maelstrom/algorithms/increment.h"
 
 #include <tuple>
-#include <iostream>
 
 namespace gremlinxx {
     namespace traversal {
@@ -154,7 +153,10 @@ namespace gremlinxx {
                 unpacked_side_effects[it->first] = maelstrom::unpack(it->second);
             }
 
-            std::vector<gremlinxx::traversal::PathInfo> unpacked_path_info = this->path_info.unpack();
+            std::vector<gremlinxx::traversal::PathInfo> unpacked_path_info;
+            if(this->persist_paths) {
+                unpacked_path_info = this->path_info.unpack();
+            } 
 
             std::vector<std::tuple<maelstrom::vector, std::unordered_map<std::string, maelstrom::vector>, gremlinxx::traversal::PathInfo>> unpacked_tuples;
             unpacked_tuples.reserve(unpacked_data.size());
@@ -169,7 +171,7 @@ namespace gremlinxx {
                     std::make_tuple(
                         std::move(unpacked_data[k]),
                         std::move(se_map),
-                        std::move(unpacked_path_info[k])
+                        this->persist_paths ? std::move(unpacked_path_info[k]) : gremlinxx::traversal::PathInfo()
                     )
                 );
             }
@@ -222,7 +224,11 @@ namespace gremlinxx {
 
         void BasicTraverserSet::addTraversers(maelstrom::vector& other_traverser_data, std::unordered_map<std::string, maelstrom::vector>& other_side_effects, gremlinxx::traversal::PathInfo& other_paths) {
             // Add the traverser data
-            this->traverser_data.insert(this->traverser_data.size(), other_traverser_data);
+            if(this->traverser_data.empty()) {
+                this->traverser_data = maelstrom::vector(other_traverser_data, false);
+            } else {
+                this->traverser_data.insert(this->traverser_data.size(), other_traverser_data);
+            }
 
             // Add the side effects
             for(auto kv = other_side_effects.begin(); kv != other_side_effects.end(); ++kv) {

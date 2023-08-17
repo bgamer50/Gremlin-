@@ -63,8 +63,8 @@ namespace gremlinxx {
 	}
 
 	
-	GraphTraversal::GraphTraversal(GraphTraversal& trv) : GraphTraversal() {
-		this->steps = trv.getSteps();
+	GraphTraversal::GraphTraversal(const GraphTraversal& trv) : GraphTraversal() {
+		this->steps = trv.steps;
 		this->source = trv.source;
 		if(this->source != nullptr) {
 			this->traversers = this->source->getNewTraverserSet();
@@ -133,7 +133,13 @@ namespace gremlinxx {
 
 	*/
 	void GraphTraversal::setInitialTraversers(traversal::TraverserSet& initial_traversers) {
-		this->traversers->clear();
+		if(this->traversers == nullptr) {
+			if(this->source == nullptr) throw std::runtime_error("Can't set initial traversers for anonymous traversal!");
+			this->traversers = this->source->getNewTraverserSet();
+		} else {
+			this->traversers->clear();
+		}
+		
 		this->traversers->addTraversers(initial_traversers);
 	}
 
@@ -414,7 +420,6 @@ namespace gremlinxx {
 		if(!this->has_iterated) this->iterate();
 
 		auto data = this->traversers->getTraverserData();
-		std::cout << "num traversers: " << data.size() << std::endl;
 		auto data_host = maelstrom::as_host_vector(data);
 		
 		for(size_t k = 0; k < data_host.size(); ++k) {
@@ -433,8 +438,8 @@ namespace gremlinxx {
 		bool debug_mode = (this->source != nullptr) ? (this->source->getOptionValue("debug") == "True") : false;
 		for(auto& step : this->steps) {
 			if(debug_mode) {
-				std::cout << "step: 0x" << std::hex << step->uid << std::dec << std::endl;
-				std::cout << step->getInfo() << std::endl;
+				std::cerr << "step: 0x" << std::hex << step->uid << std::dec << std::endl;
+				std::cerr << step->getInfo() << std::endl;
 			}
 			step->apply(this, *this->traversers);
 		}

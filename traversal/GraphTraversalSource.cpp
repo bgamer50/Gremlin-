@@ -28,7 +28,7 @@ namespace gremlinxx {
 		this->withTypeRegistration(std::type_index(typeid(uint8_t)), maelstrom::uint8);
 		this->withTypeRegistration(std::type_index(typeid(int64_t)), maelstrom::int64);
 		this->withTypeRegistration(std::type_index(typeid(int32_t)), maelstrom::int32);
-		this->withTypeRegistration(std::type_index(typeid(uint8_t)), maelstrom::int8);
+		this->withTypeRegistration(std::type_index(typeid(int8_t)), maelstrom::int8);
 		this->withTypeRegistration(std::type_index(typeid(double)), maelstrom::float64);
 		this->withTypeRegistration(std::type_index(typeid(float)), maelstrom::float32);
 

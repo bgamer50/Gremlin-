@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 #include <sstream>
 #include "traversal/TraverserSet.h"
 #include "maelstrom/algorithms/select.h"
@@ -82,7 +83,9 @@ namespace gremlinxx {
                 inline virtual std::unordered_map<std::string, maelstrom::vector> getSideEffects() {
                     std::unordered_map<std::string, maelstrom::vector> se_copy;
 
-                    for(auto& p : this->side_effects) se_copy[p.first] = maelstrom::vector(p.second);
+                    for(auto& p : this->side_effects) {
+                        se_copy[p.first] = maelstrom::vector(p.second);
+                    }
 
                     return se_copy;
                 }

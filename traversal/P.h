@@ -20,6 +20,12 @@ namespace gremlinxx {
 
 			P(maelstrom::comparator comparison, std::any operand) {
 				this->comparison = comparison;
+
+				if(operand.type() == typeid(const char*)) {
+					operand = std::string(
+						std::any_cast<const char*>(operand)
+					);
+				}
 				this->operand = operand;
 			}
 

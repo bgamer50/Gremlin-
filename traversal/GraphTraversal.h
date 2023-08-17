@@ -36,7 +36,7 @@ namespace gremlinxx {
 	class GraphTraversal {
 	protected:
 		std::vector<std::shared_ptr<TraversalStep>> steps;
-		gremlinxx::traversal::TraverserSet* traversers;
+		gremlinxx::traversal::TraverserSet* traversers; // FIXME change this to unique pointer
 		std::unordered_map<std::string, std::any> traversal_properties;
 	private:
 		GraphTraversalSource* source;
@@ -52,7 +52,7 @@ namespace gremlinxx {
 			anomymous traversal.
 		*/
 		GraphTraversal(GraphTraversalSource* src);
-		GraphTraversal(GraphTraversal& trv);
+		GraphTraversal(const GraphTraversal& trv);
 		GraphTraversal(GraphTraversal&& trv);
 	
 		GraphTraversal(GraphTraversalSource* src, GraphTraversal& trv);

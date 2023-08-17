@@ -44,6 +44,7 @@ namespace gremlinxx {
             std::tie(next_values, ix) = graph->get_vertex_properties(key, traverser_data, true);
 
             traverser_data = maelstrom::select(traverser_data, ix);
+            
 
             if(origin.empty()) {
                 origin = ix;

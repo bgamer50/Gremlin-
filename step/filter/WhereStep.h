@@ -24,6 +24,9 @@ namespace gremlinxx {
             inline std::string getLabel() { return this->label; }
             inline P getPredicate() { return this->predicate; }
 
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
+
             virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
     };
 

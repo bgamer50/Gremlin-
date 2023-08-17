@@ -38,17 +38,17 @@ namespace gremlinxx {
 			throw std::runtime_error("Can't add a property to something other than a vertex!");
 		}
 
-		if(this->value.type() == typeid(GraphTraversal*)) {
-			GraphTraversal* ap_anonymous_trv = std::any_cast<GraphTraversal*>(value);
+		if(this->value.type() == typeid(GraphTraversal)) {
+			GraphTraversal ap_anonymous_trv = std::any_cast<GraphTraversal>(value);
 			
-			for(auto& step : ap_anonymous_trv->getSteps()) {
+			for(auto& step : ap_anonymous_trv.getSteps()) {
 				auto reduction_step = dynamic_cast<ReductionStep*>(step.get());
 				if(reduction_step != nullptr) {
 					reduction_step->set_scope_context(ScopeContext{Scope::local, PROPERTY_STEP_SIDE_EFFECT_KEY});
 				}
 			}
 
-			GraphTraversal new_trv(current_traversal->getTraversalSource(), *ap_anonymous_trv);
+			GraphTraversal new_trv(current_traversal->getTraversalSource(), ap_anonymous_trv);
 			new_trv.setInitialTraversers(traversers);
 
 			// Need to initialize the scope context side effect
