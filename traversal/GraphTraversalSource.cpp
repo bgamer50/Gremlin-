@@ -68,11 +68,11 @@ namespace gremlinxx {
 	}
 
 	std::vector<TraversalStrategy>& GraphTraversalSource::getStrategies() {
-			return this->strategies;
+		return this->strategies;
 	}
 
 	Graph* GraphTraversalSource::getGraph() {
-			return graph;
+		return graph;
 	}
 
 	gremlinxx::traversal::TraverserSet* GraphTraversalSource::getNewTraverserSet() {

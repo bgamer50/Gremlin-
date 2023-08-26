@@ -50,7 +50,7 @@ namespace gremlinxx {
 	*/
 	GraphTraversal::GraphTraversal() {
 		this->source = nullptr;
-		this->traversers = nullptr;
+		this->traversers = {};
 	}
 
 	/*
@@ -58,8 +58,10 @@ namespace gremlinxx {
 		anomymous traversal.
 	*/
 	GraphTraversal::GraphTraversal(GraphTraversalSource* src) : GraphTraversal() {
-		source = src;
-		this->traversers = src->getNewTraverserSet();
+		this->source = src;
+		if(src != nullptr) {
+			this->traversers = std::unique_ptr<gremlinxx::traversal::TraverserSet>(src->getNewTraverserSet());
+		}
 	}
 
 	
@@ -67,7 +69,8 @@ namespace gremlinxx {
 		this->steps = trv.steps;
 		this->source = trv.source;
 		if(this->source != nullptr) {
-			this->traversers = this->source->getNewTraverserSet();
+			this->traversers = std::unique_ptr<gremlinxx::traversal::TraverserSet>(this->source->getNewTraverserSet());
+			this->traversers->addTraversers(*trv.traversers);
 		}
 	}
 
@@ -78,15 +81,23 @@ namespace gremlinxx {
 	}
 
 	GraphTraversal::GraphTraversal(GraphTraversalSource* src, GraphTraversal& trv) {
+		if(src == nullptr) {
+			throw std::invalid_argument("Can't use the source+traversal constructor with a null source");
+		}
+
 		this->steps = trv.getSteps();
 		this->source = src;
-		this->traversers = src->getNewTraverserSet();
+		this->traversers = std::unique_ptr<gremlinxx::traversal::TraverserSet>(src->getNewTraverserSet());
 	}
 
 	GraphTraversal& GraphTraversal::operator=(const GraphTraversal& trv) {
 		this->steps = trv.steps;
 		this->source = trv.source;
-		this->traversers = trv.traversers;
+
+		if(trv.source != nullptr) {
+			this->traversers = std::unique_ptr<gremlinxx::traversal::TraverserSet>(this->source->getNewTraverserSet());
+			this->traversers->addTraversers(*trv.traversers);
+		}
 
 		return *this;
 	}
@@ -135,7 +146,7 @@ namespace gremlinxx {
 	void GraphTraversal::setInitialTraversers(traversal::TraverserSet& initial_traversers) {
 		if(this->traversers == nullptr) {
 			if(this->source == nullptr) throw std::runtime_error("Can't set initial traversers for anonymous traversal!");
-			this->traversers = this->source->getNewTraverserSet();
+			this->traversers = std::unique_ptr<gremlinxx::traversal::TraverserSet>(this->source->getNewTraverserSet());
 		} else {
 			this->traversers->clear();
 		}
@@ -454,7 +465,7 @@ namespace gremlinxx {
 	traversal::TraverserSet& GraphTraversal::getTraverserSet() {
 		if(this->traversers == nullptr) throw std::runtime_error("Cannot get traverser set of an anonymous traversal!");
 
-		return *(this->traversers);
+		return *(this->traversers.get());
 	}
 
 }

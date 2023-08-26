@@ -23,7 +23,7 @@ namespace gremlinxx {
         gremlinxx::traversal::TraverserSet& new_traversers = bogus_traversal.getTraverserSet();
 
         for(auto it = this->traversals.begin(); it != this->traversals.end(); ++it) {
-            GraphTraversal current_union_traversal = *it;
+            GraphTraversal& current_union_traversal = *it;
 
             GraphTraversal executing_traversal(parent_traversal->getTraversalSource(), current_union_traversal);
             executing_traversal.setInitialTraversers(traversers);
@@ -31,6 +31,7 @@ namespace gremlinxx {
             
             auto& output_traversers = executing_traversal.getTraverserSet();
             new_traversers.addTraversers(output_traversers);
+            output_traversers.clear();
         }
 
         traversers.clear();
