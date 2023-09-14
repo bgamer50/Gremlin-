@@ -11,6 +11,8 @@ namespace gremlinxx {
     std::string AsStep::getInfo() { return "AsStep{" + sideEffectLabel + "}"; }
 
     void AsStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        if(traversers.empty()) return;
+
         traversers.set_side_effects(
             this->sideEffectLabel,
             std::move(traversers.getTraverserData())

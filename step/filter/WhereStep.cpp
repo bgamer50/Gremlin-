@@ -27,6 +27,8 @@ namespace gremlinxx {
     }
 
     void WhereStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        if(traversers.empty()) return;
+
         GraphTraversalSource* src = traversal->getTraversalSource();
 
         auto label = this->label;

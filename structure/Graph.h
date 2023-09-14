@@ -71,7 +71,25 @@ namespace gremlinxx {
 
 			virtual std::vector<std::string> get_vertex_property_names() = 0;
 
+			/*
+				Sets the edge properties of the given edges to the given values.
+			*/
+			virtual void set_edge_properties(std::string property_name, maelstrom::vector& edges, maelstrom::vector& property_values) = 0;
+
+			/*
+				Gets the edge properties of the given edges.
+				Returns a pair where the first vector consists of the property values
+				and the second vector consists of the originating indices.
+
+				If return_values is true, the values (first element in pair) are returned.
+				If return_values is false, an empty vector is returned in place of the values.
+			*/
+			virtual std::pair<maelstrom::vector, maelstrom::vector> get_edge_properties(std::string property_name, maelstrom::vector& edges, bool return_values=true) = 0;
+
+			virtual std::vector<std::string> get_edge_property_names() = 0;
+
 			virtual maelstrom::vector get_vertex_labels(maelstrom::vector& vertices) = 0;
+			virtual maelstrom::vector get_edge_labels(maelstrom::vector& edges) = 0;
 
 			virtual maelstrom::dtype_t get_vertex_dtype() = 0;
 			virtual maelstrom::dtype_t get_edge_dtype() = 0;

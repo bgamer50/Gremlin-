@@ -31,6 +31,7 @@
 
 #include "step/filter/IsStep.h"
 #include "step/filter/LimitStep.h"
+#include "step/filter/LimitSupportingStep.h"
 #include "step/filter/WhereStep.h"
 
 #include "step/graph/VStep.h"
@@ -71,3 +72,4 @@
 #include "strategy/FromToModulatingStrategy.h"
 #include "strategy/RepeatStepCompletionStrategy.h"
 #include "strategy/SubgraphStepCompletionStrategy.h"
+#include "strategy/LimitSupportingStrategy.h"

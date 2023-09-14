@@ -47,27 +47,42 @@ namespace gremlinxx {
             maelstrom::vector output_origin;
             switch(vs_type) {
                 case VERTEX_TO_VERTEX: {
-                    if(traverser_data.get_dtype() != graph->get_vertex_dtype()) throw std::runtime_error("Can only call out()/in() on vertices!");
-                    std::tie(
-                        successors,
-                        output_origin
-                    ) = graph->V(traverser_data, labels, dir);
+                    if(traverser_data.empty()) {
+                        successors = maelstrom::vector(traverser_data.get_mem_type(), graph->get_vertex_dtype());
+                        output_origin = maelstrom::vector();
+                    } else {
+                        if(traverser_data.get_dtype() != graph->get_vertex_dtype()) throw std::runtime_error("Can only call out()/in() on vertices!");
+                        std::tie(
+                            successors,
+                            output_origin
+                        ) = graph->V(traverser_data, labels, dir);
+                    }
                     break;
                 }
                 case VERTEX_TO_EDGE: {
-                    if(traverser_data.get_dtype() != graph->get_edge_dtype()) throw std::runtime_error("Can only call out()/in() on vertices!");
-                    std::tie(
-                        successors,
-                        output_origin
-                    ) = graph->E(traverser_data, labels, dir);
+                    if(traverser_data.empty()) {
+                        successors = maelstrom::vector(traverser_data.get_mem_type(), graph->get_edge_dtype());
+                        output_origin = maelstrom::vector();
+                    } else {
+                        if(traverser_data.get_dtype() != graph->get_vertex_dtype()) throw std::runtime_error("Can only call outE()/inE() on vertices!");
+                        std::tie(
+                            successors,
+                            output_origin
+                        ) = graph->E(traverser_data, labels, dir);
+                    }
                     break;
                 }
                 case EDGE_TO_VERTEX: {
-                    if(traverser_data.get_dtype() != graph->get_vertex_dtype()) throw std::runtime_error("Can only call out()/in() on vertices!");
-                    std::tie(
-                        successors,
-                        output_origin
-                    ) = graph->toV(traverser_data, dir);
+                    if(traverser_data.empty()) {
+                        successors = maelstrom::vector(traverser_data.get_mem_type(), graph->get_vertex_dtype());
+                        output_origin = maelstrom::vector();
+                    } else {
+                        if(traverser_data.get_dtype() != graph->get_edge_dtype()) throw std::runtime_error("Can only call outV()/inV() on edges!");
+                        std::tie(
+                            successors,
+                            output_origin
+                        ) = graph->toV(traverser_data, dir);
+                    }
                     break;
                 }
                 default: {

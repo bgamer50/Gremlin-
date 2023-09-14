@@ -106,6 +106,8 @@ namespace gremlinxx {
 		//GraphTraversal<auto n> _and();
 		//GraphTraversal<auto n> _and(std::vector<GraphTraversal<auto m>> traversals);
 		
+		GraphTraversal& sideEffect(std::string sideEffectLabel, std::any value);
+
 		GraphTraversal& as(std::string sideEffectLabel);
 		
 		//GraphTraversal* barrier();
@@ -155,7 +157,7 @@ namespace gremlinxx {
 
 		//GraphTraversal* has(std::string key, GraphTraversal* valueTraversal);
 		//GraphTraversal* has(std::string key);
-		//GraphTraversal* hasNot(std::string key);
+		GraphTraversal& hasNot(std::string key);
 		//GraphTraversal* hasLabel(std::vector<std::string> labels);
 		//GraphTraversal* hasLabel(std::string label);
 		//GraphTraversal* hasId(void* ids, size_t sizeOfEach, int length); // dangerous operation
@@ -181,6 +183,7 @@ namespace gremlinxx {
 		//GraphTraversal mean(Scope scope);
 		
 		GraphTraversal& min();
+		GraphTraversal& min(ScopeContext sc);
 
 		//GraphTraversal min(Scope scope);
 		//GraphTraversal _not(GraphTraversal notTraversal);

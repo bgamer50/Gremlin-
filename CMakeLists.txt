@@ -52,10 +52,12 @@ add_library(
     step/modulate/ToStep.cpp
 
     step/property/HasStep.cpp
+    step/property/HasNotStep.cpp
     step/property/PropertyStep.cpp
     step/property/ElementMapStep.cpp
     step/property/ValueStep.cpp
 
+    step/sideeffect/SideEffectStep.cpp
     step/sideeffect/AsStep.cpp
     step/sideeffect/SelectStep.cpp
 
@@ -67,6 +69,7 @@ add_library(
     strategy/FromToModulatingStrategy.cpp
     strategy/RepeatStepCompletionStrategy.cpp
     strategy/SubgraphStepCompletionStrategy.cpp
+    strategy/LimitSupportingStrategy.cpp
     
     traversal/Comparison.cpp
     traversal/GraphTraversal.cpp

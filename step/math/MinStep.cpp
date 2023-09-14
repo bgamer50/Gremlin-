@@ -13,6 +13,8 @@ namespace gremlinxx {
     : ReductionStep(MIN_STEP) {}
 
     void MinStep::apply_global(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        if(traversers.empty()) return;
+
         traversers.advance([](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
             std::any min;
             size_t ix;
@@ -42,6 +44,8 @@ namespace gremlinxx {
 
     void MinStep::apply_local(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
         std::string key = *this->scope_context.value().side_effect_key;
+
+        if(traversers.empty()) return;
 
         traversers.advance([key](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
             // sort

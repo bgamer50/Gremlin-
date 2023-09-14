@@ -30,6 +30,8 @@ namespace gremlinxx {
     }
 
     void ElementMapStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        if(traversers.empty()) return;
+
         auto graph = traversal->getGraph();
         auto& prop_keys = this->keys;
 
@@ -38,16 +40,25 @@ namespace gremlinxx {
         std::vector<maelstrom::vector> values;
         maelstrom::vector origin;
 
+        bool vertex = (traverser_data.get_dtype() == graph->get_vertex_dtype());
+        if(!vertex && traverser_data.get_dtype() != graph->get_edge_dtype()) {
+            throw std::domain_error("Can't get an element map for something other than a vertex or edge");
+        }
+
         for(std::string key : prop_keys) {
             maelstrom::vector next_values;
             maelstrom::vector ix;
-            std::tie(next_values, ix) = graph->get_vertex_properties(key, traverser_data, true);
 
-            traverser_data = maelstrom::select(traverser_data, ix);
-            
+            if(vertex) {
+                std::tie(next_values, ix) = graph->get_vertex_properties(key, traverser_data, true);
+            } else {
+                std::tie(next_values, ix) = graph->get_edge_properties(key, traverser_data, true);
+            }
+
+            traverser_data = std::move(maelstrom::select(traverser_data, ix));
 
             if(origin.empty()) {
-                origin = ix;
+                origin = std::move(ix);
             } else {
                 origin = maelstrom::select(origin, ix);
                 for(maelstrom::vector& v : values) v = maelstrom::select(v, ix);
@@ -64,9 +75,16 @@ namespace gremlinxx {
             );
         });
 
-        traverser_data = traversers.getTraverserData();
-        traversers.set_side_effects(ELEMENTMAP_ID_KEY, std::move(maelstrom::vector(traverser_data)));
-        traversers.set_side_effects(ElEMENTMAP_LABEL_KEY, std::move(graph->get_vertex_labels(traverser_data)));
+        traverser_data = std::move(traversers.getTraverserData());
+
+        traversers.set_side_effects(ELEMENTMAP_ID_KEY, std::move(maelstrom::vector(traverser_data, false)));
+        
+        traversers.set_side_effects(
+            ElEMENTMAP_LABEL_KEY,
+            vertex ? std::move(graph->get_vertex_labels(traverser_data)) : std::move(graph->get_edge_labels(traverser_data))
+        );
+        
         for(size_t i = 0; i < prop_keys.size(); ++i) traversers.set_side_effects(prop_keys[i], std::move(values[i]));
+        
     }
 }

@@ -7,6 +7,7 @@
 #include "strategy/RepeatStepCompletionStrategy.h"
 #include "strategy/ByModulatingStrategy.h"
 #include "strategy/FromToModulatingStrategy.h"
+#include "strategy/LimitSupportingStrategy.h"
 
 #include "traversal/BasicTraverserSet.h"
 #include "step/graph/VStep.h"
@@ -22,6 +23,7 @@ namespace gremlinxx {
 		this->withStrategy(repeat_step_completion_strategy);
 		this->withStrategy(by_modulating_strategy);
 		this->withStrategy(from_to_modulating_strategy);
+		this->withStrategy(limit_supporting_strategy);
 		
 		this->withTypeRegistration(std::type_index(typeid(uint64_t)), maelstrom::uint64);
 		this->withTypeRegistration(std::type_index(typeid(uint32_t)), maelstrom::uint32);
@@ -98,6 +100,7 @@ namespace gremlinxx {
 	}
 
 	GraphTraversal GraphTraversalSource::E() {
+		// FIXME should call a step with this as the default implementation
 		return this->V().outE();
 	}
 

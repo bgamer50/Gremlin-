@@ -33,9 +33,12 @@ namespace gremlinxx {
 	}
 
 	void PropertyStep::apply(GraphTraversal* current_traversal, gremlinxx::traversal::TraverserSet& traversers) {
+		if(traversers.empty()) return;
+
 		auto g = current_traversal->getTraversalSource();
-		if(traversers.getCurrentDataType() != g->getGraph()->get_vertex_dtype()) {
-			throw std::runtime_error("Can't add a property to something other than a vertex!");
+		auto current_data_type = traversers.getCurrentDataType();
+		if(current_data_type != g->getGraph()->get_vertex_dtype() && current_data_type != g->getGraph()->get_edge_dtype()) {
+			throw std::domain_error("Can't add a property to something other than a vertex or edge!");
 		}
 
 		if(this->value.type() == typeid(GraphTraversal)) {
@@ -59,7 +62,7 @@ namespace gremlinxx {
 			new_trv.iterate();
 			auto& retrieved_traversers = new_trv.getTraverserSet();
 
-			// Will not update vertices without a given property value
+			// Will not update vertices or edges without a given property value
 
 			maelstrom::vector original_keys = std::move(retrieved_traversers.getSideEffects()[PROPERTY_STEP_SIDE_EFFECT_KEY]);
 			maelstrom::vector property_vals = retrieved_traversers.getTraverserData();
@@ -69,28 +72,38 @@ namespace gremlinxx {
 			original_keys = maelstrom::select(original_keys, unique_ix);
 			property_vals = maelstrom::select(property_vals, unique_ix);
 			
-			maelstrom::vector vertices = traversers.getTraverserData();
-			vertices = maelstrom::select(vertices, original_keys);
+			maelstrom::vector elements = traversers.getTraverserData();
+			elements = maelstrom::select(elements, original_keys);
 			original_keys.clear();
 
-			g->getGraph()->set_vertex_properties(this->key, vertices, property_vals);
+			if(current_data_type == g->getGraph()->get_vertex_dtype()) {
+				g->getGraph()->set_vertex_properties(this->key, elements, property_vals);
+			} else {
+				g->getGraph()->set_edge_properties(this->key, elements, property_vals);
+			}
 			
 		}
 		else {
 			// Store the property
-			auto vertices = traversers.getTraverserData();
-			auto unique_ix = maelstrom::unique(vertices);
-			vertices = maelstrom::select(vertices, unique_ix);
+			auto elements = traversers.getTraverserData();
+			auto unique_ix = maelstrom::unique(elements);
+			elements = maelstrom::select(elements, unique_ix);
 			unique_ix.clear();
+			// FIXME deduplication may not be necessary but technically it is an API requirement
+			// more research needs to be done on dropping that requirement
 
 			maelstrom::vector val_vector(
-				vertices.get_mem_type(),
+				elements.get_mem_type(),
 				g->get_dtype(this->value),
-				vertices.size()
+				elements.size()
 			);
 			maelstrom::set(val_vector, this->value);
 
-			g->getGraph()->set_vertex_properties(this->key, vertices, val_vector);
+			if(current_data_type == g->getGraph()->get_vertex_dtype()) {
+				g->getGraph()->set_vertex_properties(this->key, elements, val_vector);
+			} else {
+				g->getGraph()->set_edge_properties(this->key, elements, val_vector);
+			}
 		}
 
 		// Traversers aren't modified in this step.

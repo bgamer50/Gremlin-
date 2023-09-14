@@ -6,11 +6,13 @@ namespace gremlinxx {
 
     SelectStep::SelectStep(std::string se_label)
     : TraversalStep(SIDE_EFFECT, SELECT_STEP) {
-        this->sideEffectLabel = sideEffectLabel;
+        this->sideEffectLabel = se_label;
     }
 
     void SelectStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
-        std::string se_label = this->sideEffectLabel;
+        std::string& se_label = this->sideEffectLabel;
+
+        if(traversers.empty()) return;
 
         traversers.advance([se_label](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
             if(traverser_se.find(se_label) == traverser_se.end()) {

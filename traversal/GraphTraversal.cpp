@@ -14,6 +14,7 @@
 #include "step/filter/LimitStep.h"
 #include "step/sideeffect/SelectStep.h"
 #include "step/sideeffect/AsStep.h"
+#include "step/sideeffect/SideEffectStep.h"
 #include "step/controlflow/UntilStep.h"
 #include "step/controlflow/EmitStep.h"
 #include "step/property/ElementMapStep.h"
@@ -37,6 +38,7 @@
 #include "step/filter/IsStep.h"
 #include "step/math/CountStep.h"
 #include "step/property/HasStep.h"
+#include "step/property/HasNotStep.h"
 #include "step/logic/DedupStep.h"
 #include "step/controlflow/TimesStep.h"
 #include "step/controlflow/LoopsStep.h"
@@ -301,6 +303,12 @@ namespace gremlinxx {
 	GraphTraversal& GraphTraversal::min() {
 		return this->appendStep(new MinStep());
 	}
+
+	GraphTraversal& GraphTraversal::min(ScopeContext sc) {
+		MinStep* new_step = new MinStep();
+		new_step->set_scope_context(sc);
+		return this->appendStep(new_step);
+	}
 		
 	GraphTraversal& GraphTraversal::count() {
 		return this->appendStep(new CountStep());
@@ -321,6 +329,10 @@ namespace gremlinxx {
 
 	GraphTraversal& GraphTraversal::has(std::string key) {
 		return this->appendStep(new HasStep(key, P::neq(std::any())));
+	}
+
+	GraphTraversal& GraphTraversal::hasNot(std::string key) {
+		return this->appendStep(new HasNotStep(key));
 	}
 
 	GraphTraversal& GraphTraversal::dedup() {
@@ -362,6 +374,10 @@ namespace gremlinxx {
 
 	GraphTraversal& GraphTraversal::until(GraphTraversal untilTraversal) {
 		return this->appendStep(new UntilStep(untilTraversal));
+	}
+
+	GraphTraversal& GraphTraversal::sideEffect(std::string sideEffectLabel, std::any sideEffectValue) {
+		return this->appendStep(new SideEffectStep(sideEffectLabel, sideEffectValue));
 	}
 
 	GraphTraversal& GraphTraversal::as(std::string sideEffectLabel) {
@@ -449,6 +465,7 @@ namespace gremlinxx {
 		bool debug_mode = (this->source != nullptr) ? (this->source->getOptionValue("debug") == "True") : false;
 		for(auto& step : this->steps) {
 			if(debug_mode) {
+				std::cerr << "# traversers: " << this->traversers->size() << std::endl;
 				std::cerr << "step: 0x" << std::hex << step->uid << std::dec << std::endl;
 				std::cerr << step->getInfo() << std::endl;
 			}
