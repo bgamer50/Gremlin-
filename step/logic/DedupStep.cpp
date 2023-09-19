@@ -18,10 +18,10 @@ namespace gremlinxx {
 
     void DedupStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
         traversers.advance([](auto& traverser_data, auto& traverser_se, auto& traverser_path_info){
-            maelstrom::vector sorted_data(traverser_data);
-            maelstrom::vector sorted_indices = maelstrom::sort(sorted_data);
-            
-            maelstrom::vector unique_indices = maelstrom::unique(sorted_data);
+            maelstrom::vector sorted_data(traverser_data, false);
+            maelstrom::vector sorted_indices = maelstrom::sort(sorted_data);            
+            maelstrom::vector unique_indices = maelstrom::unique(sorted_data, true);
+
             sorted_data.clear();
             unique_indices = maelstrom::select(sorted_indices, unique_indices);
             sorted_indices.clear();

@@ -99,6 +99,17 @@ namespace gremlinxx {
 		return trv;
 	}
 
+	GraphTraversal GraphTraversalSource::V(std::vector<Vertex> vertices) {
+		GraphTraversal trv(this);
+		
+		std::vector<std::any> v_ids;
+		v_ids.reserve(vertices.size());
+		for(Vertex& v : vertices) v_ids.push_back(v.id);
+
+		trv.appendStep(new VStep(v_ids));
+		return trv;
+	}
+
 	GraphTraversal GraphTraversalSource::E() {
 		// FIXME should call a step with this as the default implementation
 		return this->V().outE();

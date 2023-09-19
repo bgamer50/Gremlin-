@@ -56,6 +56,7 @@ namespace gremlinxx {
 			virtual GraphTraversal V();
 			virtual GraphTraversal V(Vertex v);
 			virtual GraphTraversal V(std::any v_id);
+			virtual GraphTraversal V(std::vector<Vertex> vertices);
 			virtual GraphTraversal E();
 			virtual GraphTraversal addV();
 			virtual GraphTraversal addV(std::string label);

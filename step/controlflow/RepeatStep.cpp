@@ -37,7 +37,7 @@ namespace gremlinxx {
             }
 
             // Build and evalulate the emit traversals
-            if(this->emitTraversal) {
+            if(this->emitTraversal && !traversers.empty()) {
                 // TODO allow using streams to do this (somehow)
                 gremlinxx::traversal::TraverserSet& emitted_traversers = emissionTraversal.getTraverserSet();
 
@@ -83,9 +83,11 @@ namespace gremlinxx {
             traversers.clear();
 
             currentActionTraversal.iterate();
-            traversers.addTraversers(
-                currentActionTraversal.getTraverserSet()
-            );
+            if(!currentActionTraversal.getTraverserSet().empty()) {
+                traversers.addTraversers(
+                    currentActionTraversal.getTraverserSet()
+                );
+            }
 
             ++loops;
         } while(traversers.size() > 0 && cont);
