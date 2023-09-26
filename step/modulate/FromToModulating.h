@@ -1,10 +1,13 @@
-#ifndef FROM_TO_MODULATING_H
-#define FROM_TO_MODULATING_H
+#pragma once
 
-class FromToModulating {
-    public:
-        virtual void modulate_from(boost::any arg) = 0;
-        virtual void modulate_to(boost::any arg) = 0;
-};
+namespace gremlinxx {
 
-#endif
+    class GraphTraversal;
+
+    class FromToModulating {
+        public:
+            virtual void modulate_from(GraphTraversal trv) = 0;
+            virtual void modulate_to(GraphTraversal trv) = 0;
+    };
+
+}

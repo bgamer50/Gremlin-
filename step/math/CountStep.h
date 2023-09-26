@@ -1,23 +1,22 @@
-#ifndef COUNT_STEP_H
-#define COUNT_STEP_H
+#pragma once
 
 #define COUNT_STEP 0x61
 
 #include "step/TraversalStep.h"
+#include "traversal/Traverser.h"
 #include <functional>
 
-class CountStep : public TraversalStep {
-    public:
-        CountStep()
-        : TraversalStep(true, MAP, COUNT_STEP) {
-            // empty constructor
-        }
+namespace gremlinxx {
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers) {
-            size_t size = traversers.size();
-			traversers.clear();
-			traversers.push_back(Traverser(size));
-        }
-};
+    class CountStep : public TraversalStep {
+        public:
+            CountStep();
 
-#endif
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
+
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+        
+    };
+
+}

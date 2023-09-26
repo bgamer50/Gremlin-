@@ -1,11 +1,12 @@
-#ifndef BY_MODULATING_H
-#define BY_MODULATING_H
+#pragma once
 
-#include <boost/any.hpp>
+#include <any>
 
-class ByModulating {
-    public:
-        virtual void modulate_by(boost::any arg) = 0;
-};
+namespace gremlinxx {
 
-#endif
+    class ByModulating {
+        public:
+            virtual void modulate_by(std::any arg) = 0;
+    };
+
+}

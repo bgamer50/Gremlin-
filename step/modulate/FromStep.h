@@ -1,50 +1,39 @@
-#ifndef FROM_STEP_H
-#define FROM_STEP_H
+#pragma once
 
-class GraphTraversal;
-class TraversalStep;
-class Vertex;
+#include "step/TraversalStep.h"
+#include "traversal/GraphTraversal.h"
 
 #include <string>
+#include <any>
 
 #define FROM_STEP 0x90
 
-class FromStep : public TraversalStep {
-	private:
-		boost::any arg;
-	public:
-		FromStep(std::string side_effect_label);
+namespace gremlinxx {
+	class Vertex;
+		
+	class FromStep : public TraversalStep {
+		private:
+			std::any arg;
+			std::optional<GraphTraversal> traversal;
+		public:
+			FromStep(std::string side_effect_label);
 
-		FromStep(Vertex* to_vertex);
+			FromStep(Vertex to_vertex);
 
-		FromStep(GraphTraversal* from_vertex_traversal);
+			FromStep(GraphTraversal from_vertex_traversal);
 
-		using TraversalStep::getInfo;
-		virtual std::string getInfo();
+			using TraversalStep::getInfo;
+			virtual std::string getInfo();
 
-		boost::any get() { return arg; }
-};
+			inline std::any get_arg() {
+				if(!arg.has_value()) throw std::runtime_error("step does not contain arg");
+				return arg; 
+			}
 
-#include "traversal/GraphTraversal.h"
-#include "step/TraversalStep.h"
+			inline GraphTraversal& get_traversal() {
+				if(!traversal) throw std::runtime_error("step does not contain traversal");
+				return traversal.value();
+			}
+	};
 
-FromStep::FromStep(GraphTraversal* from_vertex_traversal)
-: TraversalStep(MODULATOR, FROM_STEP) {
-	arg = from_vertex_traversal;
 }
-
-FromStep::FromStep(std::string side_effect_label)
-: TraversalStep(MODULATOR, FROM_STEP) {
-	arg = __->select(side_effect_label);
-}
-
-FromStep::FromStep(Vertex* to_vertex) 
-: TraversalStep(MODULATOR, FROM_STEP) {
-	arg = __->V(to_vertex);
-}
-
-std::string FromStep::getInfo() {
-	return "FromStep {?}";
-}
-
-#endif

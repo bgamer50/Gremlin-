@@ -1,5 +1,7 @@
-#ifndef DIRECTION_H
-#define DIRECTION_H
-enum Direction {IN, OUT, BOTH};
+#pragma once
 
-#endif
+namespace gremlinxx {
+
+    enum Direction {IN, OUT, BOTH};
+
+}

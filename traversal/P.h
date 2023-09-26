@@ -1,57 +1,82 @@
-#ifndef P_PREDICATE_H
-#define P_PREDICATE_H
+#pragma once
 
 #include <string>
 #include <iostream>
-#include <boost/any.hpp>
+#include <any>
 #include <stdlib.h>
 #include <functional>
 
-/**
-    Equivalent of P in Java-Gremlin.
-**/
-class P {
-	public:
-		enum Comparison { EQ, NEQ, GT, GTE, LT, LTE, BETWEEN};
-		Comparison comparison;
-		boost::any operand;
+#include "maelstrom/storage/comparison.h"
 
-		P(P::Comparison comparison, boost::any operand) {
-			this->comparison = comparison;
-			this->operand = operand;
-		}
+namespace gremlinxx {
 
-		std::string getInfo() {
-			return std::string("P<?>");
-		}
+	/**
+		Equivalent of P in Java-Gremlin.
+	**/
+	class P {
+		public:
+			maelstrom::comparator comparison;
+			std::any operand;
 
-		static P eq(boost::any t) {
-			return P(EQ, t);
-		}
+			P(maelstrom::comparator comparison, std::any operand) {
+				this->comparison = comparison;
 
-		static P neq(boost::any t) {
-			return P(NEQ, t);
-		}
+				if(operand.type() == typeid(const char*)) {
+					operand = std::string(
+						std::any_cast<const char*>(operand)
+					);
+				}
+				this->operand = operand;
+			}
 
-		static P gt(boost::any t) {
-			return P(GT, t);
-		}
+			inline std::string getInfo() {
+				return std::string("P<?>");
+			}
 
-		static P gte(boost::any t) {
-			return P(GTE, t);
-		}
+			inline static P eq(std::any t) {
+				return P(maelstrom::EQUALS, t);
+			}
 
-		static P lt(boost::any t) {
-			return P(LT, t);
-		}
+			inline static P neq(std::any t) {
+				return P(maelstrom::NOT_EQUALS, t);
+			}
 
-		static P lte(boost::any t) {
-			return P(LTE, t);
-		}
+			inline static P gt(std::any t) {
+				return P(maelstrom::GREATER_THAN, t);
+			}
 
-		static P between(boost::any t, boost::any u) {
-			return P(BETWEEN, std::make_pair(t,u));
-		}
-};
+			inline static P gte(std::any t) {
+				return P(maelstrom::GREATER_THAN_OR_EQUAL, t);
+			}
 
-#endif
+			inline static P lt(std::any t) {
+				return P(maelstrom::LESS_THAN, t);
+			}
+
+			inline static P lte(std::any t) {
+				return P(maelstrom::LESS_THAN_OR_EQUAL, t);
+			}
+
+			inline static P between(std::any t, std::any u) {
+				return P(maelstrom::BETWEEN, std::make_pair(t,u));
+			}
+
+			inline static P inside(std::any t, std::any u) {
+				return P(maelstrom::INSIDE, std::make_pair(t,u));
+			}
+
+			inline static P outside(std::any t, std::any u) {
+				return P(maelstrom::OUTSIDE, std::make_pair(t,u));
+			}
+
+			inline static P within(std::any b...) {
+				throw std::runtime_error("Within is currently unsupported in gremlin++");
+			}
+
+			inline static P without(std::any b...) {
+				throw std::runtime_error("Without is currently unsupported in gremlinx++");
+			}
+
+	};
+
+}

@@ -1,47 +1,38 @@
-#ifndef TRAVERSER_H
-#define TRAVERSER_H
+#pragma once
 
-#include <list>
-#include <map>
+#include <unordered_map>
 #include <vector>
-#include <string.h>
-#include <boost/any.hpp>
+#include <string>
+#include <any>
 
-class Traverser {
-	private:
-		boost::any my_data;
-		std::list<boost::any> path;
-		std::map<std::string, boost::any> side_effects;
+namespace gremlinxx {
 
-	public:
-		Traverser(boost::any t) {
-			my_data = boost::any(t);
-		}
+	class Traverser {
+		private:
+			std::any my_data;
+			std::vector<std::any> path;
+			std::unordered_map<std::string, std::any> side_effects;
 
-		Traverser(boost::any t, std::map<std::string, boost::any>& new_side_effects) {
-			my_data = boost::any(t);
-			this->side_effects = new_side_effects;
-		}
+		public:
+			Traverser(std::any t);
 
-		Traverser() : Traverser(boost::any()){}
+			Traverser(std::any t, std::unordered_map<std::string, std::any>& new_side_effects);
 
-		virtual boost::any get() {
-			return my_data;
-		}
+			Traverser();
 
-		virtual Traverser replace_data(boost::any t) {
-			my_data = t;
-			return *this;
-		}
+			virtual std::any get();
 
-		/**
-		 * Returns a reference to this traverser's side effect map.
-		 * **/
-		virtual std::map<std::string, boost::any>& get_side_effects() {
-			return this->side_effects;
-		}
-};
+			virtual void replace_data(std::any t);
 
-typedef std::vector<Traverser> TraverserSet;
+			/**
+			 * Returns a reference to this traverser's side effect map.
+			 * **/
+			virtual std::unordered_map<std::string, std::any>& access_side_effects();
 
-#endif
+			/*
+				Returns a reference to this traverser's path info.
+			*/
+			virtual std::vector<std::any>& access_path();
+	};
+
+}

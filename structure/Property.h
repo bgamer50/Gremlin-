@@ -1,26 +1,31 @@
-#ifndef PROPERTY_H
-#define PROPERTY_H
+#pragma once
 
 #include <string>
+#include <any>
 
-class Property {
-	private:
-		std::string my_key;
-		boost::any my_value;
+namespace gremlinxx {
 
-	public:		
-		Property(std::string new_key, boost::any new_value) {
-			this->my_key = new_key;
-			this->my_value = new_value;
-		}
+	/*
+		Deprecated
+	*/
+	class Property {
+		private:
+			std::string my_key;
+			std::any my_value;
 
-		std::string key() {
-			return this->my_key;
-		}
+		public:		
+			Property(std::string new_key, std::any new_value) {
+				this->my_key = new_key;
+				this->my_value = new_value;
+			}
 
-		boost::any value() {
-			return this->my_value;
-		}
-};
+			virtual std::string key() {
+				return this->my_key;
+			}
 
-#endif
+			virtual std::any value() {
+				return this->my_value;
+			}
+	};
+
+}

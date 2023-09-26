@@ -1,5 +1,4 @@
-#ifndef VERTEX_PROPERTY_H
-#define VERTEX_PROPERTY_H
+#pragma once
 
 #include <set>
 #include <exception>
@@ -7,27 +6,35 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
-#include <boost/any.hpp>
-#include "structure/Property.h"
+#include <any>
+#include "Property.h"
 
-enum Cardinality {SINGLE, LIST, SET};
+namespace gremlinxx {
 
-class VertexProperty: public Property {
-	private:
-		// kv pairs
-		std::unordered_map<std::string, Property> my_values;
-	public:
-		VertexProperty(std::string new_key, boost::any new_value)
-		: Property(new_key, new_value) {}
+	/*
+		Deprecated
+	*/
+	enum Cardinality {SINGLE, LIST, SET};
 
-		VertexProperty(std::string new_key, boost::any new_value, std::unordered_map<std::string, Property>& new_values)
-		: Property(new_key, new_value) {
-			my_values = new_values;
-		}
+	/*
+		Deprecated
+	*/
+	class VertexProperty: public Property {
+		private:
+			// kv pairs
+			std::unordered_map<std::string, Property> my_values;
+		public:
+			VertexProperty(std::string new_key, std::any new_value)
+			: Property(new_key, new_value) {}
 
-		std::unordered_map<std::string, Property> values() {
-			return my_values;
-		}
-};
+			VertexProperty(std::string new_key, std::any new_value, std::unordered_map<std::string, Property>& new_values)
+			: Property(new_key, new_value) {
+				my_values = new_values;
+			}
 
-#endif
+			virtual std::unordered_map<std::string, Property> values() {
+				return my_values;
+			}
+	};
+
+}

@@ -1,25 +1,24 @@
-#ifndef SUBGRAPH_EXTRACTION_STEP_H
-#define SUBGRAPH_EXTRACTION_STEP_H
+#pragma once
 
 #include "step/TraversalStep.h"
 #include "step/graph/SubgraphStep.h"
+#include "traversal/Traverser.h"
 
 #define SUBGRAPH_EXTRACTION_STEP 0x65
 
-class SubgraphExtractionStep : public TraversalStep {
-    private:
-        std::string subgraph_name;
+namespace gremlinxx {
 
-    public:
-        SubgraphExtractionStep(std::string subgraph_name) : TraversalStep(MAP, SUBGRAPH_EXTRACTION_STEP) {
-            this->subgraph_name = subgraph_name;
-        }
+    class SubgraphExtractionStep : public TraversalStep {
+        private:
+            std::string subgraph_name;
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers) {
-            throw std::runtime_error("Cannot run from anonymous traversal!");
-        }
+        public:
+            SubgraphExtractionStep(std::string sg_name);
+    
+            inline std::string get_subgraph_name() { return this->subgraph_name; }
 
-        inline std::string get_subgraph_name() { return this->subgraph_name; }
-};
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
 
-#endif
+    };
+
+}

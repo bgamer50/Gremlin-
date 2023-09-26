@@ -1,31 +1,24 @@
-#ifndef AS_STEP_H
-#define AS_STEP_H
+#pragma once
 
 #define AS_STEP 0x31
 
 #include <string>
 #include "step/TraversalStep.h"
+#include "traversal/Traverser.h"
 
-class AsStep: public TraversalStep {
-    private:
-        std::string sideEffectLabel;
+namespace gremlinxx {
 
-    public:
-        AsStep(std::string sideEffectLabel)
-        : TraversalStep(SIDE_EFFECT, AS_STEP) {
-            this->sideEffectLabel = sideEffectLabel;
-        }
+    class AsStep: public TraversalStep {
+        private:
+            std::string sideEffectLabel;
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
+        public:
+            AsStep(std::string se_label);
 
-        using TraversalStep::getInfo;
-        virtual std::string getInfo() { return "AsStep{" + sideEffectLabel + "}"; }
-};
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
 
-inline void AsStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    for(Traverser& trv : traversers) {
-        trv.get_side_effects()[sideEffectLabel] = trv.get();
-    }
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
+    };
+
 }
-
-#endif

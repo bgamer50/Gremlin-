@@ -1,21 +1,22 @@
-#ifndef EMIT_STEP_H
-#define EMIT_STEP_H
+#pragma once
 
 #define EMIT_STEP 0x44
 
 #include "step/TraversalStep.h"
+#include "traversal/GraphTraversal.h"
 
-class EmitStep: public TraversalStep {
-    private:
-        GraphTraversal* traversal;
+namespace gremlinxx {
+    
 
-    public:
-        EmitStep(GraphTraversal* traversal)
-        : TraversalStep(MODULATOR, EMIT_STEP) {
-            this->traversal = traversal;            
-        }
+    class EmitStep: public TraversalStep {
 
-        GraphTraversal* getTraversal() { return this->traversal; }
-};
+        private:
+            GraphTraversal traversal;
 
-#endif
+        public:
+            EmitStep(GraphTraversal traversal);
+
+            GraphTraversal getTraversal();
+    };
+
+}

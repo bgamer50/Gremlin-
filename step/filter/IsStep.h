@@ -1,64 +1,30 @@
-#ifndef IS_STEP_H
-#define IS_STEP_H
+#pragma once
 
 #define IS_STEP 0x46
 
 #include "step/TraversalStep.h"
+#include "traversal/Traverser.h"
+#include "traversal/P.h"
 #include <unordered_map>
 #include <string>
 
-class IsStep: public TraversalStep {
-    private:
-        P predicate = P(P::Comparison::EQ, boost::any());
+namespace gremlinxx {
 
-    public:
-        IsStep(P predicate)
-        : TraversalStep(FILTER, IS_STEP) {
-            this->predicate = predicate;
-        }
+    class GraphTraversal;
 
-        P getPredicate() { return this->predicate; }
+    class IsStep: public TraversalStep {
+        private:
+            P predicate = P(maelstrom::EQUALS, std::any());
 
-        virtual void apply(GraphTraversal* traversal, TraverserSet& traversers);
-};
+        public:
+            IsStep(P predicate);
 
-void IsStep::apply(GraphTraversal* traversal, TraverserSet& traversers) {
-    GraphTraversalSource* src = traversal->getTraversalSource();
-    boost::any val = this->predicate.operand;
+            inline P getPredicate() { return this->predicate; }
 
-    TraverserSet new_traversers;
-    for(Traverser& traverser: traversers)  {
-        boost::any t = traverser.get();
-        switch(this->predicate.comparison) {
-            case P::Comparison::EQ:
-                if(src->test_equals(t, val)) new_traversers.push_back(traverser);
-                break;
-            case P::Comparison::NEQ:
-                if(!src->test_equals(t, val)) new_traversers.push_back(traverser);
-                break;
-            case P::Comparison::GT:
-                if(src->test_compare(t, val) > 0) new_traversers.push_back(traverser);
-                break;
-            case P::Comparison::GTE:
-                if(src->test_compare(t, val) >= 0) new_traversers.push_back(traverser);
-                break;
-            case P::Comparison::LT:
-                if(src->test_compare(t, val) < 0) new_traversers.push_back(traverser);
-                break;
-            case P::Comparison::LTE:
-                if(src->test_compare(t, val) <= 0) new_traversers.push_back(traverser);
-                break;
-            case P::Comparison::BETWEEN: {
-                std::pair<boost::any, boost::any> p = boost::any_cast<std::pair<boost::any, boost::any>>(val);
-                if(src->test_compare(t, p.first) >= 0 && src->test_compare(t, p.second) < 0) new_traversers.push_back(traverser);
-                break;
-            }
-            default:
-                throw std::runtime_error("Comparison type not supported by IsStep.");
-        }
-    }
+            virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+            
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
+    };
 
-    traversers.swap(new_traversers);
 }
-
-#endif

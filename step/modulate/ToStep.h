@@ -1,46 +1,39 @@
-#ifndef TO_STEP_H
-#define TO_STEP_H
+#pragma once
 
+#include "structure/Vertex.h"
 #include "step/TraversalStep.h"
+#include "traversal/GraphTraversal.h"
 #include <string>
-class GraphTraversal;
-class Vertex;
+#include <optional>
+#include <any>
 
 #define TO_STEP 0x91
 
-class ToStep : public TraversalStep {
-	private:
-		boost::any arg;
-	public:
-		ToStep(std::string side_effect_label);
+namespace gremlinxx {
 
-		ToStep(Vertex* to_vertex);
+	class ToStep : public TraversalStep {
+		private:
+			std::any arg;
+			std::optional<GraphTraversal> traversal = {};
+		public:
+			ToStep(std::string side_effect_label);
 
-		ToStep(GraphTraversal* to_vertex_traversal)
-		: TraversalStep(MODULATOR, TO_STEP) {
-			arg = to_vertex_traversal;
-		}
+			ToStep(Vertex to_vertex);
 
-		boost::any get() { return arg; }
+			ToStep(GraphTraversal to_vertex_traversal);
 
-		using TraversalStep::getInfo;
-		virtual std::string getInfo();
-};
+			inline std::any get_arg() { 
+				if(!arg.has_value()) throw std::runtime_error("Argument is not present!");
+				return arg; 
+			}
 
-#include "traversal/GraphTraversal.h"
+			inline GraphTraversal& get_traversal() { 
+				if(!traversal) throw std::runtime_error("traversal is not present!");
+				return traversal.value();
+			}
 
-ToStep::ToStep(std::string side_effect_label)
-: TraversalStep(MODULATOR, TO_STEP) {
-	arg = (GraphTraversal*)__->select(side_effect_label);
+			using TraversalStep::getInfo;
+			virtual std::string getInfo();
+	};
+
 }
-
-ToStep::ToStep(Vertex* to_vertex)
-: TraversalStep(MODULATOR, TO_STEP) {
-	arg = __->V(to_vertex);
-}
-
-std::string ToStep::getInfo() {
-	return "ToStep {?}";
-}
-
-#endif
