@@ -47,6 +47,8 @@ namespace gremlinxx {
 		*/
 		GraphTraversal();
 
+		~GraphTraversal();
+
 		/*
 			The given traversal source is allowed to be null, in the case of an
 			anomymous traversal.

@@ -55,6 +55,10 @@ namespace gremlinxx {
 		this->traversers = {};
 	}
 
+	GraphTraversal::~GraphTraversal() {
+		//if(this->source != nullptr) delete this->source;
+	}
+
 	/*
 		The given traversal source is allowed to be null, in the case of an
 		anomymous traversal.
