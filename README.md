@@ -1,11 +1,11 @@
-Version 1.0.0 (Expected September 2023)
+Version 1.0.0 (September 26, 2023)
 
 This is a major overhaul of Gremlin++, replacing the original _Traverser_ structure
 with virtual objects managed by _Maelstrom_ vectors.  Every aspect of Gremlin++
 has been almost completely rewritten as a series of Maelstrom operations.
 The OLAP behavior of Gremlin++ has also been standardized, and should roughly
 match that of OLAP Gremlin.  Major performance and memory usage improvements are
-expected in this release.
+available in this release.
 
 ---------------------------------------------------------------
 
