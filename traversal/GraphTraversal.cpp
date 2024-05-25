@@ -413,17 +413,43 @@ namespace gremlinxx {
 	}
 
 	std::string GraphTraversal::explain() {
-		return this->explain(0);
+		std::stringstream sx;
+		sx << "Traversal Explanation" << std::endl;
+		for(size_t k = 0; k < 60; ++k) sx << "=";
+		sx << std::endl;
+
+		const size_t col_width = 60;
+		std::string s = "Original Traversal";
+		while(s.size() < col_width + 8) s += " ";
+		sx << s << this->info() << std::endl;
+
+		if(this->source != nullptr) {
+			for(auto& strategy : this->source->getStrategies()) {
+				strategy(this->steps);
+
+				std::string strat = strategy.name;
+				while(strat.length() < col_width) strat += " ";
+				strat += "[" + strategy_type_names[strategy.type].substr(0,1) + "]";
+				for(size_t k = 0; k < 5; ++k) strat += " ";
+				sx << strat << this->info() << std::endl;
+			}
+		}
+
+		sx << std::endl;
+		std::string f = "Final Traversal";
+		while(f.length() < col_width + 8) f += " ";
+		sx << f << this->info();
+
+		return sx.str();
 	}
 
-	std::string GraphTraversal::explain(size_t indent) {
-		std::string ind = "";
-		for(size_t k = 0; k < indent; ++k) ind += "  ";
-
-		if(this->source != nullptr) this->getInitialTraversal();
-
-		std::string explanation = "GraphTraversal {\n";
-		for(int k = 0; k < this->steps.size(); k++) explanation += ind + this->steps[k]->getInfo() + "\n";
+	std::string GraphTraversal::info() {
+		std::string explanation = "GraphTraversal {";
+		
+		if(!this->steps.empty()) {
+			for(int k = 0; k < this->steps.size() - 1; k++) explanation += this->steps[k]->getInfo() + ", ";
+			explanation += this->steps[this->steps.size() - 1]->getInfo();
+		}
 
 		return explanation + "}";
 	}

@@ -291,7 +291,7 @@ namespace gremlinxx {
 
 		// The explain finalizer which works in anonymous GraphTraversals
 		std::string explain();
-		std::string explain(size_t indent);
+		std::string info();
 
 		// Finalizing steps
 
