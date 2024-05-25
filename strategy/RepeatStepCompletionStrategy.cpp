@@ -32,14 +32,18 @@ namespace gremlinxx {
         return false;
     }
 
-    void repeat_step_completion_strategy(std::vector<std::shared_ptr<TraversalStep>>& steps) {
-        for(size_t k = 0; k < steps.size(); ++k) {
-            if(steps[k]->uid == REPEAT_STEP) {
-                if(acquire_step(steps, k-1, static_cast<RepeatStep*>(steps[k].get()))) acquire_step(steps, k-1, static_cast<RepeatStep*>(steps[k].get()));
-                if(acquire_step(steps, k+1, static_cast<RepeatStep*>(steps[k].get()))) acquire_step(steps, k+1, static_cast<RepeatStep*>(steps[k].get()));
-                // TODO might be an issue w/ stacked repeats, but why would you ever do that?
+    TraversalStrategy RepeatStepCompletionStrategy = {
+        FINALIZATON,
+        "RepeatStepCompletionStrategy",
+        [](std::vector<std::shared_ptr<TraversalStep>>& steps) {
+            for(size_t k = 0; k < steps.size(); ++k) {
+                if(steps[k]->uid == REPEAT_STEP) {
+                    if(acquire_step(steps, k-1, static_cast<RepeatStep*>(steps[k].get()))) acquire_step(steps, k-1, static_cast<RepeatStep*>(steps[k].get()));
+                    if(acquire_step(steps, k+1, static_cast<RepeatStep*>(steps[k].get()))) acquire_step(steps, k+1, static_cast<RepeatStep*>(steps[k].get()));
+                    // TODO might be an issue w/ stacked repeats, but why would you ever do that?
+                }
             }
         }
-    }
+    };
 
 }

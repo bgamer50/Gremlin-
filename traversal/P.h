@@ -1,12 +1,14 @@
 #pragma once
 
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <any>
 #include <stdlib.h>
 #include <functional>
 
 #include "maelstrom/storage/comparison.h"
+#include "util/gremlin_utils.h"
 
 namespace gremlinxx {
 
@@ -30,7 +32,9 @@ namespace gremlinxx {
 			}
 
 			inline std::string getInfo() {
-				return std::string("P<?>");
+				std::stringstream sx;
+				sx << "P<" << "'" << maelstrom::comparator_names[this->comparison] << "' " << string_any(operand) << ">";
+				return sx.str();
 			}
 
 			inline static P eq(std::any t) {

@@ -67,6 +67,7 @@ add_library(
     step/vertex/AddVertexStep.cpp
     step/vertex/VertexStep.cpp
 
+    strategy/TraversalStrategy.cpp
     strategy/ByModulatingStrategy.cpp
     strategy/FromToModulatingStrategy.cpp
     strategy/RepeatStepCompletionStrategy.cpp

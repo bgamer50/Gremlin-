@@ -97,7 +97,29 @@ nb::object maelstrom_to_numpy(maelstrom::vector& vec) {
 }
 
 NB_MODULE(pygremlinxx, m) {
+    nb::class_<gremlinxx::TraversalStrategy>(m, "TraversalStrategy")
+        .def(nb::new_([](std::string name){
+            if(name == "RepeatStepCompletionStrategy") {
+                return gremlinxx::RepeatStepCompletionStrategy;
+            } else if(name == "ByModulatingStrategy") {
+                return gremlinxx::ByModulatingStrategy;
+            } else if(name == "FromToModulatingStrategy") {
+                return gremlinxx::FromToModulatingStrategy;
+            } else if(name == "LimitSupportingStrategy") {
+                return gremlinxx::LimitSupportingStrategy;
+            } else if(name == "RepeatStepCompletionStrategy") {
+                return gremlinxx::RepeatStepCompletionStrategy;
+            } else if(name == "SubgraphStepCompletionStrategy") {
+                return gremlinxx::SubgraphStepCompletionStrategy;
+            } 
+
+            throw std::runtime_error(
+                "Unknown strategy type - backend strategies can't be created in Python."
+            );
+        }));
+
     nb::class_<gremlinxx::GraphTraversalSource>(m, "GraphTraversalSource")
+        .def("withoutStrategies", &gremlinxx::GraphTraversalSource::withoutStrategies)
         .def("V", [](gremlinxx::GraphTraversalSource& g){
             return g.V();
         })
@@ -220,6 +242,18 @@ NB_MODULE(pygremlinxx, m) {
         })
         .def("values", [](gremlinxx::GraphTraversal& trv, std::string label){
             return trv.values(label);
+        })
+        .def("out", [](gremlinxx::GraphTraversal& trv, std::vector<std::string> labels) {
+            return trv.out(labels);
+        })
+        .def("out", [](gremlinxx::GraphTraversal& trv) {
+            return trv.out();
+        })
+        .def("in", [](gremlinxx::GraphTraversal& trv, std::vector<std::string> labels) {
+            return trv.in(labels);
+        })
+        .def("in", [](gremlinxx::GraphTraversal& trv) {
+            return trv.in();
         })
         .def("both", [](gremlinxx::GraphTraversal& trv, std::vector<std::string> labels){
             return trv.both(labels);
