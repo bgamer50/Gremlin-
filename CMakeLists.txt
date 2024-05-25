@@ -71,8 +71,10 @@ add_library(
     strategy/ByModulatingStrategy.cpp
     strategy/FromToModulatingStrategy.cpp
     strategy/RepeatStepCompletionStrategy.cpp
+    strategy/RepeatUnrollStrategy.cpp
     strategy/SubgraphStepCompletionStrategy.cpp
     strategy/LimitSupportingStrategy.cpp
+    strategy/NoOpRemovalStrategy.cpp
     
     traversal/Comparison.cpp
     traversal/GraphTraversal.cpp

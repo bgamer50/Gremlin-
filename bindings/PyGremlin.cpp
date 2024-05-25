@@ -137,7 +137,7 @@ NB_MODULE(pygremlinxx, m) {
     nb::class_<gremlinxx::GraphTraversal>(m, "GraphTraversal")
         .def("__init__",
             [](gremlinxx::GraphTraversal* traversal) {
-                // do nothing
+                new (traversal) gremlinxx::GraphTraversal();
             }
         )
         .def("V", [](gremlinxx::GraphTraversal& trv){

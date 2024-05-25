@@ -5,9 +5,11 @@
 #include "structure/Vertex.h"
 #include "structure/Edge.h"
 #include "strategy/RepeatStepCompletionStrategy.h"
+#include "strategy/RepeatUnrollStrategy.h"
 #include "strategy/ByModulatingStrategy.h"
 #include "strategy/FromToModulatingStrategy.h"
 #include "strategy/LimitSupportingStrategy.h"
+#include "strategy/NoOpRemovalStrategy.h"
 
 #include "traversal/BasicTraverserSet.h"
 #include "step/graph/VStep.h"
@@ -21,9 +23,11 @@ namespace gremlinxx {
 	GraphTraversalSource::GraphTraversalSource(Graph* gr) {
 		graph = gr;
 		this->withStrategy(RepeatStepCompletionStrategy);
+		this->withStrategy(RepeatUnrollStrategy);
 		this->withStrategy(ByModulatingStrategy);
 		this->withStrategy(FromToModulatingStrategy);
 		this->withStrategy(LimitSupportingStrategy);
+		this->withStrategy(NoOpRemovalStrategy);
 		
 		this->withTypeRegistration(std::type_index(typeid(uint64_t)), maelstrom::uint64);
 		this->withTypeRegistration(std::type_index(typeid(uint32_t)), maelstrom::uint32);

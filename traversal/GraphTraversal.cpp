@@ -52,7 +52,9 @@ namespace gremlinxx {
 	*/
 	GraphTraversal::GraphTraversal() {
 		this->source = nullptr;
-		this->traversers = {};
+		this->traversers = std::unique_ptr<gremlinxx::traversal::TraverserSet>();
+		this->steps = {};
+		this->traversal_properties = {};
 	}
 
 	GraphTraversal::~GraphTraversal() {
@@ -141,6 +143,8 @@ namespace gremlinxx {
 	*/
 	void GraphTraversal::getInitialTraversal() {
 		// Apply each strategy to this traversal's traversers.
+		if(this->source == nullptr) return;
+		
 		for(auto& strategy : this->source->getStrategies()) {
 			strategy(this->steps);
 		}

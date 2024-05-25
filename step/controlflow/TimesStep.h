@@ -14,6 +14,9 @@ namespace gremlinxx {
             TimesStep(size_t times);
 
             inline size_t get_times() { return this->times; }
+
+            using TraversalStep::getInfo;
+            virtual std::string getInfo() { return "TimesStep{}"; };
     };
 
 }
