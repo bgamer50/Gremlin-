@@ -44,6 +44,7 @@
 #include "step/controlflow/LoopsStep.h"
 #include "step/controlflow/RepeatStep.h"
 #include "step/math/MinStep.h"
+#include "step/filter/SampleStep.h"
 
 namespace gremlinxx {
 
@@ -402,6 +403,10 @@ namespace gremlinxx {
 	
 	GraphTraversal& GraphTraversal::limit(uint64_t the_limit) {
 		return this->appendStep(new LimitStep(the_limit));
+	}
+
+	GraphTraversal& GraphTraversal::sample(size_t sample_size) {
+		return this->appendStep(new SampleStep(sample_size));
 	}
 
 	GraphTraversal& GraphTraversal::inject(std::vector<std::any> injects) {

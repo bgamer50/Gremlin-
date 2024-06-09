@@ -10,6 +10,7 @@
 #include "strategy/FromToModulatingStrategy.h"
 #include "strategy/LimitSupportingStrategy.h"
 #include "strategy/NoOpRemovalStrategy.h"
+#include "strategy/SubgraphStepCompletionStrategy.h"
 
 #include "traversal/BasicTraverserSet.h"
 #include "step/graph/VStep.h"
@@ -28,6 +29,7 @@ namespace gremlinxx {
 		this->withStrategy(FromToModulatingStrategy);
 		this->withStrategy(LimitSupportingStrategy);
 		this->withStrategy(NoOpRemovalStrategy);
+		this->withStrategy(SubgraphStepCompletionStrategy);
 		
 		this->withTypeRegistration(std::type_index(typeid(uint64_t)), maelstrom::uint64);
 		this->withTypeRegistration(std::type_index(typeid(uint32_t)), maelstrom::uint32);

@@ -5,5 +5,5 @@
 namespace gremlinxx {
 
     extern TraversalStrategy SubgraphStepCompletionStrategy;
-       
+
 }

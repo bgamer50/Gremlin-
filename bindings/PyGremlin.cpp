@@ -97,6 +97,13 @@ nb::object maelstrom_to_numpy(maelstrom::vector& vec) {
 }
 
 NB_MODULE(pygremlinxx, m) {
+    nb::class_<gremlinxx::Graph>(m, "Graph")
+        .def("traversal", &gremlinxx::Graph::traversal)
+        .def("num_vertices", &gremlinxx::Graph::num_vertices)
+        .def("num_edges", &gremlinxx::Graph::num_edges)
+        .def("get_vertex_property_names", &gremlinxx::Graph::get_vertex_property_names)
+        .def("get_edge_property_names", &gremlinxx::Graph::get_edge_property_names);
+
     nb::class_<gremlinxx::TraversalStrategy>(m, "TraversalStrategy")
         .def(nb::new_([](std::string name){
             if(name == "RepeatStepCompletionStrategy") {
@@ -109,9 +116,7 @@ NB_MODULE(pygremlinxx, m) {
                 return gremlinxx::LimitSupportingStrategy;
             } else if(name == "RepeatStepCompletionStrategy") {
                 return gremlinxx::RepeatStepCompletionStrategy;
-            } else if(name == "SubgraphStepCompletionStrategy") {
-                return gremlinxx::SubgraphStepCompletionStrategy;
-            } 
+            }
 
             throw std::runtime_error(
                 "Unknown strategy type - backend strategies can't be created in Python."
@@ -230,6 +235,7 @@ NB_MODULE(pygremlinxx, m) {
         })
         .def("order", &gremlinxx::GraphTraversal::order)
         .def("repeat", &gremlinxx::GraphTraversal::repeat)
+        .def("sample", &gremlinxx::GraphTraversal::sample)
         .def("select", &gremlinxx::GraphTraversal::select)
         .def("subgraph", &gremlinxx::GraphTraversal::subgraph)
         .def("to", [](gremlinxx::GraphTraversal& trv, std::string side_effect_label){

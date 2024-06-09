@@ -7,7 +7,7 @@ namespace gremlinxx {
 
     TraversalStrategy LimitSupportingStrategy = {
         OPTIMIZATION,
-        "LimitStepStrategy",
+        "LimitSupportingStrategy",
         [](std::vector<std::shared_ptr<TraversalStep>>& steps) {
             for(size_t k = 1; k < steps.size(); ++k) {
                 if(steps[k]->uid == LIMIT_STEP) {

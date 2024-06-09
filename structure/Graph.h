@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "structure/Edge.h"
 #include "structure/Vertex.h"
@@ -53,6 +54,9 @@ namespace gremlinxx {
 
 			// Traverses edges to their vertices.  Returns the resulting vertices (first element) and originating index (second element).
 			virtual std::pair<maelstrom::vector, maelstrom::vector> toV(maelstrom::vector& current_edges, Direction direction) = 0;
+
+			// Constructs an independent edge-induced subgraph from the given edges.
+			virtual std::shared_ptr<Graph> subgraph(maelstrom::vector& edges) = 0;
 
 			/*
 				Sets the vertex properties of the given vertices to the given values.

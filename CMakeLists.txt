@@ -34,6 +34,7 @@ add_library(
     step/filter/IsStep.cpp
     step/filter/LimitStep.cpp
     step/filter/WhereStep.cpp
+    step/filter/SampleStep.cpp
 
     step/graph/VStep.cpp
     step/graph/IdStep.cpp

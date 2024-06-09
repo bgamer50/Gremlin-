@@ -80,19 +80,37 @@ namespace gremlinxx {
 			return *this;
 		}
 
-		inline void setTraversalProperty(std::string property_name, std::any property_value) {
+		/*
+			Sets the traversal property with the given name to the given value.
+			Returns true if successful, false if unsuccessful.
+		*/
+		inline bool setTraversalProperty(std::string property_name, std::any property_value) {
 			this->traversal_properties[property_name] = property_value;
+			return true;
 		}
 
+		/*
+			Gets a copy of the traversal property with the given name.
+		*/
 		inline std::any getTraversalProperty(std::string property_name) {
 			auto f = this->traversal_properties.find(property_name);
 			if(f == traversal_properties.end()) return std::any();
 			return f->second;
 		}
 
-		inline void removeTraversalProperty(std::string property_name) {
+		/*
+			Removes and returns the traversal property with the given name.
+			If no such property exists, returns an empty any.
+		*/
+		inline std::any removeTraversalProperty(std::string property_name) {
 			auto f = this->traversal_properties.find(property_name);
-			if(f != traversal_properties.end()) this->traversal_properties.erase(f);
+			if(f == traversal_properties.end()) {
+				return std::any();	
+			}
+
+			auto val = std::move(f->second);
+			this->traversal_properties.erase(f);
+			return std::move(val);
 		}
 
 		// Steps
@@ -207,7 +225,7 @@ namespace gremlinxx {
 		//GraphTraversal range(long low, long high);
 		GraphTraversal& repeat(GraphTraversal repeatTraversal);
 		// sack step not supported
-		//GraphTraversal* sample(int sampleSize);
+		GraphTraversal& sample(size_t sampleSize);
 		//GraphTraversal sample(Scope scope, int sampleSize);
 		// single-label select is special
 		GraphTraversal& select(std::string sideEffectLabel);

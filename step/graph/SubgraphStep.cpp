@@ -3,6 +3,10 @@
 #include "structure/Vertex.h"
 #include "structure/Edge.h"
 
+#include "maelstrom/algorithms/sort.h"
+#include "maelstrom/algorithms/unique.h"
+#include "maelstrom/algorithms/select.h"
+
 namespace gremlinxx {
 
     struct edge_hash {
@@ -24,19 +28,23 @@ namespace gremlinxx {
     }
 
     void SubgraphStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
-        std::any subgraph_property = traversal->getTraversalProperty(SUBGRAPH_PREFIX + subgraph_name);
-        if(!subgraph_property.has_value()) subgraph_property = edge_set_t();
-        
-        edge_set_t subgraph_edges = std::any_cast<edge_set_t>(subgraph_property);
         auto traverser_data_copy = traversers.getTraverserData();
-        auto traverser_data_host = maelstrom::as_host_vector(traverser_data_copy);
-
-        for(size_t k = 0; k < traverser_data_host.size(); ++k) {
-            std::any e = traverser_data_host.get(k);
-            subgraph_edges.insert(std::any_cast<Edge>(e));
+        if(traverser_data_copy.get_dtype() != traversal->getGraph()->get_edge_dtype()) {
+            throw std::invalid_argument("subgraph() can only be called on edges");
         }
 
-        traversal->setTraversalProperty(SUBGRAPH_PREFIX + subgraph_name, subgraph_edges);
-    }
+        std::any subgraph_property = traversal->removeTraversalProperty(SUBGRAPH_PREFIX + subgraph_name);
+        if(subgraph_property.has_value()) {
+            traverser_data_copy.insert(std::any_cast<maelstrom::vector&>(subgraph_property));
+        }
 
+        maelstrom::sort(traverser_data_copy);
+        auto ix = maelstrom::unique(traverser_data_copy, true);
+        bool set = traversal->setTraversalProperty(
+            SUBGRAPH_PREFIX + subgraph_name,
+            std::move(maelstrom::select(traverser_data_copy, ix))
+        );
+
+        if(!set) throw std::runtime_error("An error occured setting a traversal property for subgraph " + subgraph_name);
+    }
 }

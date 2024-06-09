@@ -16,9 +16,9 @@ namespace gremlinxx {
                         auto new_steps = rs->getActionTraversal().getSteps();
 
                         for(size_t k = 0; k < times; ++k) {
-                            it = steps.insert(it+1,  new_steps.begin(), new_steps.end());
+                            it = steps.insert(it + 1,  new_steps.begin(), new_steps.end()) - 1;
                         }
-                        it = steps.erase(it-times) - 1;
+                        it = steps.erase(it);
                     }
                 }
             }

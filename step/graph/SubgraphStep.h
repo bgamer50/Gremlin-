@@ -4,6 +4,7 @@
 
 #include "step/TraversalStep.h"
 #include "traversal/Traverser.h"
+#include "structure/Graph.h"
 
 #include <unordered_map>
 #include <unordered_set>
