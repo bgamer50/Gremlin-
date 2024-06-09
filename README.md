@@ -1,3 +1,9 @@
+Version 1.0.3 (Expected June 2024)
+
+This release of Gremlin++ adds better support for traversal strategies as well as Python bindings.
+
+---------------------------------------------------------------
+
 Version 1.0.0 (September 26, 2023)
 
 This is a major overhaul of Gremlin++, replacing the original _Traverser_ structure
