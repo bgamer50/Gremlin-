@@ -116,6 +116,8 @@ NB_MODULE(pygremlinxx, m) {
                 return gremlinxx::LimitSupportingStrategy;
             } else if(name == "RepeatStepCompletionStrategy") {
                 return gremlinxx::RepeatStepCompletionStrategy;
+            } else if(name == "SubgraphStepCompletionStrategy") {
+                return gremlinxx::SubgraphStepCompletionStrategy;
             }
 
             throw std::runtime_error(
@@ -341,5 +343,11 @@ NB_MODULE(pygremlinxx, m) {
         })
         .def("explain", [](gremlinxx::GraphTraversal& trv){
             return trv.explain();
-        });
+        })
+        .def("getTraversalProperty", [](gremlinxx::GraphTraversal& trv, std::string property) {
+            auto prop = trv.getTraversalProperty(property);
+            auto graph = std::any_cast<std::shared_ptr<gremlinxx::Graph>>(prop);
+
+            return graph.get();
+        }, nb::rv_policy::reference_internal);
 }
