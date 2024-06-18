@@ -57,6 +57,18 @@ nb::object cast_type(std::any& a) {
 
 template<typename T>
 nb::object t_maelstrom_to_numpy(maelstrom::vector& vec) {
+    if(vec.empty()) {
+        const size_t shape[] = {0l};
+        return nb::cast(
+            nb::ndarray<nb::numpy, const T>(
+                nullptr,
+                1,
+                shape,
+                nb::handle()
+            )
+        );
+    }
+
     T* data = static_cast<T*>(vec.data());
     vec.disown();
     nb::capsule owner(data, [](void* ptr) noexcept {
