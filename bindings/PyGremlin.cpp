@@ -58,7 +58,7 @@ nb::object cast_type(std::any& a) {
 template<typename T>
 nb::object t_maelstrom_to_numpy(maelstrom::vector& vec) {
     if(vec.empty()) {
-        const size_t shape[] = {0l};
+        const size_t shape[] = {0L};
         return nb::cast(
             nb::ndarray<nb::numpy, const T>(
                 nullptr,
