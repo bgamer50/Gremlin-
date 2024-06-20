@@ -24,6 +24,9 @@ namespace gremlinxx {
             inline std::string get_subgraph_name() { return this->subgraph_name; }
 
             virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
     };
 
 }

@@ -19,4 +19,16 @@ namespace gremlinxx {
             }
         }
     }
+
+    std::string SubgraphExtractionStep::getInfo() {
+        std::stringstream sx;
+        sx << "SubgraphExtractionStep{";
+        for(auto it = this->subgraph_names.begin(); it != this->subgraph_names.end(); ++it){
+            sx << *it << ",";
+        }
+        
+        std::string info = sx.str();
+        info = info.substr(0, info.size() - 1) + "}";
+        return info;
+    }
 }

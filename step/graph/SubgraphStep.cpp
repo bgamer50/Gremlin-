@@ -8,21 +8,6 @@
 #include "maelstrom/algorithms/select.h"
 
 namespace gremlinxx {
-
-    struct edge_hash {
-        size_t operator() (const Edge& e) const {
-            return e.id;
-        }
-    };
-
-    struct edge_equals {
-        bool operator() (const Edge& e1, const Edge& e2) const {
-            return e1.id == e2.id;
-        }
-    };
-
-    typedef std::unordered_set<Edge, edge_hash, edge_equals> edge_set_t;
-
     SubgraphStep::SubgraphStep(std::string name) : TraversalStep(SIDE_EFFECT, SUBGRAPH_STEP) {
         this->subgraph_name = name;
     }
@@ -46,5 +31,9 @@ namespace gremlinxx {
         );
 
         if(!set) throw std::runtime_error("An error occured setting a traversal property for subgraph " + subgraph_name);
+    }
+
+    std::string SubgraphStep::getInfo() {
+        return "SubgraphStep{" + this->subgraph_name + "}";
     }
 }

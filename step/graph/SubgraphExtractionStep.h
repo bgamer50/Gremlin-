@@ -21,6 +21,8 @@ namespace gremlinxx {
 
             virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
 
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
     };
 
 }

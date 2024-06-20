@@ -43,6 +43,10 @@ namespace gremlinxx {
 				return this->predicate.operand;
 			}
 
+			inline P get_predicate() {
+				return this->predicate;
+			}
+
 			virtual void apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers);
 	};
 
