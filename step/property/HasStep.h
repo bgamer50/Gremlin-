@@ -20,32 +20,49 @@ class Vertex;
 
 namespace gremlinxx {
 
+	enum filter_policy_t {
+		BY_ENTRY_COUNT = 0,
+		BY_ENTRY_COUNT_REVERSE = 1,
+		BY_SPECIFIED_ORDER = 2
+	};
+
 	class HasStep : public TraversalStep {
 		private:
-			// The key of the property where data to compare
-			// against is stored.
-			std::string property_key_or_label;
-
-			// Predicate
-			P predicate = P(maelstrom::EQUALS, std::any());
+			std::vector<std::pair<std::string, P>> predicates;
 
 		public:
+			static filter_policy_t FILTER_POLICY;
+
 			HasStep(std::string property_key_or_label, P predicate);
 
 			using TraversalStep::getInfo;
 			virtual std::string	getInfo();
 
 			inline std::string get_key() {
-				return this->property_key_or_label;
+				if(this->predicates.size() == 1) {
+					return this->predicates.front().first;
+				}
+				
+				throw std::runtime_error("This HasStep contains more than one predicate");
 			}
 
 			inline std::any get_value() {
-				return this->predicate.operand;
+				if(this->predicates.size() == 1) {
+					return this->predicates.front().second.operand;
+				}
+				
+				throw std::runtime_error("This HasStep contains more than one predicate");
 			}
 
 			inline P get_predicate() {
-				return this->predicate;
+				if(this->predicates.size() == 1) {
+					return this->predicates.front().second;
+				}
+				
+				throw std::runtime_error("This HasStep contains more than one predicate");
 			}
+
+			void join(HasStep* other);
 
 			virtual void apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers);
 	};

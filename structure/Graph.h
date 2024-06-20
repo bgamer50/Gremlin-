@@ -76,6 +76,16 @@ namespace gremlinxx {
 			virtual std::vector<std::string> get_vertex_property_names() = 0;
 
 			/*
+				Returns the number of vertices that have the given property.
+			*/
+            virtual size_t get_vertex_property_num_entries(std::string property_name) = 0;
+
+			/*
+				Returns the number of edges that have the given property.
+			*/
+            virtual size_t get_edge_property_num_entries(std::string property_name) = 0;
+
+			/*
 				Sets the edge properties of the given edges to the given values.
 			*/
 			virtual void set_edge_properties(std::string property_name, maelstrom::vector& edges, maelstrom::vector& property_values) = 0;

@@ -76,6 +76,7 @@ add_library(
     strategy/SubgraphStepCompletionStrategy.cpp
     strategy/LimitSupportingStrategy.cpp
     strategy/NoOpRemovalStrategy.cpp
+    strategy/HasJoinStrategy.cpp
     
     traversal/Comparison.cpp
     traversal/GraphTraversal.cpp

@@ -11,6 +11,7 @@
 #include "strategy/LimitSupportingStrategy.h"
 #include "strategy/NoOpRemovalStrategy.h"
 #include "strategy/SubgraphStepCompletionStrategy.h"
+#include "strategy/HasJoinStrategy.h"
 
 #include "traversal/BasicTraverserSet.h"
 #include "step/graph/VStep.h"
@@ -27,6 +28,7 @@ namespace gremlinxx {
 		this->withStrategy(RepeatUnrollStrategy);
 		this->withStrategy(ByModulatingStrategy);
 		this->withStrategy(FromToModulatingStrategy);
+		this->withStrategy(HasJoinStrategy);
 		this->withStrategy(LimitSupportingStrategy);
 		this->withStrategy(NoOpRemovalStrategy);
 		this->withStrategy(SubgraphStepCompletionStrategy);
