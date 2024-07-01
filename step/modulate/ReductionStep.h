@@ -20,6 +20,8 @@ namespace gremlinxx {
 
             inline void set_scope_context(ScopeContext sc) { this->scope_context = sc; }
 
+            inline std::optional<ScopeContext> get_scope_context() { return this->scope_context; }
+
             virtual void apply_global(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) = 0;
 
             virtual void apply_local(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) = 0;

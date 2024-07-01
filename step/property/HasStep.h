@@ -21,9 +21,9 @@ class Vertex;
 namespace gremlinxx {
 
 	enum filter_policy_t {
-		BY_ENTRY_COUNT = 0,
-		BY_ENTRY_COUNT_REVERSE = 1,
-		BY_SPECIFIED_ORDER = 2
+		BY_ENTRY_COUNT = 0, // Will filter by # of entries in ascending order (usually best)
+		BY_ENTRY_COUNT_REVERSE = 1, // Will filter by # of entries in reverse order (usually slow)
+		BY_SPECIFIED_ORDER = 2 // Will filter in the order specified by the user
 	};
 
 	class HasStep : public TraversalStep {
@@ -60,6 +60,10 @@ namespace gremlinxx {
 				}
 				
 				throw std::runtime_error("This HasStep contains more than one predicate");
+			}
+
+			inline std::vector<std::pair<std::string, P>> get_predicates() {
+				return predicates;
 			}
 
 			void join(HasStep* other);

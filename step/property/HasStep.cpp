@@ -12,6 +12,9 @@
 
 namespace gremlinxx {
 
+    // Initialize the default filter policy
+    filter_policy_t HasStep::FILTER_POLICY = BY_ENTRY_COUNT;
+
     HasStep::HasStep(std::string property_key_or_label, P predicate)
     : TraversalStep(FILTER, HAS_STEP) {
         this->predicates.push_back(std::make_pair(

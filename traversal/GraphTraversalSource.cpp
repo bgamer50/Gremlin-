@@ -12,6 +12,7 @@
 #include "strategy/NoOpRemovalStrategy.h"
 #include "strategy/SubgraphStepCompletionStrategy.h"
 #include "strategy/HasJoinStrategy.h"
+#include "strategy/BasicPatternExtractionStrategy.h"
 
 #include "traversal/BasicTraverserSet.h"
 #include "step/graph/VStep.h"
@@ -31,6 +32,7 @@ namespace gremlinxx {
 		this->withStrategy(HasJoinStrategy);
 		this->withStrategy(LimitSupportingStrategy);
 		this->withStrategy(NoOpRemovalStrategy);
+		this->withStrategy(BasicPatternExtractionStrategy);
 		this->withStrategy(SubgraphStepCompletionStrategy);
 		
 		this->withTypeRegistration(std::type_index(typeid(uint64_t)), maelstrom::uint64);

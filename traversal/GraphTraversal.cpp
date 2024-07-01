@@ -208,12 +208,20 @@ namespace gremlinxx {
 		return this->appendStep(new VStep({std::any(v_id)}));
 	}
 
+	GraphTraversal& GraphTraversal::from(GraphTraversal fromTraversal) {
+		return this->appendStep(new FromStep(fromTraversal));
+	}
+
 	GraphTraversal& GraphTraversal::from(std::string sideEffectLabel) {
 		return this->appendStep(new FromStep(sideEffectLabel));
 	}
 
 	GraphTraversal& GraphTraversal::from(Vertex fromVertex) {
 		return this->appendStep(new FromStep(fromVertex));
+	}
+
+	GraphTraversal& GraphTraversal::to(GraphTraversal toTraversal) {
+		return this->appendStep(new ToStep(toTraversal));
 	}
 
 	GraphTraversal& GraphTraversal::to(std::string sideEffectLabel) {
@@ -227,6 +235,10 @@ namespace gremlinxx {
 	// Modulator for valuemap and others
 	GraphTraversal& GraphTraversal::by(std::any arg) {
 		return this->appendStep(new ByStep(arg));
+	}
+
+	GraphTraversal& GraphTraversal::by(std::any arg, gremlinxx::Order order) {
+		return this->appendStep(new ByStep(std::make_pair(arg, order)));
 	}
 
 	GraphTraversal& GraphTraversal::both() {
@@ -456,8 +468,8 @@ namespace gremlinxx {
 		std::string explanation = "GraphTraversal {";
 		
 		if(!this->steps.empty()) {
-			for(int k = 0; k < this->steps.size() - 1; k++) explanation += this->steps[k]->getInfo() + ", ";
-			explanation += this->steps[this->steps.size() - 1]->getInfo();
+			for(int k = 0; k < this->steps.size() - 1; k++) explanation += this->steps[k]->getInfo(this) + ", ";
+			explanation += this->steps[this->steps.size() - 1]->getInfo(this);
 		}
 
 		return explanation + "}";
@@ -489,7 +501,7 @@ namespace gremlinxx {
 		auto data_host = maelstrom::as_host_vector(data);
 		
 		for(size_t k = 0; k < data_host.size(); ++k) {
-			auto data_k = data.get(k);
+			auto data_k = data_host.get(k);
 			func(data_k);
 		}
 

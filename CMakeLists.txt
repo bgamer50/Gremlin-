@@ -67,6 +67,7 @@ add_library(
     step/vertex/AddVertexStartStep.cpp
     step/vertex/AddVertexStep.cpp
     step/vertex/VertexStep.cpp
+    step/vertex/DegreeStep.cpp
 
     strategy/TraversalStrategy.cpp
     strategy/ByModulatingStrategy.cpp
@@ -77,6 +78,7 @@ add_library(
     strategy/LimitSupportingStrategy.cpp
     strategy/NoOpRemovalStrategy.cpp
     strategy/HasJoinStrategy.cpp
+    strategy/BasicPatternExtractionStrategy.cpp
     
     traversal/Comparison.cpp
     traversal/GraphTraversal.cpp

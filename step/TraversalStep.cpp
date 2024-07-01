@@ -17,6 +17,10 @@ namespace gremlinxx {
 		return "UnknownTraversalStep{}";
 	}
 
+	std::string TraversalStep::getInfo(GraphTraversal* parent_traversal) {
+		return this->getInfo();
+	}
+
 	std::string TraversalStep::getInfo(size_t indent) {
 		std::string s = "";
 		for(size_t k = 0; k < indent; ++k) s += "  ";

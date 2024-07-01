@@ -55,6 +55,9 @@ namespace gremlinxx {
 			// Traverses edges to their vertices.  Returns the resulting vertices (first element) and originating index (second element).
 			virtual std::pair<maelstrom::vector, maelstrom::vector> toV(maelstrom::vector& current_edges, Direction direction) = 0;
 
+			// Returns the degree of the given vertices (first element) and originating index (second element).  Has a default implementation of calling V and doing a group count.
+			virtual std::pair<maelstrom::vector, maelstrom::vector> degree(maelstrom::vector& current_vertices, std::vector<std::string>& labels, Direction direction);
+
 			// Constructs an independent edge-induced subgraph from the given edges.
 			virtual std::shared_ptr<Graph> subgraph(maelstrom::vector& edges) = 0;
 

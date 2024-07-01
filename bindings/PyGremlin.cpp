@@ -86,6 +86,20 @@ nb::object t_maelstrom_to_numpy(maelstrom::vector& vec) {
 }
 
 nb::object maelstrom_to_numpy(maelstrom::vector& vec) {
+    if(vec.get_dtype().name == "string") {
+        auto host_view_or_copy = maelstrom::as_host_vector(vec);
+        nb::list out;
+
+        auto dtype = vec.get_dtype();
+        for(size_t k = 0; k < vec.size(); ++k) {
+            char* loc = static_cast<char*>(vec.data()) + (maelstrom::size_of(dtype) * k);
+            out.append(std::any_cast<std::string>(dtype.deserialize(loc)));
+        }
+
+        auto np = nb::module_::import_("numpy");
+        return np.attr("asarray")(out);
+    }
+
     switch(vec.get_dtype().prim_type) {
         case maelstrom::UINT64:
             return t_maelstrom_to_numpy<uint64_t>(vec);
@@ -115,32 +129,111 @@ NB_MODULE(pygremlinxx, m) {
         .def("num_edges", &gremlinxx::Graph::num_edges)
         .def("get_vertex_property_names", &gremlinxx::Graph::get_vertex_property_names)
         .def("get_edge_property_names", &gremlinxx::Graph::get_edge_property_names);
+    
+    nb::class_<gremlinxx::P>(m, "P")
+        .def_static("eq", [](uint64_t val){ return gremlinxx::P::eq(val); })
+        .def_static("eq", [](uint32_t val){ return gremlinxx::P::eq(val); })
+        .def_static("eq", [](uint8_t val){ return gremlinxx::P::eq(val); })
+        .def_static("eq", [](int64_t val){ return gremlinxx::P::eq(val); })
+        .def_static("eq", [](int32_t val){ return gremlinxx::P::eq(val); })
+        .def_static("eq", [](int8_t val){ return gremlinxx::P::eq(val); })
+        .def_static("eq", [](double val){ return gremlinxx::P::eq(val); })
+        .def_static("eq", [](float val){ return gremlinxx::P::eq(val); })
+        .def_static("eq", [](std::string val){ return gremlinxx::P::eq(val); })
+        .def_static("neq", [](uint64_t val){ return gremlinxx::P::neq(val); })
+        .def_static("neq", [](uint32_t val){ return gremlinxx::P::neq(val); })
+        .def_static("neq", [](uint8_t val){ return gremlinxx::P::neq(val); })
+        .def_static("neq", [](int64_t val){ return gremlinxx::P::neq(val); })
+        .def_static("neq", [](int32_t val){ return gremlinxx::P::neq(val); })
+        .def_static("neq", [](int8_t val){ return gremlinxx::P::neq(val); })
+        .def_static("neq", [](double val){ return gremlinxx::P::neq(val); })
+        .def_static("neq", [](float val){ return gremlinxx::P::neq(val); })
+        .def_static("neq", [](std::string val){ return gremlinxx::P::neq(val); })
+        .def_static("gt", [](uint64_t val){ return gremlinxx::P::gt(val); })
+        .def_static("gt", [](uint32_t val){ return gremlinxx::P::gt(val); })
+        .def_static("gt", [](uint8_t val){ return gremlinxx::P::gt(val); })
+        .def_static("gt", [](int64_t val){ return gremlinxx::P::gt(val); })
+        .def_static("gt", [](int32_t val){ return gremlinxx::P::gt(val); })
+        .def_static("gt", [](int8_t val){ return gremlinxx::P::gt(val); })
+        .def_static("gt", [](double val){ return gremlinxx::P::gt(val); })
+        .def_static("gt", [](float val){ return gremlinxx::P::gt(val); })
+        .def_static("gt", [](std::string val){ return gremlinxx::P::gt(val); })
+        .def_static("gte", [](uint64_t val){ return gremlinxx::P::gte(val); })
+        .def_static("gte", [](uint32_t val){ return gremlinxx::P::gte(val); })
+        .def_static("gte", [](uint8_t val){ return gremlinxx::P::gte(val); })
+        .def_static("gte", [](int64_t val){ return gremlinxx::P::gte(val); })
+        .def_static("gte", [](int32_t val){ return gremlinxx::P::gte(val); })
+        .def_static("gte", [](int8_t val){ return gremlinxx::P::gte(val); })
+        .def_static("gte", [](double val){ return gremlinxx::P::gte(val); })
+        .def_static("gte", [](float val){ return gremlinxx::P::gte(val); })
+        .def_static("gte", [](std::string val){ return gremlinxx::P::gte(val); })
+        .def_static("lt", [](uint64_t val){ return gremlinxx::P::lt(val); })
+        .def_static("lt", [](uint32_t val){ return gremlinxx::P::lt(val); })
+        .def_static("lt", [](uint8_t val){ return gremlinxx::P::lt(val); })
+        .def_static("lt", [](int64_t val){ return gremlinxx::P::lt(val); })
+        .def_static("lt", [](int32_t val){ return gremlinxx::P::lt(val); })
+        .def_static("lt", [](int8_t val){ return gremlinxx::P::lt(val); })
+        .def_static("lt", [](double val){ return gremlinxx::P::lt(val); })
+        .def_static("lt", [](float val){ return gremlinxx::P::lt(val); })
+        .def_static("lt", [](std::string val){ return gremlinxx::P::lt(val); })
+        .def_static("lte", [](uint64_t val){ return gremlinxx::P::lte(val); })
+        .def_static("lte", [](uint32_t val){ return gremlinxx::P::lte(val); })
+        .def_static("lte", [](uint8_t val){ return gremlinxx::P::lte(val); })
+        .def_static("lte", [](int64_t val){ return gremlinxx::P::lte(val); })
+        .def_static("lte", [](int32_t val){ return gremlinxx::P::lte(val); })
+        .def_static("lte", [](int8_t val){ return gremlinxx::P::lte(val); })
+        .def_static("lte", [](double val){ return gremlinxx::P::lte(val); })
+        .def_static("lte", [](float val){ return gremlinxx::P::lte(val); })
+        .def_static("lte", [](std::string val){ return gremlinxx::P::lte(val); })
+        .def_static("between", [](uint64_t val1, uint64_t val2){ return gremlinxx::P::between(val1, val2); })
+        .def_static("between", [](uint32_t val1, uint32_t val2){ return gremlinxx::P::between(val1, val2); })
+        .def_static("between", [](uint8_t val1, uint8_t val2){ return gremlinxx::P::between(val1, val2); })
+        .def_static("between", [](int64_t val1, int64_t val2){ return gremlinxx::P::between(val1, val2); })
+        .def_static("between", [](int32_t val1, int32_t val2){ return gremlinxx::P::between(val1, val2); })
+        .def_static("between", [](int8_t val1, int8_t val2){ return gremlinxx::P::between(val1, val2); })
+        .def_static("between", [](double val1, double val2){ return gremlinxx::P::between(val1, val2); })
+        .def_static("between", [](float val1, float val2){ return gremlinxx::P::between(val1, val2); })
+        .def_static("between", [](std::string val1, std::string val2){ return gremlinxx::P::between(val1, val2); })
+        .def_static("inside", [](uint64_t val1, uint64_t val2){ return gremlinxx::P::inside(val1, val2); })
+        .def_static("inside", [](uint32_t val1, uint32_t val2){ return gremlinxx::P::inside(val1, val2); })
+        .def_static("inside", [](uint8_t val1, uint8_t val2){ return gremlinxx::P::inside(val1, val2); })
+        .def_static("inside", [](int64_t val1, int64_t val2){ return gremlinxx::P::inside(val1, val2); })
+        .def_static("inside", [](int32_t val1, int32_t val2){ return gremlinxx::P::inside(val1, val2); })
+        .def_static("inside", [](int8_t val1, int8_t val2){ return gremlinxx::P::inside(val1, val2); })
+        .def_static("inside", [](double val1, double val2){ return gremlinxx::P::inside(val1, val2); })
+        .def_static("inside", [](float val1, float val2){ return gremlinxx::P::inside(val1, val2); })
+        .def_static("inside", [](std::string val1, std::string val2){ return gremlinxx::P::inside(val1, val2); })
+        .def_static("outside", [](uint64_t val1, uint64_t val2){ return gremlinxx::P::outside(val1, val2); })
+        .def_static("outside", [](uint32_t val1, uint32_t val2){ return gremlinxx::P::outside(val1, val2); })
+        .def_static("outside", [](uint8_t val1, uint8_t val2){ return gremlinxx::P::outside(val1, val2); })
+        .def_static("outside", [](int64_t val1, int64_t val2){ return gremlinxx::P::outside(val1, val2); })
+        .def_static("outside", [](int32_t val1, int32_t val2){ return gremlinxx::P::outside(val1, val2); })
+        .def_static("outside", [](int8_t val1, int8_t val2){ return gremlinxx::P::outside(val1, val2); })
+        .def_static("outside", [](double val1, double val2){ return gremlinxx::P::outside(val1, val2); })
+        .def_static("outside", [](float val1, float val2){ return gremlinxx::P::outside(val1, val2); })
+        .def_static("outside", [](std::string val1, std::string val2){ return gremlinxx::P::outside(val1, val2); });
 
     nb::class_<gremlinxx::TraversalStrategy>(m, "TraversalStrategy")
-        .def(nb::new_([](std::string name){
-            if(name == "RepeatStepCompletionStrategy") {
-                return gremlinxx::RepeatStepCompletionStrategy;
-            } else if(name == "ByModulatingStrategy") {
-                return gremlinxx::ByModulatingStrategy;
-            } else if(name == "FromToModulatingStrategy") {
-                return gremlinxx::FromToModulatingStrategy;
-            } else if(name == "LimitSupportingStrategy") {
-                return gremlinxx::LimitSupportingStrategy;
-            } else if(name == "RepeatStepCompletionStrategy") {
-                return gremlinxx::RepeatStepCompletionStrategy;
-            } else if(name == "SubgraphStepCompletionStrategy") {
-                return gremlinxx::SubgraphStepCompletionStrategy;
-            }
-
-            throw std::runtime_error(
-                "Unknown strategy type - backend strategies can't be created in Python."
-            );
-        }));
+        .def_ro_static("RepeatStepCompletionStrategy", &gremlinxx::RepeatStepCompletionStrategy)
+        .def_ro_static("ByModulatingStrategy", &gremlinxx::ByModulatingStrategy)
+        .def_ro_static("FromToModulatingStrategy", &gremlinxx::FromToModulatingStrategy)
+        .def_ro_static("LimitSupportingStrategy:", &gremlinxx::LimitSupportingStrategy)
+        .def_ro_static("SubgraphStepCompletionStrategy", &gremlinxx::SubgraphStepCompletionStrategy)
+        .def_ro_static("RepeatUnrollStrategy", &gremlinxx::RepeatUnrollStrategy)
+        .def_ro_static("HasJoinStrategy", &gremlinxx::HasJoinStrategy)
+        .def_ro_static("NoOpRemovalStrategy", &gremlinxx::NoOpRemovalStrategy)
+        .def_ro_static("BasicPatternExtractionStrategy", &gremlinxx::BasicPatternExtractionStrategy);
+        
 
     nb::class_<gremlinxx::GraphTraversalSource>(m, "GraphTraversalSource")
         .def("withoutStrategies", &gremlinxx::GraphTraversalSource::withoutStrategies)
+        .def("withoutStrategy", &gremlinxx::GraphTraversalSource::withoutStrategy)
+        .def("withStrategy", &gremlinxx::GraphTraversalSource::withStrategy)
         .def("V", [](gremlinxx::GraphTraversalSource& g){
             return g.V();
+        })
+        .def("V", [](gremlinxx::GraphTraversalSource& g, uint64_t v_id){
+            return g.V(std::any(v_id));
         })
         .def("E", [](gremlinxx::GraphTraversalSource& g){
             return g.E();
@@ -162,12 +255,16 @@ NB_MODULE(pygremlinxx, m) {
         .def("V", [](gremlinxx::GraphTraversal& trv){
             return trv.V();
         })
+        .def("V", [](gremlinxx::GraphTraversal& trv, uint64_t v_id){
+            return trv.V(std::any(v_id));
+        })
         .def("addV", [](gremlinxx::GraphTraversal& trv, std::string label){
             return trv.addV(label);
         })
         .def("addV", [](gremlinxx::GraphTraversal& trv) {
             return trv.addV();
         })
+        .def("addE", &gremlinxx::GraphTraversal::addE)
         .def("property", [](gremlinxx::GraphTraversal& trv, std::string property_key, std::string value){
             return trv.property(property_key, value);
         })
@@ -182,6 +279,9 @@ NB_MODULE(pygremlinxx, m) {
         })
         .def("property", [](gremlinxx::GraphTraversal& trv, std::string property_key, double value, std::string type_name){
             return trv.property(property_key, num_to_type(value, type_name));
+        })
+        .def("property", [](gremlinxx::GraphTraversal& trv, std::string property_key, gremlinxx::GraphTraversal prop_traversal){
+            return trv.property(property_key, prop_traversal);
         })
         .def("sideEffect", [](gremlinxx::GraphTraversal& trv, std::string side_effect_key, std::string value){
             return trv.sideEffect(side_effect_key, value);
@@ -198,12 +298,19 @@ NB_MODULE(pygremlinxx, m) {
         .def("sideEffect", [](gremlinxx::GraphTraversal& trv, std::string side_effect_key, double value, std::string type_name){
             return trv.sideEffect(side_effect_key, num_to_type(value, type_name));
         })
-        .def("as", &gremlinxx::GraphTraversal::as)
+        .def("_as", &gremlinxx::GraphTraversal::as)
         .def("by", [](gremlinxx::GraphTraversal& trv, gremlinxx::GraphTraversal mod){
             return trv.by(mod);
         })
         .def("by", [](gremlinxx::GraphTraversal& trv, std::string mod){
             return trv.by(mod);
+        })
+        .def("by", [](gremlinxx::GraphTraversal& trv, gremlinxx::GraphTraversal mod, std::string order_str){
+            if(order_str == "ASC") return trv.by(mod, gremlinxx::Order::ASC);
+            if(order_str == "DESC") return trv.by(mod, gremlinxx::Order::DESC);
+            if(order_str == "SHUFFLE") return trv.by(mod, gremlinxx::Order::SHUFFLE);
+            
+            throw std::invalid_argument("Invalid order " + order_str);
         })
         .def("cap", &gremlinxx::GraphTraversal::cap)
         .def("count", &gremlinxx::GraphTraversal::count)
@@ -214,8 +321,11 @@ NB_MODULE(pygremlinxx, m) {
         .def("emit", [](gremlinxx::GraphTraversal& trv){
             return trv.emit();
         })
-        .def("from", [](gremlinxx::GraphTraversal& trv, std::string side_effect_label){
+        .def("_from", [](gremlinxx::GraphTraversal& trv, std::string side_effect_label){
             return trv.from(side_effect_label);
+        })
+        .def("_from", [](gremlinxx::GraphTraversal& trv, gremlinxx::GraphTraversal from_traversal){
+            return trv.from(from_traversal);
         })
         .def("groupCount", &gremlinxx::GraphTraversal::groupCount)
         .def("has", [](gremlinxx::GraphTraversal& trv, std::string key, int64_t value){
@@ -229,6 +339,9 @@ NB_MODULE(pygremlinxx, m) {
         })
         .def("has", [](gremlinxx::GraphTraversal& trv, std::string key){
             return trv.has(key);
+        })
+        .def("has", [](gremlinxx::GraphTraversal& trv, std::string key, gremlinxx::P p){
+            return trv.has(key, p);
         })
         .def("hasNot", &gremlinxx::GraphTraversal::hasNot)
         .def("id", &gremlinxx::GraphTraversal::id)
@@ -255,6 +368,9 @@ NB_MODULE(pygremlinxx, m) {
         .def("to", [](gremlinxx::GraphTraversal& trv, std::string side_effect_label){
             return trv.to(side_effect_label);
         })
+        .def("to", [](gremlinxx::GraphTraversal& trv, gremlinxx::GraphTraversal to_traversal){
+            return trv.to(to_traversal);
+        })
         .def("_union", &gremlinxx::GraphTraversal::_union)
         .def("until", &gremlinxx::GraphTraversal::until)
         .def("values", [](gremlinxx::GraphTraversal& trv, std::vector<std::string> labels){
@@ -269,10 +385,10 @@ NB_MODULE(pygremlinxx, m) {
         .def("out", [](gremlinxx::GraphTraversal& trv) {
             return trv.out();
         })
-        .def("in", [](gremlinxx::GraphTraversal& trv, std::vector<std::string> labels) {
+        .def("_in", [](gremlinxx::GraphTraversal& trv, std::vector<std::string> labels) {
             return trv.in(labels);
         })
-        .def("in", [](gremlinxx::GraphTraversal& trv) {
+        .def("_in", [](gremlinxx::GraphTraversal& trv) {
             return trv.in();
         })
         .def("both", [](gremlinxx::GraphTraversal& trv, std::vector<std::string> labels){

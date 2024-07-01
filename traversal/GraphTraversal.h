@@ -17,6 +17,7 @@
 #include <memory>
 
 #include "structure/Direction.h"
+#include "structure/Order.h"
 #include "traversal/P.h"
 #include "structure/Direction.h"
 #include "traversal/Scope.h"
@@ -130,8 +131,8 @@ namespace gremlinxx {
 
 		GraphTraversal& as(std::string sideEffectLabel);
 		
-		//GraphTraversal* barrier();
 		GraphTraversal& by(std::any arg);
+		GraphTraversal& by(std::any arg, gremlinxx::Order);
 		GraphTraversal& cap(std::string sideEffectLabel);
 		//GraphTraversal<auto n> choose(GraphTraversal<A> ifTraversal, GraphTraversal<B> trueTraversal, GraphTraversal<C> falseTraversal);
 		//GraphTraversal<auto n> choose(GraphTraversal<A> withOptionTraversal);
@@ -147,7 +148,8 @@ namespace gremlinxx {
 		//GraphTraversal emit(Predicate predicate);
 		GraphTraversal& emit(GraphTraversal emitTraversal);
 		GraphTraversal& fold();
-		//GraphTraversal* from(GraphTraversal* fromTraversal);
+		
+		GraphTraversal& from(GraphTraversal fromTraversal);
 
 		GraphTraversal& from(std::string sideEffectLabel);
 
@@ -246,7 +248,8 @@ namespace gremlinxx {
 		//GraphTraversal* to(Direction direction, std::vector<std::string> labels);
 		//GraphTraversal* to(Direction direction);
 		//GraphTraversal* to(Direction direction, std::string label);
-		//GraphTraversal* to(GraphTraversal* toTraversal); //MODULATOR for addE
+		
+		GraphTraversal& to(GraphTraversal toTraversal); //MODULATOR for addE
 
 		// MODULATOR for addE
 		GraphTraversal& to(std::string sideEffectLabel);

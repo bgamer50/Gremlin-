@@ -11,10 +11,16 @@ namespace gremlinxx {
     }
 
     void SampleStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        if(traversers.empty()) return;
+
         size_t N = this->count;
         traversers.advance([N](auto& data, auto& side_effects, auto& paths){
             // FIXME properly set random seed
-            auto perm = maelstrom::randperm(data.get_mem_type(), data.size(), N);
+            auto perm = maelstrom::randperm(
+                data.get_mem_type(),
+                data.size(),
+                (N < data.size()) ? N : data.size()
+            );
 
             auto new_data = maelstrom::select(data, perm);
             return std::make_pair(

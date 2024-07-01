@@ -21,11 +21,13 @@ namespace gremlinxx {
                 }
             }
 
-            steps.push_back(
-                std::shared_ptr<TraversalStep>(
-                    new SubgraphExtractionStep(std::move(names))
-                )
-            );
+            if(!names.empty()) {
+                steps.push_back(
+                    std::shared_ptr<TraversalStep>(
+                        new SubgraphExtractionStep(std::move(names))
+                    )
+                );
+            }
         }
     };
 
