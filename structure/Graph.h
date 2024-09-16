@@ -108,8 +108,21 @@ namespace gremlinxx {
 			virtual maelstrom::vector get_vertex_labels(maelstrom::vector& vertices) = 0;
 			virtual maelstrom::vector get_edge_labels(maelstrom::vector& edges) = 0;
 
+			/*
+				Sets the embedding of the specified vertices.  An embedding is a (# vertices) x (embedding dim) tensor.
+				If there is no embedding with the given name, a new embedding is automatically created and populated
+				with the default value for unspecified vertices.
+			*/
+			virtual void set_vertex_embeddings(std::string emb_name, maelstrom::vector& vertices, maelstrom::vector& embeddings, std::any default_val=0) = 0;
+
+			/*
+				Returns the embedding with the given name, if it exists.  Throws an error if it does not exist.
+			*/
+			virtual maelstrom::vector get_vertex_embeddings(std::string emb_name, maelstrom::vector& vertices) = 0;
+
 			virtual maelstrom::dtype_t get_vertex_dtype() = 0;
 			virtual maelstrom::dtype_t get_edge_dtype() = 0;
+
 	};
 	
 }

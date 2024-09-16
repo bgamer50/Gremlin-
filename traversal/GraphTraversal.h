@@ -298,14 +298,11 @@ namespace gremlinxx {
 		GraphTraversal& where(std::string label, P predicate);
 		//GraphTraversal where(GraphTraversal<auto n> whereTraversal);
 
-		// These may replace predicates...
-		//GraphTraversal lt(double max_exclusive);
-		//GraphTraversal gt(double min_exculsive);
-		//GraphTraversal eq(double equal, double tolerance);
-		//GraphTraversal eq(long equal);
-		//GraphTraversal eq(int equal);
-		//GraphTraversal eq(std::string equal);
-		//GraphTraversal
+		GraphTraversal& embedding(std::string emb_name, maelstrom::vector emb, std::any default_val);
+
+		inline GraphTraversal& embedding(std::string emb_name, maelstrom::vector emb) { 
+			return this->embedding(emb_name, emb, std::any());
+		}
 
 		void getInitialTraversal();
 		void setInitialTraversers(gremlinxx::traversal::TraverserSet& initial_traversers);

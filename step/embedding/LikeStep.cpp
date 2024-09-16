@@ -1,0 +1,64 @@
+#include "step/embedding/LikeStep.h"
+#include "structure/Graph.h"
+#include "traversal/GraphTraversal.h"
+
+#include "maelstrom/algorithms/filter.h"
+#include "maelstrom/algorithms/select.h"
+
+namespace gremlinxx {
+
+    LikeStep::LikeStep(std::string name, std::vector<maelstrom::vector> embs, double threshold, maelstrom::similarity_t metric)
+    : TraversalStep(FILTER, LIKE_STEP) {
+        this->emb_name = name;
+        this->match_threshold = threshold;
+        this->similarity_metric = metric;
+
+        this->emb_stride = embs[0].size();
+        this->embeddings.reserve(this->emb_stride * embs.size());
+
+        for(maelstrom::vector& vec : embs) {
+            if(vec.size() != this->emb_stride) {
+                throw std::invalid_argument("Embedding lengths do not match");
+            }
+            this->embeddings.insert(vec);
+        }
+    }
+
+    void LikeStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        Graph* graph = traversal->getGraph();
+
+        traversers.advance([this, &graph](auto data, auto se, auto paths){
+            auto src_emb = graph->get_vertex_embeddings(this->emb_name, data);
+
+            maelstrom::vector empty;
+            auto sim = maelstrom::similarity(
+                this->similarity_metric,
+                src_emb,
+                empty,
+                this->embeddings,
+                this->emb_stride
+            );
+
+            auto ix = maelstrom::filter(
+                sim,
+                maelstrom::GREATER_THAN_OR_EQUAL,
+                this->match_threshold
+            );
+
+            auto z = maelstrom::select(
+                data,
+                ix
+            );
+
+            return std::make_pair(
+                std::move(z),
+                std::move(ix)
+            );
+        });
+    }
+
+    std::string LikeStep::getInfo() {
+        return "LikeStep{}";
+    }
+
+}

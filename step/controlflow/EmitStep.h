@@ -5,6 +5,8 @@
 #include "step/TraversalStep.h"
 #include "traversal/GraphTraversal.h"
 
+// TODO make the traversal optional
+
 namespace gremlinxx {
     
 
@@ -17,6 +19,9 @@ namespace gremlinxx {
             EmitStep(GraphTraversal traversal);
 
             GraphTraversal getTraversal();
+
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
     };
 
 }

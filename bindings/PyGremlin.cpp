@@ -5,6 +5,7 @@
 
 #include "gremlinxx/gremlinxx.h"
 #include "maelstrom/storage/datatype.h"
+#include "maelstrom/util/any_utils.h"
 
 namespace nb = nanobind;
 using namespace nb::literals;
@@ -234,6 +235,12 @@ NB_MODULE(pygremlinxx, m) {
         })
         .def("V", [](gremlinxx::GraphTraversalSource& g, uint64_t v_id){
             return g.V(std::any(v_id));
+        })
+        .def("V", [](gremlinxx::GraphTraversalSource& g, std::vector<uint64_t> v_ids){
+            std::vector<std::any> anys;
+            anys.reserve(v_ids.size());
+            for(uint64_t i : v_ids) anys.push_back(i);
+            return g.V(anys);
         })
         .def("E", [](gremlinxx::GraphTraversalSource& g){
             return g.E();

@@ -60,6 +60,10 @@ add_library(
     step/property/ElementMapStep.cpp
     step/property/ValueStep.cpp
 
+    step/embedding/EmbeddingStep.cpp
+    step/embedding/SimilarityStep.cpp
+    step/embedding/LikeStep.cpp
+
     step/sideeffect/SideEffectStep.cpp
     step/sideeffect/AsStep.cpp
     step/sideeffect/SelectStep.cpp

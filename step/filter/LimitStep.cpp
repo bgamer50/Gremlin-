@@ -1,4 +1,5 @@
 #include "step/filter/LimitStep.h"
+#include <iostream>
 
 namespace gremlinxx {
 
@@ -10,7 +11,7 @@ namespace gremlinxx {
     std::string LimitStep::getInfo() { return "LimitStep(" + std::to_string(limit) + ")"; }
 
     void LimitStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
-        if(limit > traversers.size()) {
+        if(limit < traversers.size()) {
             traversers.resize(limit);
         }
     }

@@ -30,6 +30,7 @@
 #include "step/controlflow/CoalesceStep.h"
 #include "step/controlflow/UnionStep.h"
 #include "step/property/PropertyStep.h"
+#include "step/embedding/EmbeddingStep.h"
 #include "step/graph/VStep.h"
 #include "step/modulate/ToStep.h"
 #include "step/graph/SubgraphStep.h"
@@ -45,6 +46,9 @@
 #include "step/controlflow/RepeatStep.h"
 #include "step/math/MinStep.h"
 #include "step/filter/SampleStep.h"
+
+#include <chrono>
+#include <ctime>
 
 namespace gremlinxx {
 
@@ -433,6 +437,10 @@ namespace gremlinxx {
 		return this->appendStep(new LoopsStep());
 	}
 
+	GraphTraversal& GraphTraversal::embedding(std::string emb_name, maelstrom::vector emb, std::any default_val) {
+		return this->appendStep(new EmbeddingStep(emb_name, emb, default_val));
+	}
+
 	std::string GraphTraversal::explain() {
 		std::stringstream sx;
 		sx << "Traversal Explanation" << std::endl;
@@ -519,8 +527,15 @@ namespace gremlinxx {
 				std::cerr << "# traversers: " << this->traversers->size() << std::endl;
 				std::cerr << "step: 0x" << std::hex << step->uid << std::dec << std::endl;
 				std::cerr << step->getInfo() << std::endl;
+
+				auto start = std::chrono::system_clock::now();
+				step->apply(this, *this->traversers);
+				auto end = std::chrono::system_clock::now();
+				
+				std::cerr << "exec time: " << static_cast<std::chrono::duration<double>>(end - start).count() << "seconds" << std::endl;
+			} else {			
+				step->apply(this, *this->traversers);
 			}
-			step->apply(this, *this->traversers);
 		}
 
 		this->has_iterated = true;
