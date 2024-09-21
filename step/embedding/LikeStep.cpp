@@ -7,13 +7,17 @@
 
 namespace gremlinxx {
 
-    LikeStep::LikeStep(std::string name, std::vector<maelstrom::vector> embs, double threshold, maelstrom::similarity_t metric)
+    LikeStep::LikeStep(std::string name, std::vector<maelstrom::vector>& embs, double threshold, maelstrom::similarity_t metric)
     : TraversalStep(FILTER, LIKE_STEP) {
         this->emb_name = name;
         this->match_threshold = threshold;
         this->similarity_metric = metric;
 
         this->emb_stride = embs[0].size();
+        this->embeddings = maelstrom::vector(
+            embs[0].get_mem_type(),
+            embs[0].get_dtype()
+        );
         this->embeddings.reserve(this->emb_stride * embs.size());
 
         for(maelstrom::vector& vec : embs) {

@@ -70,6 +70,10 @@
 #include "step/vertex/VertexStep.h"
 #include "step/vertex/DegreeStep.h"
 
+#include "step/embedding/EmbeddingStep.h"
+#include "step/embedding/LikeStep.h"
+#include "step/embedding/SimilarityStep.h"
+
 #include "strategy/TraversalStrategy.h"
 #include "strategy/ByModulatingStrategy.h"
 #include "strategy/FromToModulatingStrategy.h"

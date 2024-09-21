@@ -5,6 +5,7 @@
 
 #include "gremlinxx/gremlinxx.h"
 #include "maelstrom/storage/datatype.h"
+#include "maelstrom/containers/vector.h"
 #include "maelstrom/util/any_utils.h"
 
 namespace nb = nanobind;
@@ -22,6 +23,32 @@ std::any num_to_type(T val, std::string& type_name) {
     if("float32" == type_name) return static_cast<float>(val);
 
     throw std::runtime_error("Invalid type name");
+}
+
+maelstrom::dtype_t maelstrom_dtype_from_dlpack_dtype(nb::dlpack::dtype t) {
+    if(t.code == static_cast<uint8_t>(nb::dlpack::dtype_code::Int)) {
+        // signed integer
+        switch(t.bits) {
+            case 8: return maelstrom::int8;
+            case 32: return maelstrom::int32;
+            case 64: return maelstrom::int64;
+        }
+    } else if(t.code == static_cast<uint8_t>(nb::dlpack::dtype_code::UInt)) {
+        // unsigned integer
+        switch(t.bits) {
+            case 8: return maelstrom::uint8;
+            case 32: return maelstrom::uint32;
+            case 64: return maelstrom::uint64;
+        }
+    } else if(t.code == static_cast<uint8_t>(nb::dlpack::dtype_code::Float)) {
+        // floating point
+        switch(t.bits) {
+            case 32: return maelstrom::float32;
+            case 64: return maelstrom::float64;
+        }
+    }
+
+    throw std::runtime_error("Unsupported data type");
 }
 
 nb::object cast_type(std::any& a) {
@@ -386,13 +413,56 @@ NB_MODULE(pygremlinxx, m) {
         .def("values", [](gremlinxx::GraphTraversal& trv, std::string label){
             return trv.values(label);
         })
-        .def("out", [](gremlinxx::GraphTraversal& trv, std::vector<std::string> labels) {
+        .def("embedding", [](gremlinxx::GraphTraversal& trv, std::string name, nb::ndarray<> emb){
+            auto maelstrom_type = maelstrom_dtype_from_dlpack_dtype(emb.dtype());
+            maelstrom::vector m_emb_view(
+                maelstrom::HOST,
+                maelstrom_type,
+                emb.data(),
+                emb.size(),
+                true
+            );
+            return trv.embedding(name, m_emb_view);
+        })
+        .def("similarity", [](gremlinxx::GraphTraversal& trv, std::string emb_name, std::vector<nb::ndarray<>>& emb_values){
+            std::vector<maelstrom::vector> m_emb_views;
+            for(auto& arr : emb_values) {
+                auto maelstrom_type = maelstrom_dtype_from_dlpack_dtype(arr.dtype());
+                m_emb_views.push_back(
+                    std::move(maelstrom::vector(
+                        maelstrom::HOST,
+                        maelstrom_type,
+                        arr.data(),
+                        arr.size(),
+                        true
+                    ))
+                );
+            }
+            return trv.similarity(emb_name, m_emb_views);
+        })
+        .def("like", [](gremlinxx::GraphTraversal& trv, std::string emb_name, std::vector<nb::ndarray<>>& emb_values, double threshold){
+            std::vector<maelstrom::vector> m_emb_views;
+            for(auto& arr : emb_values) {
+                auto maelstrom_type = maelstrom_dtype_from_dlpack_dtype(arr.dtype());
+                m_emb_views.push_back(
+                    std::move(maelstrom::vector(
+                        maelstrom::HOST,
+                        maelstrom_type,
+                        arr.data(),
+                        arr.size(),
+                        true
+                    ))
+                );
+            }
+            return trv.like(emb_name, m_emb_views, threshold);
+        })
+        .def("out", [](gremlinxx::GraphTraversal& trv, std::vector<std::string> labels){
             return trv.out(labels);
         })
         .def("out", [](gremlinxx::GraphTraversal& trv) {
             return trv.out();
         })
-        .def("_in", [](gremlinxx::GraphTraversal& trv, std::vector<std::string> labels) {
+        .def("_in", [](gremlinxx::GraphTraversal& trv, std::vector<std::string> labels){
             return trv.in(labels);
         })
         .def("_in", [](gremlinxx::GraphTraversal& trv) {

@@ -304,6 +304,10 @@ namespace gremlinxx {
 			return this->embedding(emb_name, emb, std::any());
 		}
 
+		GraphTraversal& similarity(std::string emb_name, std::vector<maelstrom::vector>& embedding_values);
+
+		GraphTraversal& like(std::string emb_name, std::vector<maelstrom::vector>& embs, double threshold);
+
 		void getInitialTraversal();
 		void setInitialTraversers(gremlinxx::traversal::TraverserSet& initial_traversers);
 

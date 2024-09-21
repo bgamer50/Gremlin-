@@ -31,6 +31,8 @@
 #include "step/controlflow/UnionStep.h"
 #include "step/property/PropertyStep.h"
 #include "step/embedding/EmbeddingStep.h"
+#include "step/embedding/SimilarityStep.h"
+#include "step/embedding/LikeStep.h"
 #include "step/graph/VStep.h"
 #include "step/modulate/ToStep.h"
 #include "step/graph/SubgraphStep.h"
@@ -439,6 +441,14 @@ namespace gremlinxx {
 
 	GraphTraversal& GraphTraversal::embedding(std::string emb_name, maelstrom::vector emb, std::any default_val) {
 		return this->appendStep(new EmbeddingStep(emb_name, emb, default_val));
+	}
+	
+	GraphTraversal& GraphTraversal::similarity(std::string emb_name, std::vector<maelstrom::vector>& embedding_values) {
+		return this->appendStep(new SimilarityStep(emb_name, embedding_values));
+	}
+
+	GraphTraversal& GraphTraversal::like(std::string emb_name, std::vector<maelstrom::vector>& embs, double threshold) {
+		return this->appendStep(new LikeStep(emb_name, embs, threshold));
 	}
 
 	std::string GraphTraversal::explain() {

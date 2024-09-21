@@ -6,7 +6,7 @@
 
 namespace gremlinxx {
 
-    SimilarityStep::SimilarityStep(std::string emb_name, std::vector<maelstrom::vector>& embedding_values, maelstrom::similarity_t metric=maelstrom::COSINE)
+    SimilarityStep::SimilarityStep(std::string emb_name, std::vector<maelstrom::vector>& embedding_values, maelstrom::similarity_t metric)
     : TraversalStep(MAP, SIMILARITY_STEP) {
         this->similarity_metric = metric;
         this->name = emb_name;
@@ -31,6 +31,10 @@ namespace gremlinxx {
         Graph* graph = traversal->getGraph();
         traversers.advance([this, &graph](auto& data, auto& se, auto& paths){
             auto trv_emb = graph->get_vertex_embeddings(this->name, data);
+
+            if(trv_emb.size() % data.size() != 0 || trv_emb.size() / data.size() != this->emb_stride) {
+                throw std::invalid_argument("Invalid embedding stride");
+            }
 
             maelstrom::vector empty;
             auto sim_vals = maelstrom::similarity(
