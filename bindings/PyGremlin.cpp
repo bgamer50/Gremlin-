@@ -477,6 +477,7 @@ NB_MODULE(pygremlinxx, m) {
             }
             return trv.similarity(emb_name, m_emb_views);
         })
+        .def("encode", &gremlinxx::GraphTraversal::encode)
         .def("like", [](gremlinxx::GraphTraversal& trv, std::string emb_name, std::vector<nb::ndarray<>>& emb_values, double threshold){
             std::vector<maelstrom::vector> m_emb_views;
             for(auto& arr : emb_values) {
