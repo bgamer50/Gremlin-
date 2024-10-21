@@ -116,6 +116,11 @@ namespace gremlinxx {
 			virtual void set_vertex_embeddings(std::string emb_name, maelstrom::vector& vertices, maelstrom::vector& embeddings, std::any default_val=0) = 0;
 
 			/*
+				Sets the embeddings of the specified contiguous chunk of vertices (from v_start, inclusive to v_end, inclusive).
+			*/
+			virtual void set_vertex_embeddings(std::string emb_name, size_t v_start, size_t v_end, maelstrom::vector& embeddings, std::any default_value = 0) = 0;
+
+			/*
 				Returns the embedding with the given name, if it exists.  Throws an error if it does not exist.
 			*/
 			virtual maelstrom::vector get_vertex_embeddings(std::string emb_name, maelstrom::vector& vertices) = 0;

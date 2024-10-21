@@ -33,6 +33,7 @@
 #include "step/embedding/EmbeddingStep.h"
 #include "step/embedding/SimilarityStep.h"
 #include "step/embedding/LikeStep.h"
+#include "step/embedding/EncodeStep.h"
 #include "step/graph/VStep.h"
 #include "step/modulate/ToStep.h"
 #include "step/graph/SubgraphStep.h"
@@ -439,6 +440,10 @@ namespace gremlinxx {
 		return this->appendStep(new LoopsStep());
 	}
 
+	GraphTraversal& GraphTraversal::encode(std::string emb_name) {
+		return this->appendStep(new EncodeStep(emb_name));
+	}
+
 	GraphTraversal& GraphTraversal::embedding(std::string emb_name, maelstrom::vector emb, std::any default_val) {
 		return this->appendStep(new EmbeddingStep(emb_name, emb, default_val));
 	}
@@ -447,8 +452,12 @@ namespace gremlinxx {
 		return this->appendStep(new SimilarityStep(emb_name, embedding_values));
 	}
 
-	GraphTraversal& GraphTraversal::like(std::string emb_name, std::vector<maelstrom::vector>& embs, double threshold) {
-		return this->appendStep(new LikeStep(emb_name, embs, threshold));
+	GraphTraversal& GraphTraversal::like(std::string emb_name, std::vector<maelstrom::vector>& embs, double threshold, std::optional<size_t> count) {
+		return this->appendStep(new LikeStep(emb_name, embs, threshold, count, maelstrom::COSINE));
+	}
+
+	GraphTraversal& GraphTraversal::like(std::string emb_name, std::vector<maelstrom::vector>& embs, size_t count) {
+		return this->appendStep(new LikeStep(emb_name, embs, std::nullopt, count, maelstrom::COSINE));
 	}
 
 	std::string GraphTraversal::explain() {

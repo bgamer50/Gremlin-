@@ -51,6 +51,22 @@ maelstrom::dtype_t maelstrom_dtype_from_dlpack_dtype(nb::dlpack::dtype t) {
     throw std::runtime_error("Unsupported data type");
 }
 
+maelstrom::storage maelstrom_storage_from_device_type(int32_t device_type) {
+    switch(device_type) {
+        case nb::device::cpu::value:
+        case nb::device::none::value:
+            return maelstrom::HOST;
+        case nb::device::cuda::value:
+            return maelstrom::DEVICE;
+        case nb::device::cuda_managed::value:
+            return maelstrom::MANAGED;
+        case nb::device::cuda_host::value:
+            return maelstrom::PINNED;
+        default:
+            throw std::runtime_error("Unsupported device");
+    }
+}
+
 nb::object cast_type(std::any& a) {
     if(a.type() == typeid(gremlinxx::Vertex)) {
         throw std::runtime_error("Vertex return type currently unsupported");
@@ -83,12 +99,12 @@ nb::object cast_type(std::any& a) {
     throw std::runtime_error("invalid type");
 }
 
-template<typename T>
-nb::object t_maelstrom_to_numpy(maelstrom::vector& vec) {
+template<typename T, typename B, maelstrom::storage S, typename D>
+nb::object t_maelstrom_to_py_ndarray(maelstrom::vector& vec) {
     if(vec.empty()) {
         const size_t shape[] = {0L};
         return nb::cast(
-            nb::ndarray<nb::numpy, const T>(
+            nb::ndarray<B, const T, D>(
                 nullptr,
                 1,
                 shape,
@@ -100,20 +116,38 @@ nb::object t_maelstrom_to_numpy(maelstrom::vector& vec) {
     T* data = static_cast<T*>(vec.data());
     vec.disown();
     nb::capsule owner(data, [](void* ptr) noexcept {
-        maelstrom::vector tmp(maelstrom::HOST, maelstrom::uint64, ptr, 1, true);
+        maelstrom::vector tmp(S, maelstrom::uint64, ptr, 1, true);
         tmp.own(); // will free memory once tmp goes out of scope
     });
 
-    nb::ndarray<nb::numpy, T> arr(
+    nb::ndarray<B, T, D> arr(
         data,
         {vec.size()},
         owner
     );
 
-    return nb::cast(arr);
+    auto cupy = nb::module_::import_("cupy");
+    auto c = arr.cast();
+    return c;
 }
 
-nb::object maelstrom_to_numpy(maelstrom::vector& vec) {
+template<typename T>
+nb::object maelstrom_to_py_ndarray_dispatch_backend(maelstrom::vector& vec) {
+    switch(vec.get_mem_type()) {
+        case maelstrom::HOST:
+            return t_maelstrom_to_py_ndarray<T, nb::numpy, maelstrom::HOST, nb::device::cpu>(vec);
+        case maelstrom::DEVICE:
+            return t_maelstrom_to_py_ndarray<T, nb::cupy, maelstrom::DEVICE, nb::device::cuda>(vec);
+        case maelstrom::MANAGED:
+            return t_maelstrom_to_py_ndarray<T, nb::cupy, maelstrom::MANAGED, nb::device::cuda>(vec);
+        case maelstrom::PINNED:
+            return t_maelstrom_to_py_ndarray<T, nb::cupy, maelstrom::PINNED, nb::device::cuda>(vec);
+    }
+
+    throw std::runtime_error("invalid memory type for ndarray conversion");
+}
+
+nb::object maelstrom_to_py_ndarray(maelstrom::vector& vec) {
     if(vec.get_dtype().name == "string") {
         auto host_view_or_copy = maelstrom::as_host_vector(vec);
         nb::list out;
@@ -130,21 +164,21 @@ nb::object maelstrom_to_numpy(maelstrom::vector& vec) {
 
     switch(vec.get_dtype().prim_type) {
         case maelstrom::UINT64:
-            return t_maelstrom_to_numpy<uint64_t>(vec);
+            return maelstrom_to_py_ndarray_dispatch_backend<uint64_t>(vec);
         case maelstrom::UINT32:
-            return t_maelstrom_to_numpy<uint32_t>(vec);
+            return maelstrom_to_py_ndarray_dispatch_backend<uint32_t>(vec);
         case maelstrom::UINT8:
-            return t_maelstrom_to_numpy<uint8_t>(vec);
+            return maelstrom_to_py_ndarray_dispatch_backend<uint8_t>(vec);
         case maelstrom::INT64:
-            return t_maelstrom_to_numpy<int64_t>(vec);
+            return maelstrom_to_py_ndarray_dispatch_backend<int64_t>(vec);
         case maelstrom::INT32:
-            return t_maelstrom_to_numpy<int32_t>(vec);
+            return maelstrom_to_py_ndarray_dispatch_backend<int32_t>(vec);
         case maelstrom::INT8:
-            return t_maelstrom_to_numpy<int8_t>(vec);
+            return maelstrom_to_py_ndarray_dispatch_backend<int8_t>(vec);
         case maelstrom::FLOAT64:
-            return t_maelstrom_to_numpy<double>(vec);
+            return maelstrom_to_py_ndarray_dispatch_backend<double>(vec);
         case maelstrom::FLOAT32:
-            return t_maelstrom_to_numpy<float>(vec);
+            return maelstrom_to_py_ndarray_dispatch_backend<float>(vec);
     }
 
     throw std::runtime_error("invalid primitive type");
@@ -257,6 +291,7 @@ NB_MODULE(pygremlinxx, m) {
         .def("withoutStrategies", &gremlinxx::GraphTraversalSource::withoutStrategies)
         .def("withoutStrategy", &gremlinxx::GraphTraversalSource::withoutStrategy)
         .def("withStrategy", &gremlinxx::GraphTraversalSource::withStrategy)
+        .def("withAdminOption", &gremlinxx::GraphTraversalSource::withAdminOption)
         .def("V", [](gremlinxx::GraphTraversalSource& g){
             return g.V();
         })
@@ -415,8 +450,9 @@ NB_MODULE(pygremlinxx, m) {
         })
         .def("embedding", [](gremlinxx::GraphTraversal& trv, std::string name, nb::ndarray<> emb){
             auto maelstrom_type = maelstrom_dtype_from_dlpack_dtype(emb.dtype());
+            auto maelstrom_storage = maelstrom_storage_from_device_type(emb.device_type());
             maelstrom::vector m_emb_view(
-                maelstrom::HOST,
+                maelstrom_storage,
                 maelstrom_type,
                 emb.data(),
                 emb.size(),
@@ -428,9 +464,10 @@ NB_MODULE(pygremlinxx, m) {
             std::vector<maelstrom::vector> m_emb_views;
             for(auto& arr : emb_values) {
                 auto maelstrom_type = maelstrom_dtype_from_dlpack_dtype(arr.dtype());
+                auto maelstrom_storage = maelstrom_storage_from_device_type(arr.device_type());
                 m_emb_views.push_back(
                     std::move(maelstrom::vector(
-                        maelstrom::HOST,
+                        maelstrom_storage,
                         maelstrom_type,
                         arr.data(),
                         arr.size(),
@@ -444,9 +481,10 @@ NB_MODULE(pygremlinxx, m) {
             std::vector<maelstrom::vector> m_emb_views;
             for(auto& arr : emb_values) {
                 auto maelstrom_type = maelstrom_dtype_from_dlpack_dtype(arr.dtype());
+                auto maelstrom_storage = maelstrom_storage_from_device_type(arr.device_type());
                 m_emb_views.push_back(
                     std::move(maelstrom::vector(
-                        maelstrom::HOST,
+                        maelstrom_storage,
                         maelstrom_type,
                         arr.data(),
                         arr.size(),
@@ -455,6 +493,40 @@ NB_MODULE(pygremlinxx, m) {
                 );
             }
             return trv.like(emb_name, m_emb_views, threshold);
+        })
+        .def("like", [](gremlinxx::GraphTraversal& trv, std::string emb_name, std::vector<nb::ndarray<>>& emb_values, double threshold, size_t count){
+            std::vector<maelstrom::vector> m_emb_views;
+            for(auto& arr : emb_values) {
+                auto maelstrom_type = maelstrom_dtype_from_dlpack_dtype(arr.dtype());
+                auto maelstrom_storage = maelstrom_storage_from_device_type(arr.device_type());
+                m_emb_views.push_back(
+                    std::move(maelstrom::vector(
+                        maelstrom_storage,
+                        maelstrom_type,
+                        arr.data(),
+                        arr.size(),
+                        true
+                    ))
+                );
+            }
+            return trv.like(emb_name, m_emb_views, threshold, count);
+        })
+        .def("like", [](gremlinxx::GraphTraversal& trv, std::string emb_name, std::vector<nb::ndarray<>>& emb_values, size_t count){
+            std::vector<maelstrom::vector> m_emb_views;
+            for(auto& arr : emb_values) {
+                auto maelstrom_type = maelstrom_dtype_from_dlpack_dtype(arr.dtype());
+                auto maelstrom_storage = maelstrom_storage_from_device_type(arr.device_type());
+                m_emb_views.push_back(
+                    std::move(maelstrom::vector(
+                        maelstrom_storage,
+                        maelstrom_type,
+                        arr.data(),
+                        arr.size(),
+                        true
+                    ))
+                );
+            }
+            return trv.like(emb_name, m_emb_views, count);
         })
         .def("out", [](gremlinxx::GraphTraversal& trv, std::vector<std::string> labels){
             return trv.out(labels);
@@ -543,8 +615,8 @@ NB_MODULE(pygremlinxx, m) {
         })
         .def("toArray", [](gremlinxx::GraphTraversal& trv) {
             trv.iterate();
-            auto traverser_data = trv.getTraverserSet().getTraverserData().to(maelstrom::HOST);
-            return maelstrom_to_numpy(traverser_data);
+            auto traverser_data = trv.getTraverserSet().getTraverserData();
+            return maelstrom_to_py_ndarray(traverser_data);
         })
         .def("explain", [](gremlinxx::GraphTraversal& trv){
             return trv.explain();
@@ -554,5 +626,5 @@ NB_MODULE(pygremlinxx, m) {
             auto graph = std::any_cast<std::shared_ptr<gremlinxx::Graph>>(prop);
 
             return graph.get();
-        }, nb::rv_policy::reference_internal);
+        }, nb::rv_policy::take_ownership);
 }

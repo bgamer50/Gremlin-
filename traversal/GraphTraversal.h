@@ -298,6 +298,8 @@ namespace gremlinxx {
 		GraphTraversal& where(std::string label, P predicate);
 		//GraphTraversal where(GraphTraversal<auto n> whereTraversal);
 
+		GraphTraversal& encode(std::string emb_name);
+
 		GraphTraversal& embedding(std::string emb_name, maelstrom::vector emb, std::any default_val);
 
 		inline GraphTraversal& embedding(std::string emb_name, maelstrom::vector emb) { 
@@ -306,7 +308,8 @@ namespace gremlinxx {
 
 		GraphTraversal& similarity(std::string emb_name, std::vector<maelstrom::vector>& embedding_values);
 
-		GraphTraversal& like(std::string emb_name, std::vector<maelstrom::vector>& embs, double threshold);
+		GraphTraversal& like(std::string emb_name, std::vector<maelstrom::vector>& embs, double threshold, std::optional<size_t> count=std::nullopt);
+		GraphTraversal& like(std::string emb_name, std::vector<maelstrom::vector>& embs, size_t count);
 
 		void getInitialTraversal();
 		void setInitialTraversers(gremlinxx::traversal::TraverserSet& initial_traversers);

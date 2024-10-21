@@ -63,6 +63,7 @@ add_library(
     step/embedding/EmbeddingStep.cpp
     step/embedding/SimilarityStep.cpp
     step/embedding/LikeStep.cpp
+    step/embedding/EncodeStep.cpp
 
     step/sideeffect/SideEffectStep.cpp
     step/sideeffect/AsStep.cpp
