@@ -4,6 +4,7 @@
 
 #include "maelstrom/algorithms/arange.h"
 
+
 namespace gremlinxx {
 
     SimilarityStep::SimilarityStep(std::string emb_name, std::vector<maelstrom::vector>& embedding_values, maelstrom::similarity_t metric)
@@ -28,6 +29,10 @@ namespace gremlinxx {
     }
 
     void SimilarityStep::apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers) {
+        if(traversers.empty()) {
+            return;
+        }
+
         Graph* graph = traversal->getGraph();
         traversers.advance([this, &graph](auto& data, auto& se, auto& paths){
             auto trv_emb = graph->get_vertex_embeddings(this->name, data);

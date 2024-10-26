@@ -295,14 +295,28 @@ NB_MODULE(pygremlinxx, m) {
         .def("V", [](gremlinxx::GraphTraversalSource& g){
             return g.V();
         })
-        .def("V", [](gremlinxx::GraphTraversalSource& g, uint64_t v_id){
-            return g.V(std::any(v_id));
+        .def("V", [](gremlinxx::GraphTraversalSource& g, nb::ndarray<> v_ids) {
+            auto mem_type = maelstrom_storage_from_device_type(v_ids.device_type());
+            auto dtype = maelstrom_dtype_from_dlpack_dtype(v_ids.dtype());
+
+            maelstrom::vector m_v_ids(
+                mem_type,
+                dtype,
+                v_ids.data(),
+                v_ids.size(),
+                true
+            );
+
+            return g.V(m_v_ids);
         })
         .def("V", [](gremlinxx::GraphTraversalSource& g, std::vector<uint64_t> v_ids){
             std::vector<std::any> anys;
             anys.reserve(v_ids.size());
             for(uint64_t i : v_ids) anys.push_back(i);
             return g.V(anys);
+        })
+        .def("V", [](gremlinxx::GraphTraversalSource& g, uint64_t v_id){
+            return g.V(std::any(v_id));
         })
         .def("E", [](gremlinxx::GraphTraversalSource& g){
             return g.E();

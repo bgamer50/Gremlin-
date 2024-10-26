@@ -157,6 +157,8 @@ namespace gremlinxx {
 
 		GraphTraversal& V();
 
+		GraphTraversal& V(maelstrom::vector vertices);
+
 		GraphTraversal& V(Vertex vertex);
 
 		GraphTraversal& V(std::vector<Vertex> vertices);

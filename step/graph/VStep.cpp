@@ -8,7 +8,14 @@ namespace gremlinxx {
 
     VStep::VStep(std::vector<std::any> eids)
     : TraversalStep(MAP, V_STEP) {
-        this->element_ids = eids;
+        this->element_ids = std::move(
+            maelstrom::make_vector_from_anys(maelstrom::PINNED, eids)
+        );
+    }
+
+    VStep::VStep(maelstrom::vector eids)
+    : TraversalStep(MAP, V_STEP) {
+        this->element_ids = std::move(eids);
     }
 
     std::string	VStep::getInfo() {

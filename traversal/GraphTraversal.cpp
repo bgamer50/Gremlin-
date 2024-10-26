@@ -198,11 +198,16 @@ namespace gremlinxx {
 	}
 
 	GraphTraversal& GraphTraversal::V() {
-		return this->appendStep(new VStep({}));
+		std::vector<std::any> empty;
+		return this->appendStep(new VStep(empty));
 	}
 
 	GraphTraversal& GraphTraversal::V(Vertex vertex) {
 		return this->appendStep(new VStep({vertex.id}));
+	}
+
+	GraphTraversal& GraphTraversal::V(maelstrom::vector vertices) {
+		return this->appendStep(new VStep(vertices));
 	}
 
 	GraphTraversal& GraphTraversal::V(std::vector<Vertex> vertices) {
