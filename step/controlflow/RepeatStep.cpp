@@ -9,10 +9,10 @@ namespace gremlinxx {
     }
 
     std::string RepeatStep::getInfo() { 
-        std::string info = "RepeatStep{\n" + this->actionTraversal.explain(1) ;
+        std::string info = "RepeatStep{" + this->actionTraversal.info() ;
         //if(this->emitTraversal != nullptr) info += ",\nemit = " + emitTraversal->explain();
         //if(this->untilTraversal != nullptr) info += ",\nuntil = " + untilTraversal->explain();
-        info += "\n}";
+        info += "}";
 
         return info;
     }

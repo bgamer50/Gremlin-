@@ -10,6 +10,7 @@
 
 #include "maelstrom/storage/datatype.h"
 #include "traversal/TraverserSet.h"
+#include "strategy/TraversalStrategy.h"
 
 namespace gremlinxx {
 	class Graph;
@@ -17,7 +18,6 @@ namespace gremlinxx {
 	class Edge;
 	class TraversalStep;
 	class GraphTraversal;
-	typedef std::function<void(std::vector<std::shared_ptr<TraversalStep>>&)> TraversalStrategy;
 	typedef std::function<int(std::any,std::any)> compare_func_t;
 	typedef std::function<bool(std::any,std::any)> equals_func_t;
 	typedef std::function<size_t(std::any)> hash_func_t;
@@ -42,7 +42,8 @@ namespace gremlinxx {
 			virtual gremlinxx::traversal::TraverserSet* getNewTraverserSet();
 
 			virtual GraphTraversalSource* withStrategy(TraversalStrategy strategy);
-			//GraphTraversalSource* withoutStrategy(TraversalStrategy strategy); TODO
+			virtual GraphTraversalSource* withoutStrategy(TraversalStrategy strategy);
+			virtual GraphTraversalSource* withoutStrategies();
 			virtual GraphTraversalSource* withTypeRegistration(std::type_index tid, maelstrom::dtype_t dtype);
 			//GraphTraversalSource* withoutTypeRegistration(typeid_t tid); TODO
 			
@@ -54,9 +55,11 @@ namespace gremlinxx {
 			virtual std::vector<TraversalStrategy>& getStrategies();
 
 			virtual GraphTraversal V();
+			virtual GraphTraversal V(maelstrom::vector vertices);
+			virtual GraphTraversal V(std::vector<Vertex> vertices);
+			virtual GraphTraversal V(std::vector<std::any> v_ids);
 			virtual GraphTraversal V(Vertex v);
 			virtual GraphTraversal V(std::any v_id);
-			virtual GraphTraversal V(std::vector<Vertex> vertices);
 			virtual GraphTraversal E();
 			virtual GraphTraversal addV();
 			virtual GraphTraversal addV(std::string label);

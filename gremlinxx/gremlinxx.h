@@ -33,6 +33,7 @@
 #include "step/filter/LimitStep.h"
 #include "step/filter/LimitSupportingStep.h"
 #include "step/filter/WhereStep.h"
+#include "step/filter/SampleStep.h"
 
 #include "step/graph/VStep.h"
 #include "step/graph/IdStep.h"
@@ -53,6 +54,7 @@
 #include "step/modulate/FromStep.h"
 #include "step/modulate/FromToModulating.h"
 #include "step/modulate/ToStep.h"
+#include "step/modulate/ReductionStep.h"
 
 #include "step/property/PropertyStep.h"
 #include "step/property/HasStep.h"
@@ -66,6 +68,11 @@
 #include "step/vertex/AddVertexStartStep.h"
 #include "step/vertex/AddVertexStep.h"
 #include "step/vertex/VertexStep.h"
+#include "step/vertex/DegreeStep.h"
+
+#include "step/embedding/EmbeddingStep.h"
+#include "step/embedding/LikeStep.h"
+#include "step/embedding/SimilarityStep.h"
 
 #include "strategy/TraversalStrategy.h"
 #include "strategy/ByModulatingStrategy.h"
@@ -73,3 +80,7 @@
 #include "strategy/RepeatStepCompletionStrategy.h"
 #include "strategy/SubgraphStepCompletionStrategy.h"
 #include "strategy/LimitSupportingStrategy.h"
+#include "strategy/BasicPatternExtractionStrategy.h"
+#include "strategy/HasJoinStrategy.h"
+#include "strategy/NoOpRemovalStrategy.h"
+#include "strategy/RepeatUnrollStrategy.h"

@@ -21,6 +21,7 @@ namespace gremlinxx {
 		TraversalStep(bool is_barrier, TraversalStepType tsType, unsigned int id);
 		virtual std::string getInfo();
 		virtual std::string getInfo(size_t indent);
+		virtual std::string getInfo(GraphTraversal* parent_traversal);
 		virtual void apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers);
 
 	};

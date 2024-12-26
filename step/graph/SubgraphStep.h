@@ -4,6 +4,7 @@
 
 #include "step/TraversalStep.h"
 #include "traversal/Traverser.h"
+#include "structure/Graph.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -23,6 +24,9 @@ namespace gremlinxx {
             inline std::string get_subgraph_name() { return this->subgraph_name; }
 
             virtual void apply(GraphTraversal* traversal, gremlinxx::traversal::TraverserSet& traversers);
+
+            using TraversalStep::getInfo;
+            virtual std::string getInfo();
     };
 
 }

@@ -17,6 +17,7 @@
 #include <memory>
 
 #include "structure/Direction.h"
+#include "structure/Order.h"
 #include "traversal/P.h"
 #include "structure/Direction.h"
 #include "traversal/Scope.h"
@@ -46,6 +47,8 @@ namespace gremlinxx {
 			The "default" constructor.
 		*/
 		GraphTraversal();
+
+		~GraphTraversal();
 
 		/*
 			The given traversal source is allowed to be null, in the case of an
@@ -78,19 +81,37 @@ namespace gremlinxx {
 			return *this;
 		}
 
-		inline void setTraversalProperty(std::string property_name, std::any property_value) {
+		/*
+			Sets the traversal property with the given name to the given value.
+			Returns true if successful, false if unsuccessful.
+		*/
+		inline bool setTraversalProperty(std::string property_name, std::any property_value) {
 			this->traversal_properties[property_name] = property_value;
+			return true;
 		}
 
+		/*
+			Gets a copy of the traversal property with the given name.
+		*/
 		inline std::any getTraversalProperty(std::string property_name) {
 			auto f = this->traversal_properties.find(property_name);
 			if(f == traversal_properties.end()) return std::any();
 			return f->second;
 		}
 
-		inline void removeTraversalProperty(std::string property_name) {
+		/*
+			Removes and returns the traversal property with the given name.
+			If no such property exists, returns an empty any.
+		*/
+		inline std::any removeTraversalProperty(std::string property_name) {
 			auto f = this->traversal_properties.find(property_name);
-			if(f != traversal_properties.end()) this->traversal_properties.erase(f);
+			if(f == traversal_properties.end()) {
+				return std::any();	
+			}
+
+			auto val = std::move(f->second);
+			this->traversal_properties.erase(f);
+			return std::move(val);
 		}
 
 		// Steps
@@ -110,8 +131,8 @@ namespace gremlinxx {
 
 		GraphTraversal& as(std::string sideEffectLabel);
 		
-		//GraphTraversal* barrier();
 		GraphTraversal& by(std::any arg);
+		GraphTraversal& by(std::any arg, gremlinxx::Order);
 		GraphTraversal& cap(std::string sideEffectLabel);
 		//GraphTraversal<auto n> choose(GraphTraversal<A> ifTraversal, GraphTraversal<B> trueTraversal, GraphTraversal<C> falseTraversal);
 		//GraphTraversal<auto n> choose(GraphTraversal<A> withOptionTraversal);
@@ -127,13 +148,16 @@ namespace gremlinxx {
 		//GraphTraversal emit(Predicate predicate);
 		GraphTraversal& emit(GraphTraversal emitTraversal);
 		GraphTraversal& fold();
-		//GraphTraversal* from(GraphTraversal* fromTraversal);
+		
+		GraphTraversal& from(GraphTraversal fromTraversal);
 
 		GraphTraversal& from(std::string sideEffectLabel);
 
 		GraphTraversal& from(Vertex fromVertex);
 
 		GraphTraversal& V();
+
+		GraphTraversal& V(maelstrom::vector vertices);
 
 		GraphTraversal& V(Vertex vertex);
 
@@ -205,7 +229,7 @@ namespace gremlinxx {
 		//GraphTraversal range(long low, long high);
 		GraphTraversal& repeat(GraphTraversal repeatTraversal);
 		// sack step not supported
-		//GraphTraversal* sample(int sampleSize);
+		GraphTraversal& sample(size_t sampleSize);
 		//GraphTraversal sample(Scope scope, int sampleSize);
 		// single-label select is special
 		GraphTraversal& select(std::string sideEffectLabel);
@@ -226,7 +250,8 @@ namespace gremlinxx {
 		//GraphTraversal* to(Direction direction, std::vector<std::string> labels);
 		//GraphTraversal* to(Direction direction);
 		//GraphTraversal* to(Direction direction, std::string label);
-		//GraphTraversal* to(GraphTraversal* toTraversal); //MODULATOR for addE
+		
+		GraphTraversal& to(GraphTraversal toTraversal); //MODULATOR for addE
 
 		// MODULATOR for addE
 		GraphTraversal& to(std::string sideEffectLabel);
@@ -275,21 +300,25 @@ namespace gremlinxx {
 		GraphTraversal& where(std::string label, P predicate);
 		//GraphTraversal where(GraphTraversal<auto n> whereTraversal);
 
-		// These may replace predicates...
-		//GraphTraversal lt(double max_exclusive);
-		//GraphTraversal gt(double min_exculsive);
-		//GraphTraversal eq(double equal, double tolerance);
-		//GraphTraversal eq(long equal);
-		//GraphTraversal eq(int equal);
-		//GraphTraversal eq(std::string equal);
-		//GraphTraversal
+		GraphTraversal& encode(std::string emb_name);
+
+		GraphTraversal& embedding(std::string emb_name, maelstrom::vector emb, std::any default_val);
+
+		inline GraphTraversal& embedding(std::string emb_name, maelstrom::vector emb) { 
+			return this->embedding(emb_name, emb, std::any());
+		}
+
+		GraphTraversal& similarity(std::string emb_name, std::vector<maelstrom::vector>& embedding_values);
+
+		GraphTraversal& like(std::string emb_name, std::vector<maelstrom::vector>& embs, double threshold, std::optional<size_t> count=std::nullopt);
+		GraphTraversal& like(std::string emb_name, std::vector<maelstrom::vector>& embs, size_t count);
 
 		void getInitialTraversal();
 		void setInitialTraversers(gremlinxx::traversal::TraverserSet& initial_traversers);
 
 		// The explain finalizer which works in anonymous GraphTraversals
 		std::string explain();
-		std::string explain(size_t indent);
+		std::string info();
 
 		// Finalizing steps
 

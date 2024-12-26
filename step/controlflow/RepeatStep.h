@@ -36,14 +36,22 @@ namespace gremlinxx {
                 if(!this->emitTraversal) throw std::runtime_error("Traversal does not have an emit traversal!");
                 return this->emitTraversal.value(); 
             }
+            inline bool hasEmitTraversal() { return emitTraversal.has_value(); }
 
             inline void setUntilTraversal(GraphTraversal untilTraversal) { this->untilTraversal.emplace(untilTraversal); }
             inline GraphTraversal& getUntilTraversal() { 
                 if(!this->untilTraversal) throw std::runtime_error("Traversal does not have an until traversal!");
                 return this->untilTraversal.value(); 
             }
+            inline bool hasUntilTraversal() { return untilTraversal.has_value(); }
 
-            inline void setTimes(size_t times) { *(this->times) = times; }
+            inline void setTimes(size_t times) { this->times.emplace(times); }
+            inline size_t getTimes() { 
+                if(!this->times) throw std::runtime_error("Traversal does not have a times parameter!");
+                return this->times.value();
+            }
+            inline bool hasTimes() { return times.has_value(); }
+
 
             virtual void apply(GraphTraversal* trv, gremlinxx::traversal::TraverserSet& traversers);
 

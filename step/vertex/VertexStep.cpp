@@ -51,7 +51,7 @@ namespace gremlinxx {
                         successors = maelstrom::vector(traverser_data.get_mem_type(), graph->get_vertex_dtype());
                         output_origin = maelstrom::vector();
                     } else {
-                        if(traverser_data.get_dtype() != graph->get_vertex_dtype()) throw std::runtime_error("Can only call out()/in() on vertices!");
+                        if(traverser_data.get_dtype() != graph->get_vertex_dtype()) throw std::domain_error("Can only call out()/in() on vertices!");
                         std::tie(
                             successors,
                             output_origin
@@ -64,7 +64,7 @@ namespace gremlinxx {
                         successors = maelstrom::vector(traverser_data.get_mem_type(), graph->get_edge_dtype());
                         output_origin = maelstrom::vector();
                     } else {
-                        if(traverser_data.get_dtype() != graph->get_vertex_dtype()) throw std::runtime_error("Can only call outE()/inE() on vertices!");
+                        if(traverser_data.get_dtype() != graph->get_vertex_dtype()) throw std::domain_error("Can only call outE()/inE() on vertices!");
                         std::tie(
                             successors,
                             output_origin
@@ -77,7 +77,7 @@ namespace gremlinxx {
                         successors = maelstrom::vector(traverser_data.get_mem_type(), graph->get_vertex_dtype());
                         output_origin = maelstrom::vector();
                     } else {
-                        if(traverser_data.get_dtype() != graph->get_edge_dtype()) throw std::runtime_error("Can only call outV()/inV() on edges!");
+                        if(traverser_data.get_dtype() != graph->get_edge_dtype()) throw std::domain_error("Can only call outV()/inV() on edges!");
                         std::tie(
                             successors,
                             output_origin

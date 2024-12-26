@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "structure/Edge.h"
 #include "structure/Vertex.h"
@@ -54,6 +55,12 @@ namespace gremlinxx {
 			// Traverses edges to their vertices.  Returns the resulting vertices (first element) and originating index (second element).
 			virtual std::pair<maelstrom::vector, maelstrom::vector> toV(maelstrom::vector& current_edges, Direction direction) = 0;
 
+			// Returns the degree of the given vertices (first element) and originating index (second element).  Has a default implementation of calling V and doing a group count.
+			virtual std::pair<maelstrom::vector, maelstrom::vector> degree(maelstrom::vector& current_vertices, std::vector<std::string>& labels, Direction direction);
+
+			// Constructs an independent edge-induced subgraph from the given edges.
+			virtual std::shared_ptr<Graph> subgraph(maelstrom::vector& edges) = 0;
+
 			/*
 				Sets the vertex properties of the given vertices to the given values.
 			*/
@@ -70,6 +77,16 @@ namespace gremlinxx {
 			virtual std::pair<maelstrom::vector, maelstrom::vector> get_vertex_properties(std::string property_name, maelstrom::vector& vertices, bool return_values=true) = 0;
 
 			virtual std::vector<std::string> get_vertex_property_names() = 0;
+
+			/*
+				Returns the number of vertices that have the given property.
+			*/
+            virtual size_t get_vertex_property_num_entries(std::string property_name) = 0;
+
+			/*
+				Returns the number of edges that have the given property.
+			*/
+            virtual size_t get_edge_property_num_entries(std::string property_name) = 0;
 
 			/*
 				Sets the edge properties of the given edges to the given values.
@@ -91,8 +108,26 @@ namespace gremlinxx {
 			virtual maelstrom::vector get_vertex_labels(maelstrom::vector& vertices) = 0;
 			virtual maelstrom::vector get_edge_labels(maelstrom::vector& edges) = 0;
 
+			/*
+				Sets the embedding of the specified vertices.  An embedding is a (# vertices) x (embedding dim) tensor.
+				If there is no embedding with the given name, a new embedding is automatically created and populated
+				with the default value for unspecified vertices.
+			*/
+			virtual void set_vertex_embeddings(std::string emb_name, maelstrom::vector& vertices, maelstrom::vector& embeddings, std::any default_val=0) = 0;
+
+			/*
+				Sets the embeddings of the specified contiguous chunk of vertices (from v_start, inclusive to v_end, inclusive).
+			*/
+			virtual void set_vertex_embeddings(std::string emb_name, size_t v_start, size_t v_end, maelstrom::vector& embeddings, std::any default_value = 0) = 0;
+
+			/*
+				Returns the embedding with the given name, if it exists.  Throws an error if it does not exist.
+			*/
+			virtual maelstrom::vector get_vertex_embeddings(std::string emb_name, maelstrom::vector& vertices) = 0;
+
 			virtual maelstrom::dtype_t get_vertex_dtype() = 0;
 			virtual maelstrom::dtype_t get_edge_dtype() = 0;
+
 	};
 	
 }

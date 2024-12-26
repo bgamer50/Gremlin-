@@ -30,6 +30,10 @@
 #include "step/controlflow/CoalesceStep.h"
 #include "step/controlflow/UnionStep.h"
 #include "step/property/PropertyStep.h"
+#include "step/embedding/EmbeddingStep.h"
+#include "step/embedding/SimilarityStep.h"
+#include "step/embedding/LikeStep.h"
+#include "step/embedding/EncodeStep.h"
 #include "step/graph/VStep.h"
 #include "step/modulate/ToStep.h"
 #include "step/graph/SubgraphStep.h"
@@ -44,6 +48,10 @@
 #include "step/controlflow/LoopsStep.h"
 #include "step/controlflow/RepeatStep.h"
 #include "step/math/MinStep.h"
+#include "step/filter/SampleStep.h"
+
+#include <chrono>
+#include <ctime>
 
 namespace gremlinxx {
 
@@ -52,7 +60,13 @@ namespace gremlinxx {
 	*/
 	GraphTraversal::GraphTraversal() {
 		this->source = nullptr;
-		this->traversers = {};
+		this->traversers = std::unique_ptr<gremlinxx::traversal::TraverserSet>();
+		this->steps = {};
+		this->traversal_properties = {};
+	}
+
+	GraphTraversal::~GraphTraversal() {
+		//if(this->source != nullptr) delete this->source;
 	}
 
 	/*
@@ -137,6 +151,8 @@ namespace gremlinxx {
 	*/
 	void GraphTraversal::getInitialTraversal() {
 		// Apply each strategy to this traversal's traversers.
+		if(this->source == nullptr) return;
+		
 		for(auto& strategy : this->source->getStrategies()) {
 			strategy(this->steps);
 		}
@@ -182,11 +198,16 @@ namespace gremlinxx {
 	}
 
 	GraphTraversal& GraphTraversal::V() {
-		return this->appendStep(new VStep({}));
+		std::vector<std::any> empty;
+		return this->appendStep(new VStep(empty));
 	}
 
 	GraphTraversal& GraphTraversal::V(Vertex vertex) {
 		return this->appendStep(new VStep({vertex.id}));
+	}
+
+	GraphTraversal& GraphTraversal::V(maelstrom::vector vertices) {
+		return this->appendStep(new VStep(vertices));
 	}
 
 	GraphTraversal& GraphTraversal::V(std::vector<Vertex> vertices) {
@@ -199,12 +220,20 @@ namespace gremlinxx {
 		return this->appendStep(new VStep({std::any(v_id)}));
 	}
 
+	GraphTraversal& GraphTraversal::from(GraphTraversal fromTraversal) {
+		return this->appendStep(new FromStep(fromTraversal));
+	}
+
 	GraphTraversal& GraphTraversal::from(std::string sideEffectLabel) {
 		return this->appendStep(new FromStep(sideEffectLabel));
 	}
 
 	GraphTraversal& GraphTraversal::from(Vertex fromVertex) {
 		return this->appendStep(new FromStep(fromVertex));
+	}
+
+	GraphTraversal& GraphTraversal::to(GraphTraversal toTraversal) {
+		return this->appendStep(new ToStep(toTraversal));
 	}
 
 	GraphTraversal& GraphTraversal::to(std::string sideEffectLabel) {
@@ -218,6 +247,10 @@ namespace gremlinxx {
 	// Modulator for valuemap and others
 	GraphTraversal& GraphTraversal::by(std::any arg) {
 		return this->appendStep(new ByStep(arg));
+	}
+
+	GraphTraversal& GraphTraversal::by(std::any arg, gremlinxx::Order order) {
+		return this->appendStep(new ByStep(std::make_pair(arg, order)));
 	}
 
 	GraphTraversal& GraphTraversal::both() {
@@ -396,6 +429,10 @@ namespace gremlinxx {
 		return this->appendStep(new LimitStep(the_limit));
 	}
 
+	GraphTraversal& GraphTraversal::sample(size_t sample_size) {
+		return this->appendStep(new SampleStep(sample_size));
+	}
+
 	GraphTraversal& GraphTraversal::inject(std::vector<std::any> injects) {
 		return this->appendStep(new InjectStep(injects));
 	}
@@ -408,18 +445,64 @@ namespace gremlinxx {
 		return this->appendStep(new LoopsStep());
 	}
 
-	std::string GraphTraversal::explain() {
-		return this->explain(0);
+	GraphTraversal& GraphTraversal::encode(std::string emb_name) {
+		return this->appendStep(new EncodeStep(emb_name));
 	}
 
-	std::string GraphTraversal::explain(size_t indent) {
-		std::string ind = "";
-		for(size_t k = 0; k < indent; ++k) ind += "  ";
+	GraphTraversal& GraphTraversal::embedding(std::string emb_name, maelstrom::vector emb, std::any default_val) {
+		return this->appendStep(new EmbeddingStep(emb_name, emb, default_val));
+	}
+	
+	GraphTraversal& GraphTraversal::similarity(std::string emb_name, std::vector<maelstrom::vector>& embedding_values) {
+		return this->appendStep(new SimilarityStep(emb_name, embedding_values));
+	}
 
-		if(this->source != nullptr) this->getInitialTraversal();
+	GraphTraversal& GraphTraversal::like(std::string emb_name, std::vector<maelstrom::vector>& embs, double threshold, std::optional<size_t> count) {
+		return this->appendStep(new LikeStep(emb_name, embs, threshold, count, maelstrom::COSINE));
+	}
 
-		std::string explanation = "GraphTraversal {\n";
-		for(int k = 0; k < this->steps.size(); k++) explanation += ind + this->steps[k]->getInfo() + "\n";
+	GraphTraversal& GraphTraversal::like(std::string emb_name, std::vector<maelstrom::vector>& embs, size_t count) {
+		return this->appendStep(new LikeStep(emb_name, embs, std::nullopt, count, maelstrom::COSINE));
+	}
+
+	std::string GraphTraversal::explain() {
+		std::stringstream sx;
+		sx << "Traversal Explanation" << std::endl;
+		for(size_t k = 0; k < 60; ++k) sx << "=";
+		sx << std::endl;
+
+		const size_t col_width = 60;
+		std::string s = "Original Traversal";
+		while(s.size() < col_width + 8) s += " ";
+		sx << s << this->info() << std::endl;
+
+		if(this->source != nullptr) {
+			for(auto& strategy : this->source->getStrategies()) {
+				strategy(this->steps);
+
+				std::string strat = strategy.name;
+				while(strat.length() < col_width) strat += " ";
+				strat += "[" + strategy_type_names[strategy.type].substr(0,1) + "]";
+				for(size_t k = 0; k < 5; ++k) strat += " ";
+				sx << strat << this->info() << std::endl;
+			}
+		}
+
+		sx << std::endl;
+		std::string f = "Final Traversal";
+		while(f.length() < col_width + 8) f += " ";
+		sx << f << this->info();
+
+		return sx.str();
+	}
+
+	std::string GraphTraversal::info() {
+		std::string explanation = "GraphTraversal {";
+		
+		if(!this->steps.empty()) {
+			for(int k = 0; k < this->steps.size() - 1; k++) explanation += this->steps[k]->getInfo(this) + ", ";
+			explanation += this->steps[this->steps.size() - 1]->getInfo(this);
+		}
 
 		return explanation + "}";
 	}
@@ -450,7 +533,7 @@ namespace gremlinxx {
 		auto data_host = maelstrom::as_host_vector(data);
 		
 		for(size_t k = 0; k < data_host.size(); ++k) {
-			auto data_k = data.get(k);
+			auto data_k = data_host.get(k);
 			func(data_k);
 		}
 
@@ -468,8 +551,15 @@ namespace gremlinxx {
 				std::cerr << "# traversers: " << this->traversers->size() << std::endl;
 				std::cerr << "step: 0x" << std::hex << step->uid << std::dec << std::endl;
 				std::cerr << step->getInfo() << std::endl;
+
+				auto start = std::chrono::system_clock::now();
+				step->apply(this, *this->traversers);
+				auto end = std::chrono::system_clock::now();
+				
+				std::cerr << "exec time: " << static_cast<std::chrono::duration<double>>(end - start).count() << "seconds" << std::endl;
+			} else {			
+				step->apply(this, *this->traversers);
 			}
-			step->apply(this, *this->traversers);
 		}
 
 		this->has_iterated = true;

@@ -9,4 +9,8 @@ namespace gremlinxx {
 
     GraphTraversal EmitStep::getTraversal() { return this->traversal; }
 
+    std::string EmitStep::getInfo() {
+        return "EmitStep{traversal}";
+    }
+
 }

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "step/TraversalStep.h"
-#include <vector>
+#include "strategy/TraversalStrategy.h"
 
 namespace gremlinxx {
-    void subgraph_step_completion_strategy(std::vector<TraversalStep*>& steps);
+
+    extern TraversalStrategy SubgraphStepCompletionStrategy;
+
 }

@@ -5,9 +5,14 @@
 #include "structure/Vertex.h"
 #include "structure/Edge.h"
 #include "strategy/RepeatStepCompletionStrategy.h"
+#include "strategy/RepeatUnrollStrategy.h"
 #include "strategy/ByModulatingStrategy.h"
 #include "strategy/FromToModulatingStrategy.h"
 #include "strategy/LimitSupportingStrategy.h"
+#include "strategy/NoOpRemovalStrategy.h"
+#include "strategy/SubgraphStepCompletionStrategy.h"
+#include "strategy/HasJoinStrategy.h"
+#include "strategy/BasicPatternExtractionStrategy.h"
 
 #include "traversal/BasicTraverserSet.h"
 #include "step/graph/VStep.h"
@@ -20,10 +25,15 @@ namespace gremlinxx {
 
 	GraphTraversalSource::GraphTraversalSource(Graph* gr) {
 		graph = gr;
-		this->withStrategy(repeat_step_completion_strategy);
-		this->withStrategy(by_modulating_strategy);
-		this->withStrategy(from_to_modulating_strategy);
-		this->withStrategy(limit_supporting_strategy);
+		this->withStrategy(RepeatStepCompletionStrategy);
+		this->withStrategy(RepeatUnrollStrategy);
+		this->withStrategy(ByModulatingStrategy);
+		this->withStrategy(FromToModulatingStrategy);
+		this->withStrategy(HasJoinStrategy);
+		this->withStrategy(LimitSupportingStrategy);
+		this->withStrategy(NoOpRemovalStrategy);
+		this->withStrategy(BasicPatternExtractionStrategy);
+		this->withStrategy(SubgraphStepCompletionStrategy);
 		
 		this->withTypeRegistration(std::type_index(typeid(uint64_t)), maelstrom::uint64);
 		this->withTypeRegistration(std::type_index(typeid(uint32_t)), maelstrom::uint32);
@@ -40,6 +50,22 @@ namespace gremlinxx {
 
 	GraphTraversalSource* GraphTraversalSource::withStrategy(TraversalStrategy strategy) {
 		this->strategies.push_back(strategy);
+		return this;
+	}
+
+	GraphTraversalSource* GraphTraversalSource::withoutStrategy(TraversalStrategy strategy) {
+		auto it = std::find_if(
+			this->strategies.begin(),
+			this->strategies.end(),
+			[&strategy](TraversalStrategy& ts){return (ts.name == strategy.name);}
+		);
+		this->strategies.erase(it);
+
+		return this;
+	}
+
+	GraphTraversalSource* GraphTraversalSource::withoutStrategies() {
+		this->strategies.clear();
 		return this;
 	}
 
@@ -82,8 +108,9 @@ namespace gremlinxx {
 	}
 
 	GraphTraversal GraphTraversalSource::V() {
+		std::vector<std::any> empty;
 		GraphTraversal trv(this);
-		trv.appendStep(new VStep({}));
+		trv.appendStep(new VStep(empty));
 		return trv;
 	}
 
@@ -99,6 +126,13 @@ namespace gremlinxx {
 		return trv;
 	}
 
+	GraphTraversal GraphTraversalSource::V(maelstrom::vector vertices) {
+		GraphTraversal trv(this);
+
+		trv.appendStep(new VStep(vertices));
+		return trv;
+	}
+
 	GraphTraversal GraphTraversalSource::V(std::vector<Vertex> vertices) {
 		GraphTraversal trv(this);
 		
@@ -106,6 +140,12 @@ namespace gremlinxx {
 		v_ids.reserve(vertices.size());
 		for(Vertex& v : vertices) v_ids.push_back(v.id);
 
+		trv.appendStep(new VStep(v_ids));
+		return trv;
+	}
+
+	GraphTraversal GraphTraversalSource::V(std::vector<std::any> v_ids) {
+		GraphTraversal trv(this);
 		trv.appendStep(new VStep(v_ids));
 		return trv;
 	}

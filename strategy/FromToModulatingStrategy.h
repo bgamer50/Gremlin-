@@ -2,8 +2,10 @@
 #include <vector>
 #include <memory>
 
-#include "step/TraversalStep.h"
+#include "strategy/TraversalStrategy.h"
 
 namespace gremlinxx {
-    void from_to_modulating_strategy(std::vector<std::shared_ptr<TraversalStep>>& steps);
+
+    extern TraversalStrategy FromToModulatingStrategy;
+    
 }
