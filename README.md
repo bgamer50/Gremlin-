@@ -1,6 +1,8 @@
-Version 1.0.3 (Expected June 2024)
+Version 1.1.0 (December 2024)
 
 This release of Gremlin++ adds better support for traversal strategies as well as Python bindings.
+These improvements are documented in the paper "Accelerating Graph Query Languages for Machine
+Learning and Retrieval Augmented Generation", published at KGBigData at IEEE BigData 2024.
 
 ---------------------------------------------------------------
 
